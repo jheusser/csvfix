@@ -1,0 +1,1 @@
+$CSVED eval -e '($1 + $2)/2' data/numbers.csv

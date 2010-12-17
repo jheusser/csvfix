@@ -1,0 +1,13 @@
+# test find ad remove
+$CSVED find -e GB -f 1  data/countries.csv 
+$CSVED remove -e GB -f 1  data/countries.csv 
+$CSVED find -f 2 -e 'GB' -n data/cities.csv
+$CSVED find -f 2 -e '.*'  data/f2empty.csv
+$CSVED find -f 2 -e '^$'  data/f2empty.csv
+$CSVED find -r A:H -f 1  data/countries.csv 
+$CSVED find -r 10:50 -f 2  data/numbers.csv 
+$CSVED find -l 1:5 -f 1  data/cities.csv 
+$CSVED find -l 5 -f 1  data/cities.csv 
+$CSVED find -fc 3 data/varfields.csv 
+$CSVED find -fc 1 data/varfields.csv 
+$CSVED remove -fc 1 data/varfields.csv 
