@@ -1,3 +1,6 @@
+readme.txt
+----------
+
 This is the source for csvfix and the supporting alib library.
 This mercurial repository has not yet been tested - the scripts,
 makefiles etct. it contains almost certainly won't work. The C++ 
