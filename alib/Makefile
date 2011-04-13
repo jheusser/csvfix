@@ -39,5 +39,5 @@ lin: $(OBJS) $(EXPAT)
 .PHONY: clean
 
 clean:
-	rm -f $(ODIR)/*.o $(OUT)
+	rm lib/* obj/* 
 
