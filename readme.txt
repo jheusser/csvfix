@@ -2,12 +2,11 @@ readme.txt
 ----------
 
 This is the source for csvfix and the supporting alib library.
-This mercurial repository has not yet been tested - the scripts,
-makefiles etct. it contains almost certainly won't work. The C++ 
-source should be OK, however.
+To build, enter the command "make win" for a Windows build 
+or "make lin" for a Linux/Unix build.
 
 Neil Butterworth
-17-Dec-2010
+13-April-2012
 
 
 

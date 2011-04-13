@@ -92,5 +92,5 @@ lin:
 
 .PHONY: clean
 clean:
-	rm -f $(ODIR)/*.o $(OUT)
+	rm -f bin/* obj/* 
 
