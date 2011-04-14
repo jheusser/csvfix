@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------
 // a_debug.h
 //
-// Debug stuff for alib
+// Debug stuff for alib - windows only
 //
 // Copyright (C) 2008 Neil Butterworth
 //------------------------------------------------------------------------
@@ -9,7 +9,7 @@
 #ifndef INC_A_DEBUG_H
 #define INC_A_DEBUG_H
 
-#include <windows.h>
+#include "a_win.h"
 #include <sstream>
 
 namespace ALib {
@@ -17,6 +17,8 @@ namespace ALib {
 }
 
 //----------------------------------------------------------------------------
+
+#ifdef WINNT
 
 #define DBGMSG( msg_ ) 												\
 {																	\
@@ -35,6 +37,8 @@ namespace ALib {
 	MessageBox( 0, ALib::debug_os_.str().c_str(),					\
 				  "ALib Debug", MB_ICONASTERISK | MB_OK );			\
 }
+
+#endif
 
 //----------------------------------------------------------------------------
 
