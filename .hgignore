@@ -3,3 +3,7 @@ syntax: glob
 *.exe
 csvfix/test/tmp
 *.a
+alib/lib
+alib/obj
+csvfix/bin
+csvfix/obj
