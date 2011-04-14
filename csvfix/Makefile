@@ -37,6 +37,7 @@ _OBJS = csved_atable.o \
 		csved_find.o \
 		csved_fixed.o \
 		csved_flatten.o \
+		csved_fromxml.o \
 		csved_inter.o \
 		csved_ioman.o \
 		csved_join.o \
