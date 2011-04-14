@@ -6,7 +6,6 @@ ALIB=alib
 CSVFIX=csvfix
 TEMP=csvfix-build
 ZIPPER="C:\Program Files\7-Zip\7z.exe"
-ZIP=csvfix-build.zip
 
 error() {
 	echo "ERROR: $*"
@@ -22,6 +21,17 @@ create_dir() {
 	cp $1/inc/*.h "$TEMP/$1/inc"
 	cp $1/Makefile "$TEMP/$1"
 }
+
+if [ "$1" = "" ]
+then
+	error "need to specify name of output zip file"
+fi
+
+if [ -d "$1" -o -f "$1" ]
+then
+	error "$1 already exists" 
+fi
+ZIPOUT=$1
 
 if [ ! -d "$ALIB" ]
 then
@@ -40,7 +50,7 @@ fi
 
 if mkdir "$TEMP"
 then
-	echo "copying files...."
+	echo "copying files..."
 	create_dir "$CSVFIX" 
 	create_dir "$ALIB" 
 	cp Makefile "$TEMP"
@@ -50,10 +60,15 @@ then
 	mkdir "$TEMP/$ALIB/expat"
 	cp $ALIB/expat/*.h "$TEMP/$ALIB/expat" 
 	cp $ALIB/expat/*.cpp "$TEMP/$ALIB/expat" 
-	echo "created new directory structre in $TEMP"
-	"C:\Program Files\7-Zip\7z.exe" a -tzip csvfix.zip $TEMP
-	echo "removing temporary files"
-	rm -rf $TEMP
+	echo "creating zip file $ZIPOUT..."
+	if "$ZIPPER" a -tzip $ZIPOUT $TEMP > /dev/null
+	then
+		echo "removing temporary files..."
+		rm -rf $TEMP
+		echo "$ZIPOUT created succesfully"
+	else
+		error "zip operation failed"
+	fi
 else
 	error "failed to create $TEMP directory"
 fi
