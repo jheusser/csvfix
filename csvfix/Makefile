@@ -47,6 +47,7 @@ _OBJS = csved_atable.o \
 		csved_printf.o \
 		csved_put.o \
 		csved_readmulti.o \
+		csved_rmnewline.o \
 		csved_rules.o \
 		csved_seq.o \
 		csved_shuffle.o \
