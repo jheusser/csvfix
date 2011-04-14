@@ -1,0 +1,60 @@
+# uspack
+#
+# produce source code zip for csvfix
+
+ALIB=alib
+CSVFIX=csvfix
+TEMP=csvfix-build
+ZIPPER="C:\Program Files\7-Zip\7z.exe"
+ZIP=csvfix-build.zip
+
+error() {
+	echo "ERROR: $*"
+	exit 1
+}
+
+create_dir() {
+	mkdir "$TEMP/$1"
+	mkdir "$TEMP/$1/src"
+	mkdir "$TEMP/$1/inc"
+	mkdir "$TEMP/$1/obj"
+	cp $1/src/*.cpp "$TEMP/$1/src"
+	cp $1/inc/*.h "$TEMP/$1/inc"
+	cp $1/Makefile "$TEMP/$1"
+}
+
+if [ ! -d "$ALIB" ]
+then
+	error "$ALIB directory not found"
+fi
+
+if [ ! -d "$CSVFIX" ]
+then
+	error "$CSVFIX directory not found"
+fi
+
+if [ -d "$TEMP" ]
+then
+	error "$TEMP directory already exist"
+fi
+
+if mkdir "$TEMP"
+then
+	echo "copying files...."
+	create_dir "$CSVFIX" 
+	create_dir "$ALIB" 
+	cp Makefile "$TEMP"
+	cp LICENSE readme.txt "$TEMP"
+	mkdir "$TEMP/$CSVFIX/bin"
+	mkdir "$TEMP/$ALIB/lib"
+	mkdir "$TEMP/$ALIB/expat"
+	cp $ALIB/expat/*.h "$TEMP/$ALIB/expat" 
+	cp $ALIB/expat/*.cpp "$TEMP/$ALIB/expat" 
+	echo "created new directory structre in $TEMP"
+	"C:\Program Files\7-Zip\7z.exe" a -tzip csvfix.zip $TEMP
+	echo "removing temporary files"
+	rm -rf $TEMP
+else
+	error "failed to create $TEMP directory"
+fi
+

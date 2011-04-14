@@ -6,7 +6,7 @@ To build, enter the command "make win" for a Windows build
 or "make lin" for a Linux/Unix build.
 
 Neil Butterworth
-13-April-2012
+13-April-2011
 
 
 
