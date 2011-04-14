@@ -12,6 +12,7 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
+					<Add option="-std=c++0x" />
 					<Add option="-g" />
 				</Compiler>
 			</Target>
@@ -101,6 +102,7 @@
 		<Unit filename="inc\csved_printf.h" />
 		<Unit filename="inc\csved_put.h" />
 		<Unit filename="inc\csved_readmulti.h" />
+		<Unit filename="inc\csved_rmnewline.h" />
 		<Unit filename="inc\csved_rules.h" />
 		<Unit filename="inc\csved_seq.h" />
 		<Unit filename="inc\csved_shuffle.h" />
@@ -148,6 +150,7 @@
 		<Unit filename="src\csved_printf.cpp" />
 		<Unit filename="src\csved_put.cpp" />
 		<Unit filename="src\csved_readmulti.cpp" />
+		<Unit filename="src\csved_rmnewline.cpp" />
 		<Unit filename="src\csved_rules.cpp" />
 		<Unit filename="src\csved_seq.cpp" />
 		<Unit filename="src\csved_shuffle.cpp" />
@@ -324,6 +327,15 @@
 			<code_completion />
 			<debugger />
 			<envvars />
+			<DoxyBlocks>
+				<comment_style block="0" line="0" />
+				<doxyfile_project />
+				<doxyfile_build />
+				<doxyfile_warnings />
+				<doxyfile_output />
+				<doxyfile_dot />
+				<general />
+			</DoxyBlocks>
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>
