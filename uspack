@@ -13,6 +13,7 @@ error() {
 }
 
 create_dir() {
+	echo "copying $1 ..."
 	mkdir "$TEMP/$1"
 	mkdir "$TEMP/$1/src"
 	mkdir "$TEMP/$1/inc"
@@ -20,6 +21,12 @@ create_dir() {
 	cp $1/src/*.cpp "$TEMP/$1/src"
 	cp $1/inc/*.h "$TEMP/$1/inc"
 	cp $1/Makefile "$TEMP/$1"
+}
+
+create_tests() {
+	echo "copying tests..."
+	cp -r $1/test "$TEMP/$1"
+	rm -f $TEMP/$1/test/tmp/*
 }
 
 if [ "$1" = "" ]
@@ -50,8 +57,9 @@ fi
 
 if mkdir "$TEMP"
 then
-	echo "copying files..."
+	echo "creating temporary directories..."
 	create_dir "$CSVFIX" 
+	create_tests "$CSVFIX"
 	create_dir "$ALIB" 
 	cp Makefile "$TEMP"
 	cp LICENSE readme.txt "$TEMP"
