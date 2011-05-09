@@ -42,7 +42,6 @@
 			</Environment>
 		</Build>
 		<Compiler>
-			<Add option="-pedantic-errors" />
 			<Add option="-g" />
 			<Add directory="inc" />
 			<Add directory="expat" />
