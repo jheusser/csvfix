@@ -7,3 +7,5 @@ alib/lib
 alib/obj
 csvfix/bin
 csvfix/obj
+*.layout
+*.depend

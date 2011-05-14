@@ -39,5 +39,5 @@ lin: $(OBJS) $(EXPAT)
 .PHONY: clean
 
 clean:
-	rm -f lib/* obj/* 
+	rm -rf lib/* obj/*  
 
