@@ -101,10 +101,11 @@ void SeqCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 				<< " must be integer" );
 	}
 
-	if ( (mCol = ALib::ToInteger( sn ) - 1 ) < 0 ) {
+	if ( ALib::ToInteger( sn ) - 1  < 0 ) {
 		CSVTHROW( "Field number specified by " << FLAG_COLS
 				<< " must be 1 or greater" );
 	}
+	mCol = ALib::ToInteger( sn ) - 1;
 
 	sn = cmd.GetValue( FLAG_NUM, "1" );
 	if ( sn != "" && ! ALib::IsInteger( sn) ) {
@@ -118,10 +119,11 @@ void SeqCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 		CSVTHROW( "Padding specified by " << FLAG_PAD
 				<< " must be integer" );
 	}
-	if ( (mPad = ALib::ToInteger( sn )) < 0 ) {
+	if ( ALib::ToInteger( sn ) < 0 ) {
 		CSVTHROW( "Padding specified by " << FLAG_PAD
 				<< " must be 0 or greater" );
 	}
+	mPad = ALib::ToInteger( sn );
 
 	sn = cmd.GetValue( FLAG_INC, "1" );
 	if ( sn != "" && ! ALib::IsInteger( sn) ) {

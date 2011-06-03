@@ -131,10 +131,10 @@ int TruncPadBase :: Execute( ALib::CommandLine & cmd ) {
 		}
 		ncolspec = true;
 		string nv = cmd.GetValue( FLAG_NUM );
-		ncols = ALib::ToInteger( nv, "-n flag needs integer value" );
-		if ( ncols < 0 ) {
+		if ( ALib::ToInteger( nv, "-n flag needs integer value" ) < 0 ) {
 			CSVTHROW( FLAG_NUM << " needs value greater or equal to zero" );
 		}
+		ncols = ALib::ToInteger( nv );
 	}
 
 	IOManager io( cmd );

@@ -67,7 +67,7 @@ OrderCommand ::	OrderCommand( const string & name,
 // find the current field name ordering, if one exists.
 //----------------------------------------------------------------------------
 
-void OrderCommand :: OnNewCSVStream( const string & filename,
+void OrderCommand :: OnNewCSVStream( const string &,
 										const ALib::CSVStreamParser * p ) {
 	if ( mOrderNames.Size() != 0 ) {
 		mOrder.clear();

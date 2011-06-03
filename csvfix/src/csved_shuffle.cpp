@@ -81,10 +81,11 @@ void ShuffleCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 	if ( ! ALib::IsInteger( sn )) {
 		CSVTHROW( "Value for " << FLAG_NUM << " must be integeer" );
 	}
-	mCount = ALib::ToInteger( sn );
-	if ( mCount < 0 ) {
+
+	if ( ALib::ToInteger( sn ) < 0 ) {
 		CSVTHROW( "Value for " << FLAG_NUM << " must be zero or greater" );
 	}
+	mCount = ALib::ToInteger( sn );
 
 	string sr = cmd.GetValue( FLAG_RSEED, "-1" );
 	if ( ! ALib::IsInteger( sr ) ) {

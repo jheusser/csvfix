@@ -313,8 +313,8 @@ FieldsRule :: FieldsRule( const string & name,
 // Never called - all work done in  apply
 //---------------------------------------------------------------------------
 
-ValidationResult FieldsRule :: Validate( const CSVRow & row,
-										unsigned int idx ) const {
+ValidationResult FieldsRule :: Validate( const CSVRow &,
+										unsigned int ) const {
 	return ValidationResult();
 }
 
@@ -496,8 +496,8 @@ ValidationRule::Results LookupRule :: Apply( const CSVRow & row ) const {
 // This is never called - all work done in Apply()
 //---------------------------------------------------------------------------
 
-ValidationResult LookupRule :: Validate( const CSVRow & row,
-											unsigned int idx ) const {
+ValidationResult LookupRule :: Validate( const CSVRow &,
+											unsigned int  ) const {
 	return ValidationResult();
 }
 

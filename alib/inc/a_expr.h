@@ -34,7 +34,7 @@ class ExprToken {
 		ExprToken( ETType type, const std::string & value, int prec = -1 )
 			: mType( type ), mValue( value ), mPrec( prec ) {}
 
-		const ETType Type() const {
+		ETType Type() const {
 			return mType;
 		}
 

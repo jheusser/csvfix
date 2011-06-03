@@ -79,10 +79,10 @@ void SplitBase :: GetCommonFlags( ALib::CommandLine & cl ) {
 	if ( ! ALib::IsInteger( nf ) ) {
 		CSVTHROW( "Field specified by " << FLAG_COLS << " must be integer" );
 	}
-	mField = ALib::ToInteger( nf ) - 1;
-	if ( mField < 0 ) {
+	if ( ALib::ToInteger( nf ) - 1 < 0 ) {
 		CSVTHROW( "Invalid field index: " << nf );
 	}
+	mField = ALib::ToInteger( nf ) - 1;
 }
 
 //---------------------------------------------------------------------------
