@@ -9,3 +9,4 @@ csvfix/bin
 csvfix/obj
 *.layout
 *.depend
+csvfix/tests/tmp
