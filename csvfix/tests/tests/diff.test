@@ -1,0 +1,4 @@
+$CSVED diff data/n1.csv data/n1.csv
+$CSVED diff data/n1.csv data/n2.csv
+$CSVED diff data/n1.csv data/n3.csv
+$CSVED diff data/n3.csv data/n1.csv
