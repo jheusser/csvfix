@@ -78,6 +78,7 @@
 		<Unit filename="inc\csved_cli.h" />
 		<Unit filename="inc\csved_command.h" />
 		<Unit filename="inc\csved_date.h" />
+		<Unit filename="inc\csved_diff.h" />
 		<Unit filename="inc\csved_dsv.h" />
 		<Unit filename="inc\csved_echo.h" />
 		<Unit filename="inc\csved_edit.h" />
@@ -125,6 +126,7 @@
 		<Unit filename="src\csved_cli.cpp" />
 		<Unit filename="src\csved_command.cpp" />
 		<Unit filename="src\csved_date.cpp" />
+		<Unit filename="src\csved_diff.cpp" />
 		<Unit filename="src\csved_dsv.cpp" />
 		<Unit filename="src\csved_echo.cpp" />
 		<Unit filename="src\csved_edit.cpp" />
