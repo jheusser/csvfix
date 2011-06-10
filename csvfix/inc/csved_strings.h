@@ -33,6 +33,7 @@ const char * const CMD_FIND		= "find";
 const char * const CMD_FIXREAD	= "read_fixed";
 const char * const CMD_FIXWRITE	= "write_fixed";
 const char * const CMD_FLATTEN	= "flatten";
+const char * const CMD_FMERGE	= "fmerge";
 const char * const CMD_FROMXML	= "from_xml";
 const char * const CMD_FSPLIT	= "file_split";
 const char * const CMD_JOIN		= "join";
