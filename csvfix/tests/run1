@@ -97,7 +97,7 @@ then
 		echo "Created correct output"
 		exit 0
 	else
-		echo "Execution problem with $TEST - please correct"
+		echo "Execution problem with $TEST -c - please correct"
 		exit 1
 	fi
 fi

@@ -16,6 +16,8 @@ namespace CSVED {
 
 class DiffCommand : public Command {
 
+	friend class Differ;
+
 	public:
 
 		DiffCommand( const std::string & name,

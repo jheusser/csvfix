@@ -173,7 +173,7 @@ class Differ {
 
 	public:
 
-		Differ();
+		Differ( const DiffCommand * cmd );
 		Results Diff( const CSVList & src, const CSVList & dest );
 		void Display( const Results & r, IOManager & io ) const;
 
@@ -188,10 +188,13 @@ class Differ {
 		bool AddChanges( Results & r, int dest, int nextdest, int src, int nextsrc );
 		Results MakeReport();
 
+		bool NotEq( const CSVRow & src, const CSVRow & dest ) const;
+
 		const CSVList * mSrc;
 		const CSVList * mDest;
 		Results mMatches;
 		StateList mStates;
+		const DiffCommand * mCmd;
 };
 
 
@@ -257,6 +260,7 @@ static void ReadCSV( IOManager & io, int index, CSVList & csvlist ) {
 
 int DiffCommand :: Execute( ALib::CommandLine & cmd ) {
 
+	ProcessFlags( cmd );
 	IOManager io( cmd );
 	if ( io.InStreamCount() != 2 ) {
 		CSVTHROW( "diff needs two input files" );
@@ -266,7 +270,7 @@ int DiffCommand :: Execute( ALib::CommandLine & cmd ) {
 	ReadCSV( io, 0, src );
 	ReadCSV( io, 1, dest );
 
-	Differ differ;
+	Differ differ( this );
 
 	const Results & r = differ.Diff( src, dest );
 
@@ -293,7 +297,7 @@ void DiffCommand :: ProcessFlags( ALib::CommandLine & cmd ) {
 
 //----------------------------------------------------------------------------
 
-Differ :: Differ () : mSrc( 0 ), mDest( 0 ) {
+Differ :: Differ ( const DiffCommand * cmd ) : mSrc( 0 ), mDest( 0 ), mCmd( cmd ) {
 }
 
 
@@ -313,10 +317,43 @@ Results Differ :: Diff( const CSVList & src, const CSVList & dest ) {
 	return r;
 }
 
+//----------------------------------------------------------------------------
+// Helper to get field from row or return empty field
+//----------------------------------------------------------------------------
+
+static string GetField( const CSVRow & row, unsigned int index ) {
+	if ( index >= row.size() ) {
+		return "";
+	}
+	else {
+		return row[ index ];
+	}
+}
+
+//----------------------------------------------------------------------------
+// Helper to do comparison possibly using user supplied field list
+//----------------------------------------------------------------------------
+
+bool Differ :: NotEq( const CSVRow & src, const CSVRow & dest ) const {
+	if ( mCmd->mFields.size() ) {
+		for ( unsigned int  i = 0; i < mCmd->mFields.size(); i++ ) {
+			string ss = GetField( src,  mCmd->mFields[i]  );
+			string ds = GetField( dest,  mCmd->mFields[i]  );
+			if ( ss != ds ) {
+				return true;
+			}
+		}
+		return false;
+	}
+	else {
+		return src != dest;	 // vector comparison
+	}
+}
+
 int Differ :: SourceMatchLen( int di, int si, int maxlen ) const {
 	int matchcount = 0;
 	for ( ; matchcount < maxlen; matchcount++ ) {
-		if ( mDest->At( di + matchcount) != mSrc->At( si + matchcount ) ) {
+		if ( NotEq( mDest->At( di + matchcount), mSrc->At( si + matchcount ) ) ) {
 			break;
 		}
 	}
