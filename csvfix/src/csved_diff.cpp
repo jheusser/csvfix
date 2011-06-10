@@ -1,7 +1,14 @@
 //---------------------------------------------------------------------------
 // csved_diff.cpp
 //
-// diff two csv files
+// diff two csv files.
+//
+// This code is adapted from that presented in this article:
+//
+//    http://www.codeproject.com/KB/recipes/diffengine.aspx
+//
+// I'm still in the process of converting it, but the current code
+// does work. Lack of comments is my fault.
 //
 // Copyright (C) 2009 Neil Butterworth
 //---------------------------------------------------------------------------
@@ -197,7 +204,15 @@ static RegisterCommand <DiffCommand> rc1_(
 	"compare two CSV files"
 );
 
+//----------------------------------------------------------------------------
+// Flag used to indicate no diff output wanted, just return value.
+//----------------------------------------------------------------------------
+
 const char * const FLAG_QUIET = "-q";
+
+//----------------------------------------------------------------------------
+// Help
+//----------------------------------------------------------------------------
 
 const char * const DIFF_HELP = {
 	"compare two CSV files and display differences\n"
@@ -208,6 +223,9 @@ const char * const DIFF_HELP = {
 	"#ALL"
 };
 
+//----------------------------------------------------------------------------
+// The diff command
+//----------------------------------------------------------------------------
 
 DiffCommand :: DiffCommand( const string & name, const string & desc )
 				: Command( name, desc, DIFF_HELP ), mReport( true ) {
@@ -216,6 +234,10 @@ DiffCommand :: DiffCommand( const string & name, const string & desc )
 	AddFlag( ALib::CommandLineFlag( FLAG_QUIET, false, 0 ) );
 
 }
+
+//----------------------------------------------------------------------------
+// Helper to read the indexed input stream into a CSVList
+//----------------------------------------------------------------------------
 
 static void ReadCSV( IOManager & io, int index, CSVList & csvlist ) {
 
@@ -227,8 +249,13 @@ static void ReadCSV( IOManager & io, int index, CSVList & csvlist ) {
 	}
 }
 
-int DiffCommand :: Execute( ALib::CommandLine & cmd ) {
+//----------------------------------------------------------------------------
+// Read the two input files (source and destination in the parlance of the
+// adapted code) and produce a diff. Diff format is currently of my
+// own devising!
+//----------------------------------------------------------------------------
 
+int DiffCommand :: Execute( ALib::CommandLine & cmd ) {
 
 	IOManager io( cmd );
 	if ( io.InStreamCount() != 2 ) {
@@ -242,10 +269,17 @@ int DiffCommand :: Execute( ALib::CommandLine & cmd ) {
 	Differ differ;
 
 	const Results & r = differ.Diff( src, dest );
-	differ.Display( r, io );
 
-	return 0;
+	if ( mReport ) {
+		differ.Display( r, io );
+	}
+
+	return Differ::Same( r ) ? 0 : 1;
 }
+
+//----------------------------------------------------------------------------
+// Get command line options
+//----------------------------------------------------------------------------
 
 void DiffCommand :: ProcessFlags( ALib::CommandLine & cmd ) {
 
