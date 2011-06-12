@@ -14,6 +14,8 @@
 
 #include <string>
 #include <vector>
+#include <memory>
+
 using std::string;
 
 namespace CSVED {
@@ -51,12 +53,50 @@ FMergeCommand :: FMergeCommand( const string & name, const string & desc )
 
 }
 
+bool FMergeCommand :: GetARow( CSVRow & row ) {
+
+	for ( unsigned int i = 0; i < mInputs.size(); i++ ) {
+		if ( mInputs[i]->ParseNext( row ) ) {
+			return true;
+		}
+	}
+	return false;
+
+}
+
+bool FMergeCommand :: OutputOneRow( IOManager & io ) {
+
+	for ( unsigned int i = 0; i < mInputs.size(); i++ ) {
+
+		if ( mInputs[i] ->ParseNext( row ) ) {
+
+		}
+}
 
 int FMergeCommand :: Execute( ALib::CommandLine & cmd ) {
 
 	ProcessFlags( cmd );
 	IOManager io( cmd );
-	return 0;
+
+	mInputs.clear();
+	for ( unsigned int i = 0; i < io.InStreamCount(); i++ ) {
+		mInputs.push_back( SpType( io.CreateStreamParser( i ) ) );
+	}
+
+	CSVRow arow;
+	if ( ! GetARow( arow ) ) {
+		ATHROW( "Empty inputs" );
+	}
+	mOutStack.push( arow );
+
+	while ( OutputOneRow( io ) {
+
+	}
+
+}
+
+bool FMergeCommand :: HaveInput() const {
+	return mInputs.size() != 0;
 }
 
 //----------------------------------------------------------------------------

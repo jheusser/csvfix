@@ -92,6 +92,7 @@
 		<Unit filename="inc\csved_find.h" />
 		<Unit filename="inc\csved_fixed.h" />
 		<Unit filename="inc\csved_flatten.h" />
+		<Unit filename="inc\csved_fmerge.h" />
 		<Unit filename="inc\csved_fromxml.h" />
 		<Unit filename="inc\csved_inter.h" />
 		<Unit filename="inc\csved_ioman.h" />
@@ -140,6 +141,7 @@
 		<Unit filename="src\csved_find.cpp" />
 		<Unit filename="src\csved_fixed.cpp" />
 		<Unit filename="src\csved_flatten.cpp" />
+		<Unit filename="src\csved_fmerge.cpp" />
 		<Unit filename="src\csved_fromxml.cpp" />
 		<Unit filename="src\csved_inter.cpp" />
 		<Unit filename="src\csved_ioman.cpp" />
