@@ -65,12 +65,7 @@ bool FMergeCommand :: GetARow( CSVRow & row ) {
 }
 
 bool FMergeCommand :: OutputOneRow( IOManager & io ) {
-
-	for ( unsigned int i = 0; i < mInputs.size(); i++ ) {
-
-		if ( mInputs[i] ->ParseNext( row ) ) {
-
-		}
+	return true;
 }
 
 int FMergeCommand :: Execute( ALib::CommandLine & cmd ) {
@@ -89,15 +84,12 @@ int FMergeCommand :: Execute( ALib::CommandLine & cmd ) {
 	}
 	mOutStack.push( arow );
 
-	while ( OutputOneRow( io ) {
+	while ( OutputOneRow( io )  ){
 
 	}
 
 }
 
-bool FMergeCommand :: HaveInput() const {
-	return mInputs.size() != 0;
-}
 
 //----------------------------------------------------------------------------
 // Get command line options

@@ -31,7 +31,7 @@ class DiffCommand : public Command {
 		void ProcessFlags( ALib::CommandLine & cmd );
 
 		FieldList mFields;
-		bool mReport;
+		bool mReport, mTrim, mIgnoreCase;
 };
 
 }

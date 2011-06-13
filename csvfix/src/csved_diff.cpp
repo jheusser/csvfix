@@ -223,6 +223,8 @@ const char * const DIFF_HELP = {
 	"where flags are:\n"
 	"  -f fields\tfields to check for differences (default all)\n"
 	"  -q\t\tdo not report, only return same/different status\n"
+	"  -ic\t\tignore case when diffing\n"
+	"  -is\t\tignore leading and trailing spaces when diffing\n"
 	"#ALL"
 };
 
@@ -231,10 +233,14 @@ const char * const DIFF_HELP = {
 //----------------------------------------------------------------------------
 
 DiffCommand :: DiffCommand( const string & name, const string & desc )
-				: Command( name, desc, DIFF_HELP ), mReport( true ) {
+				: Command( name, desc, DIFF_HELP ),
+				  mReport( true ), mTrim( false ), mIgnoreCase( false ) {
 
 	AddFlag( ALib::CommandLineFlag( FLAG_COLS, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_QUIET, false, 0 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_ICASE, false, 0 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_ISPACE, false, 0 ) );
+
 
 }
 
@@ -288,6 +294,8 @@ int DiffCommand :: Execute( ALib::CommandLine & cmd ) {
 void DiffCommand :: ProcessFlags( ALib::CommandLine & cmd ) {
 
 	mReport = ! cmd.HasFlag( FLAG_QUIET );
+	mIgnoreCase = cmd.HasFlag( FLAG_ICASE );
+	mTrim = cmd.HasFlag( FLAG_ISPACE );
 	if ( cmd.HasFlag( FLAG_COLS ) ) {
 		ALib::CommaList cl( cmd.GetValue( FLAG_COLS ) );
 		CommaListToIndex( cl, mFields );
@@ -331,6 +339,23 @@ static string GetField( const CSVRow & row, unsigned int index ) {
 }
 
 //----------------------------------------------------------------------------
+// Helper to compare strings possibly uppercased and trimmed
+//----------------------------------------------------------------------------
+
+static bool Cmp( const string & src, const string & dest, bool ic, bool is ) {
+	string s = src, d = dest;
+	if ( ic ) {
+		s = ALib::Upper( s );
+		d = ALib::Upper( d );
+	}
+	if ( is ) {
+		s = ALib::Trim( s );
+		d = ALib::Trim( d );
+	}
+	return s != d;
+}
+
+//----------------------------------------------------------------------------
 // Helper to do comparison possibly using user supplied field list
 //----------------------------------------------------------------------------
 
@@ -339,16 +364,27 @@ bool Differ :: NotEq( const CSVRow & src, const CSVRow & dest ) const {
 		for ( unsigned int  i = 0; i < mCmd->mFields.size(); i++ ) {
 			string ss = GetField( src,  mCmd->mFields[i]  );
 			string ds = GetField( dest,  mCmd->mFields[i]  );
-			if ( ss != ds ) {
+			if ( Cmp( ss, ds, mCmd->mIgnoreCase, mCmd->mTrim )) {
 				return true;
 			}
 		}
 		return false;
 	}
 	else {
-		return src != dest;	 // vector comparison
+		unsigned int sz = std::max( src.size(), dest.size() );
+		for ( unsigned int  i = 0; i < sz; i++ ) {
+			string ss = GetField( src,  i  );
+			string ds = GetField( dest,  i  );
+			if ( Cmp( ss, ds, mCmd->mIgnoreCase, mCmd->mTrim )) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
+
+
+//----------------------------------------------------------------------------
 
 int Differ :: SourceMatchLen( int di, int si, int maxlen ) const {
 	int matchcount = 0;

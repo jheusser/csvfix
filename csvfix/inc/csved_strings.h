@@ -119,6 +119,7 @@ const char * const FLAG_IND		= "-in";
 const char * const FLAG_INVERT	= "-inv";
 const char * const FLAG_IGNBL		= "-ibl";
 const char * const FLAG_INDTAB	= "-it";
+const char * const FLAG_ISPACE	= "-is";
 const char * const FLAG_KEEP		= "-k";
 const char * const FLAG_KEY		= "-k";
 const char * const FLAG_LEN		= "-l";

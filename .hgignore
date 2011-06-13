@@ -10,3 +10,4 @@ csvfix/obj
 *.layout
 *.depend
 csvfix/tests/tmp
+*_build_log.html
