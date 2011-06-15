@@ -53,41 +53,18 @@ FMergeCommand :: FMergeCommand( const string & name, const string & desc )
 
 }
 
-bool FMergeCommand :: GetARow( CSVRow & row ) {
-
-	for ( unsigned int i = 0; i < mInputs.size(); i++ ) {
-		if ( mInputs[i]->ParseNext( row ) ) {
-			return true;
-		}
-	}
-	return false;
-
-}
-
-bool FMergeCommand :: OutputOneRow( IOManager & io ) {
-	return true;
-}
 
 int FMergeCommand :: Execute( ALib::CommandLine & cmd ) {
 
 	ProcessFlags( cmd );
 	IOManager io( cmd );
+	MinFinder mf( io );
+	CSVRow row;
 
-	mInputs.clear();
-	for ( unsigned int i = 0; i < io.InStreamCount(); i++ ) {
-		mInputs.push_back( SpType( io.CreateStreamParser( i ) ) );
+	while( mf.FindMin( row ) ) {
+		io.WriteRow( row );
 	}
-
-	CSVRow arow;
-	if ( ! GetARow( arow ) ) {
-		ATHROW( "Empty inputs" );
-	}
-	mOutStack.push( arow );
-
-	while ( OutputOneRow( io )  ){
-
-	}
-
+	return 0;
 }
 
 
@@ -104,6 +81,19 @@ void FMergeCommand :: ProcessFlags( ALib::CommandLine & cmd ) {
 }
 
 //----------------------------------------------------------------------------
+
+		typedef std::shared_ptr <ALib::CSVStreamParser> SpType;
+		typedef std::vector <SpType> SpVec;
+
+MinFinder :: MinFinder( IOManager & io ) : mIOMan( io ) {
+}
+
+MinFinder :: ~MinFinder() {
+}
+
+bool MinFinder :: FindMin( CSVRow & row ) {
+	return false;
+}
 
 } // namespace
 

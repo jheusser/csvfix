@@ -17,6 +17,20 @@
 
 namespace CSVED {
 
+class MinFinder {
+
+	public:
+
+		MinFinder( IOManager & io );
+		~MinFinder();
+
+		bool FindMin( CSVRow & row );
+
+	private:
+
+		IOManager & mIOMan;
+};
+
 class FMergeCommand : public Command {
 
 	public:
@@ -30,16 +44,10 @@ class FMergeCommand : public Command {
 	private:
 
 		void ProcessFlags( ALib::CommandLine & cmd );
-		bool GetARow( CSVRow & row );
-		bool OutputOneRow( class IOManager & io  );
 
 		FieldList mFields;
-		std::stack <CSVRow> mOutStack;
 
-		typedef std::shared_ptr <ALib::CSVStreamParser> SpType;
-		typedef std::vector <SpType> SpVec;
 
-		SpVec mInputs;
 };
 
 }
