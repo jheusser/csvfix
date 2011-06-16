@@ -20,7 +20,12 @@ using std::string;
 
 namespace CSVED {
 
-
+void DumpRow( const CSVRow & r ) {
+	for ( unsigned int i = 0; i < r.size(); i++ ) {
+		std::cout << r[i] << " ";
+	}
+	std::cout << std::endl;
+}
 //---------------------------------------------------------------------------
 // Register fmerge  command
 //---------------------------------------------------------------------------
@@ -53,11 +58,18 @@ FMergeCommand :: FMergeCommand( const string & name, const string & desc )
 
 }
 
+//----------------------------------------------------------------------------
+// Exec the command, merging all inputs into a single output.
+//----------------------------------------------------------------------------
 
 int FMergeCommand :: Execute( ALib::CommandLine & cmd ) {
 
 	ProcessFlags( cmd );
+
 	IOManager io( cmd );
+
+
+
 	MinFinder mf( io );
 	CSVRow row;
 
@@ -82,18 +94,72 @@ void FMergeCommand :: ProcessFlags( ALib::CommandLine & cmd ) {
 
 //----------------------------------------------------------------------------
 
-		typedef std::shared_ptr <ALib::CSVStreamParser> SpType;
-		typedef std::vector <SpType> SpVec;
 
-MinFinder :: MinFinder( IOManager & io ) : mIOMan( io ) {
+MinFinder :: MinFinder( IOManager & io ) {
+
+	for ( unsigned int i = 0; i < io.InStreamCount(); i++ ) {
+		mGetters.push_back( new RowGetter( io.CreateStreamParser( i ) ));
+
+	}
 }
 
 MinFinder :: ~MinFinder() {
+	for ( unsigned int i = 0; i < mGetters.size(); i++ ) {
+		delete mGetters[ i ];
+	}
 }
 
-bool MinFinder :: FindMin( CSVRow & row ) {
-	return false;
+bool MinFinder :: FindMin( CSVRow & rmin ) {
+
+	CSVRow row;
+	int gi = -1;
+
+	for ( unsigned int i = 0; i < mGetters.size(); i++ ) {
+		bool ok = mGetters[i]->Get( row );
+		if ( ok ) {
+			if ( gi == -1 || row <= rmin ) {
+				rmin = row;
+				gi = i;
+			}
+		}
+	}
+
+	if ( gi >= 0 ) {
+		mGetters[gi]->ClearLatch();
+	}
+
+	return gi >= 0;
 }
+
+
+RowGetter :: RowGetter( ALib::CSVStreamParser * p )
+				: mParser( p ), mDone( false ), mHave( false ) {
+
+}
+
+RowGetter :: ~RowGetter() {
+	delete mParser;
+}
+
+
+
+bool RowGetter :: Get( CSVRow & row ) {
+	if ( mHave ) {
+		row = mLatch;
+		return true;
+	}
+	else {
+		mDone = ! mParser->ParseNext( mLatch );
+		mHave = ! mDone;
+		row = mLatch;
+		return mHave;
+	}
+}
+
+void RowGetter :: ClearLatch() {
+	mHave = false;
+}
+
 
 } // namespace
 

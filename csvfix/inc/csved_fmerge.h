@@ -17,6 +17,23 @@
 
 namespace CSVED {
 
+class RowGetter {
+
+	public:
+
+		RowGetter( ALib::CSVStreamParser * p );
+		~RowGetter();
+
+		bool Get( CSVRow & row );
+		void ClearLatch();
+
+	private:
+
+		ALib::CSVStreamParser * mParser;
+		bool mDone, mHave;
+		CSVRow mLatch;
+};
+
 class MinFinder {
 
 	public:
@@ -28,7 +45,8 @@ class MinFinder {
 
 	private:
 
-		IOManager & mIOMan;
+		std::vector <RowGetter *> mGetters;
+
 };
 
 class FMergeCommand : public Command {

@@ -94,5 +94,5 @@ lin:
 
 .PHONY: clean
 clean:
-	rm -f bin/* obj/* 
+	rm -Rf bin/* obj/* 
 
