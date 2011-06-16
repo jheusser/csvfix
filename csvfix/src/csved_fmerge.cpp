@@ -65,12 +65,9 @@ FMergeCommand :: FMergeCommand( const string & name, const string & desc )
 int FMergeCommand :: Execute( ALib::CommandLine & cmd ) {
 
 	ProcessFlags( cmd );
-
 	IOManager io( cmd );
+	MinFinder mf( io, mFields );
 
-
-
-	MinFinder mf( io );
 	CSVRow row;
 
 	while( mf.FindMin( row ) ) {
@@ -93,9 +90,10 @@ void FMergeCommand :: ProcessFlags( ALib::CommandLine & cmd ) {
 }
 
 //----------------------------------------------------------------------------
+// Create row getters for all input sources
+//----------------------------------------------------------------------------
 
-
-MinFinder :: MinFinder( IOManager & io ) {
+MinFinder :: MinFinder( IOManager & io, const FieldList & f ) : mFields( f ){
 
 	for ( unsigned int i = 0; i < io.InStreamCount(); i++ ) {
 		mGetters.push_back( new RowGetter( io.CreateStreamParser( i ) ));
@@ -103,11 +101,19 @@ MinFinder :: MinFinder( IOManager & io ) {
 	}
 }
 
+//----------------------------------------------------------------------------
+// Delete all row getters
+//----------------------------------------------------------------------------
+
 MinFinder :: ~MinFinder() {
 	for ( unsigned int i = 0; i < mGetters.size(); i++ ) {
 		delete mGetters[ i ];
 	}
 }
+
+//----------------------------------------------------------------------------
+// Find least row and return it
+//----------------------------------------------------------------------------
 
 bool MinFinder :: FindMin( CSVRow & rmin ) {
 
@@ -117,7 +123,7 @@ bool MinFinder :: FindMin( CSVRow & rmin ) {
 	for ( unsigned int i = 0; i < mGetters.size(); i++ ) {
 		bool ok = mGetters[i]->Get( row );
 		if ( ok ) {
-			if ( gi == -1 || row <= rmin ) {
+			if ( gi == -1 ||  CmpRow( row, rmin, mFields ) < 1 ) {
 				rmin = row;
 				gi = i;
 			}
@@ -132,6 +138,10 @@ bool MinFinder :: FindMin( CSVRow & rmin ) {
 }
 
 
+//----------------------------------------------------------------------------
+// Getter encapsulates  astream parser and a latched input row
+//----------------------------------------------------------------------------
+
 RowGetter :: RowGetter( ALib::CSVStreamParser * p )
 				: mParser( p ), mDone( false ), mHave( false ) {
 
@@ -142,6 +152,10 @@ RowGetter :: ~RowGetter() {
 }
 
 
+//----------------------------------------------------------------------------
+// If there is anything in the latch, return that, else try to get a row
+// and return that.
+//----------------------------------------------------------------------------
 
 bool RowGetter :: Get( CSVRow & row ) {
 	if ( mHave ) {
@@ -155,6 +169,10 @@ bool RowGetter :: Get( CSVRow & row ) {
 		return mHave;
 	}
 }
+
+//----------------------------------------------------------------------------
+// Clear the latch - used if we have located the least row.
+//----------------------------------------------------------------------------
 
 void RowGetter :: ClearLatch() {
 	mHave = false;

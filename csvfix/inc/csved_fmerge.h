@@ -38,7 +38,7 @@ class MinFinder {
 
 	public:
 
-		MinFinder( IOManager & io );
+		MinFinder( IOManager & io, const FieldList & fields );
 		~MinFinder();
 
 		bool FindMin( CSVRow & row );
@@ -46,6 +46,7 @@ class MinFinder {
 	private:
 
 		std::vector <RowGetter *> mGetters;
+		const FieldList & mFields;
 
 };
 

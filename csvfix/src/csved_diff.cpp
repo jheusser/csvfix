@@ -325,18 +325,6 @@ Results Differ :: Diff( const CSVList & src, const CSVList & dest ) {
 	return r;
 }
 
-//----------------------------------------------------------------------------
-// Helper to get field from row or return empty field
-//----------------------------------------------------------------------------
-
-static string GetField( const CSVRow & row, unsigned int index ) {
-	if ( index >= row.size() ) {
-		return "";
-	}
-	else {
-		return row[ index ];
-	}
-}
 
 //----------------------------------------------------------------------------
 // Helper to compare strings possibly uppercased and trimmed

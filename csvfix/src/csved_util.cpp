@@ -9,6 +9,7 @@
 #include "a_base.h"
 #include "a_env.h"
 #include "a_str.h"
+#include "a_collect.h"
 #include "csved_util.h"
 #include "csved_except.h"
 
@@ -75,6 +76,43 @@ void CommaListToIndex( const ALib::CommaList & cl,
 	}
 }
 
+
+//---------------------------------------------------------------------------
+// Compare two CSV rows - return as for strcmp. If field list is provided,
+// compare oonly fields in list.
+//----------------------------------------------------------------------------
+
+int CmpRow( const CSVRow & a, const CSVRow & b, const FieldList & f ) {
+	unsigned int n = std::max( a.size(), b.size() );
+	for ( unsigned int i = 0; i < n; i++ ) {
+
+		if ( f.size() && ! ALib::Contains( f, i ) ) {
+			continue;
+		}
+
+		string fa = GetField( a, i );
+		string fb = GetField( b, i );
+
+		if ( fa == fb ) {
+			continue;
+		}
+		else if ( fa < fb ) {
+			return -1;
+		}
+		else {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+//----------------------------------------------------------------------------
+// Get field or empty string if field does not exist
+//----------------------------------------------------------------------------
+
+std:: string GetField( const CSVRow & row, unsigned int  i ) {
+	return i >= row.size() ? "" : row[i];
+}
 
 //---------------------------------------------------------------------------
 
