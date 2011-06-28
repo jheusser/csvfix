@@ -55,7 +55,7 @@ std::istream &  Executor:: Exec( const string & cmd  ) {
 	delete mStream;
 	mStream = new std::istringstream;
 
-	mPipe = popen( cmd.c_str(), "rt" );
+	mPipe = popen( cmd.c_str(), "r" );
 	int rv = 1;
 	if ( mPipe ) {
 		string s;
