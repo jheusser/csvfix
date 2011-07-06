@@ -11,3 +11,6 @@ csvfix/obj
 *.depend
 csvfix/tests/tmp
 *_build_log.html
+doc/output
+doc/HTML
+desktop.ini
