@@ -2,6 +2,7 @@
 // csved_split.cpp
 //
 // split single field to multple fields
+// can split on specific character or on transitions between char types
 //
 // Copyright (C) 2009 Neil Butterworth
 //---------------------------------------------------------------------------
@@ -17,6 +18,13 @@ using std::vector;
 
 namespace CSVED {
 
+//----------------------------------------------------------------------------
+// Transition split values
+//----------------------------------------------------------------------------
+
+const char * const FLAG_TRANA2N	= "-tan";
+const char * const FLAG_TRANN2A	= "-tna";
+
 //---------------------------------------------------------------------------
 // Register split command
 //---------------------------------------------------------------------------
@@ -29,7 +37,7 @@ static RegisterCommand <SplitFixed> rc1_(
 
 static RegisterCommand <SplitChar> rc2_(
 	CMD_SPLCHR,
-	"split at character"
+	"split at character or character type transition"
 );
 
 //----------------------------------------------------------------------------
@@ -47,11 +55,13 @@ const char * const FSPLIT_HELP = {
 };
 
 const char * const CSPLIT_HELP = {
-	"split CSV field at specific character(s)\n"
+	"split CSV field at specific character(s) or character type transition\n"
 	"usage: csvfix split_char  [flags] [file ...]\n"
 	"where flags are:\n"
-	"  -f field\tindex of the field to be split\n"
+	"  -f field\tindex of the field to be split (required)\n"
 	"  -c char\tcharacter to split at (default is space)\n"
+	"  -tcn\tsplit at first transition from character to number\n"
+	"  -tnc\tsplit at first transition from number to character\n"
 	"  -k\t\tretain field being split in output (default is discard it)\n"
 	"#ALL"
 };
@@ -126,11 +136,12 @@ int SplitFixed :: Execute( ALib::CommandLine & cmd ) {
 
 	GetCommonFlags( cmd );
 	string pos = cmd.GetValue( FLAG_POS );
+
 	if ( ALib::IsEmpty( pos ) ) {
 		CSVTHROW( "Need list of position pairs specified by " << FLAG_POS );
 	}
-
 	CreatePositions( pos );
+
 
 	IOManager io( cmd );
 	CSVRow row;
@@ -207,23 +218,35 @@ void SplitFixed :: AddPosition( const string & spos,
 //---------------------------------------------------------------------------
 
 SplitChar :: SplitChar( const string & name, const string & desc )
-	: SplitBase( name, desc, CSPLIT_HELP ) {
+	: SplitBase( name, desc, CSPLIT_HELP ), mTrans( stNone ) {
 	AddFlag( ALib::CommandLineFlag( FLAG_CHAR, false, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_TRANA2N, false, 0 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_TRANN2A, false, 0 ) );
 }
 
 //---------------------------------------------------------------------------
-// Get the character to split on, then split the field specified by the -f
-// flag for all inputs.
+// See if we are splitting on characters or transitions then do split.
 //---------------------------------------------------------------------------
 
 int SplitChar :: Execute( ALib::CommandLine & cmd ) {
 
 	GetCommonFlags( cmd );
-	string sc = cmd.GetValue( FLAG_CHAR, " " );
-	if ( sc == "" ) {
-		CSVTHROW( "Need characters specified by " << FLAG_CHAR );
+
+	if ( cmd.HasFlag( FLAG_TRANA2N ) || cmd.HasFlag( FLAG_TRANN2A ) ) {
+		if ( cmd.HasFlag( FLAG_TRANA2N ) && cmd.HasFlag( FLAG_TRANN2A ) ) {
+			CSVTHROW( "Only one of " << FLAG_TRANA2N << " or "
+							<< FLAG_TRANN2A << " allowed" );
+		}
+		mTrans = cmd.HasFlag( FLAG_TRANA2N ) ? stAlpha2Num : stNum2Alpha;
+		if ( cmd.HasFlag( FLAG_CHAR ) ) {
+			CSVTHROW( "Cannot specify both character and transiton ");
+		}
 	}
 	else {
+		string sc = cmd.GetValue( FLAG_CHAR, " " );
+		if ( sc == "" ) {
+			CSVTHROW( "Need characters specified by " << FLAG_CHAR );
+		}
 		mChars = ALib::UnEscape( sc );
 	}
 
@@ -231,7 +254,12 @@ int SplitChar :: Execute( ALib::CommandLine & cmd ) {
 	CSVRow row;
 
 	while( io.ReadCSV( row ) ) {
-		Split( row );
+		if ( mTrans == stNone ) {
+			Split( row );
+		}
+		else {
+			TransSplit( row );
+		}
 		io.WriteRow( row );
 	}
 
@@ -258,6 +286,34 @@ void SplitChar :: Split( CSVRow & row ) {
 	}
 	Insert( row, tmp );
 }
+
+//----------------------------------------------------------------------------
+// split fields on a transition for a alpha to numeric or vice versa.
+//----------------------------------------------------------------------------
+
+void SplitChar :: TransSplit( CSVRow & row ) {
+	string target = Field() < row.size() ? row[ Field() ] : "";
+	char last = 0;		// neither alpha nor digit
+	size_t i = 0;
+	while( i < target.size() ) {
+		char c = target[i];
+		if (
+			( mTrans == stAlpha2Num && std::isdigit( c ) && std::isalpha( last ) )
+			||
+			( mTrans == stNum2Alpha && std::isalpha( c ) && std::isdigit( last ) )
+		) {
+			CSVRow tmp;
+			tmp.push_back( target.substr( 0, i ) );
+			tmp.push_back( target.substr( i ) );
+			Insert( row, tmp );
+			return;
+		}
+		last = c;
+		i++;
+	}
+}
+
+//----------------------------------------------------------------------------
 
 } // end namespace
 

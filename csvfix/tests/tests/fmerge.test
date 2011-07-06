@@ -1,2 +1,2 @@
-$CSVED fmerge data/n1.csv data/n1.csv
-$CSVED fmerge data/n1.csv data/n2.csv
+$CSVED file_merge data/n1.csv data/n1.csv
+$CSVED file_merge data/n1.csv data/n2.csv

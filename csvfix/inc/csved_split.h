@@ -82,8 +82,13 @@ class SplitChar : public SplitBase {
 
 	private:
 
+		enum SplitTrans { stNone, stAlpha2Num, stNum2Alpha };
+
 		void Split( CSVRow & row );
+		void TransSplit( CSVRow & row );
+
 		std::string mChars;
+		SplitTrans mTrans;
 };
 
 //------------------------------------------------------------------------
