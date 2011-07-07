@@ -25,8 +25,8 @@ create_dir() {
 
 create_tests() {
 	echo "copying tests..."
-	cp -r $1/test "$TEMP/$1"
-	rm -f $TEMP/$1/test/tmp/*
+	cp -r $1/tests "$TEMP/$1"
+	rm -f $TEMP/$1/tests/tmp/*
 }
 
 if [ "$1" = "" ]

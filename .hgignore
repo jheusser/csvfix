@@ -14,3 +14,6 @@ csvfix/tests/tmp
 doc/output
 doc/HTML
 desktop.ini
+csvfix/installer/Files/*
+csvfix/installer/Output/*
+
