@@ -24,6 +24,7 @@ _OBJS = csved_atable.o \
 		csved_cli.o \
 		csved_command.o \
 		csved_date.o \
+		csved_diff.o \
 		csved_dsv.o \
 		csved_echo.o \
 		csved_edit.o \
@@ -37,6 +38,7 @@ _OBJS = csved_atable.o \
 		csved_find.o \
 		csved_fixed.o \
 		csved_flatten.o \
+		csved_fmerge.o \
 		csved_fromxml.o \
 		csved_inter.o \
 		csved_ioman.o \
