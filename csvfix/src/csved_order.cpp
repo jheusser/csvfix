@@ -58,7 +58,7 @@ OrderCommand ::	OrderCommand( const string & name,
 	AddFlag( ALib::CommandLineFlag( FLAG_EXCLF, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_REVCOLS, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_FNAMES, false, 1 ) );
-	AddFlag( ALib::CommandLineFlag( FLAG_NOCREATE, false, 0 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_NOCREAT, false, 0 ) );
 
 }
 
@@ -169,7 +169,7 @@ void OrderCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 					<< " flags (but only one)" );
 	}
 
-	mNoCreate = cmd.HasFlag( FLAG_NOCREATE );
+	mNoCreate = cmd.HasFlag( FLAG_NOCREAT );
 
 	if ( cmd.HasFlag( FLAG_COLS ) ||  cmd.HasFlag( FLAG_EXCLF )) {
 		mExclude = cmd.HasFlag( FLAG_EXCLF );

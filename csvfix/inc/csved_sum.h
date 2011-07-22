@@ -29,7 +29,7 @@ class SummaryCommand : public Command {
 
 	private:
 
-		enum Type { Average, Sum, Min, Max, Median, Mode, Frequency };
+		enum Type { Average, Sum, Min, Max, Median, Mode, Frequency, Size };
 
 		void DoMinMax( IOManager & io );
 		void DoSum( IOManager & io );
@@ -37,6 +37,10 @@ class SummaryCommand : public Command {
 		void DoFreq( IOManager & io );
 		void DoMedian( IOManager & io );
 		void DoMode( IOManager & io );
+
+		typedef std::map <int,std::pair<int,int> > SizeMap;
+		void RecordSizes( const CSVRow & row, SizeMap & sm );
+		void PrintSizes( IOManager & io, const SizeMap & sm );
 
 		void SumCols( std::vector <double> & sums );
 		unsigned int  CalcFreqs();
@@ -63,7 +67,7 @@ class SummaryCommand : public Command {
 		};
 
 		typedef std::map <std::string, FreqMapEntry> FreqMap;
-		FreqMap mFreqMap;
+			FreqMap mFreqMap;
 };
 
 //------------------------------------------------------------------------

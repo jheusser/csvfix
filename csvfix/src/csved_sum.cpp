@@ -42,6 +42,7 @@ const char * const SUM_HELP = {
 	"  -med fields\tcalculate median of fields\n"
 	"  -mod fields\tcalculate mode of fields\n"
 	"  -sum fields\tperform summation of fields\n"
+	"  -siz\t\tfind max and min lengths of all fields\n"
 	"  Note that only one of the above flags can be specified\n"
 	"#SMQ,SEP,IBL,IFN,OFL"
 };
@@ -61,6 +62,7 @@ SummaryCommand :: SummaryCommand( const string & name,
 	AddFlag( ALib::CommandLineFlag( FLAG_MEDIAN, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_MODE, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_SUM, false, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_SIZE, false, 0 ) );
 }
 
 //----------------------------------------------------------------------------
@@ -74,23 +76,62 @@ int SummaryCommand :: Execute( ALib::CommandLine & cmd ) {
 
 	CSVRow row;
 
+	SizeMap sizemap;
 	while( io.ReadCSV( row ) ) {
-		mRows.push_back( row );
+		if ( mType == Size ) {
+			RecordSizes( row, sizemap );
+		}
+		else {
+			mRows.push_back( row );
+		}
 	}
 
-	if ( mRows.size() == 0 ) {
-		CSVTHROW( "No input" );
+
+	if ( mType == Size ) {
+		PrintSizes( io, sizemap );
 	}
-
-	Summarise( io );
-
+	else {
+		if ( mRows.size() == 0 ) {
+			CSVTHROW( "No input" );
+		}
+		Summarise( io );
+	}
 	return 0;
+}
+
+//----------------------------------------------------------------------------
+// Find the min and max lengths of each field
+//----------------------------------------------------------------------------
+
+void SummaryCommand :: RecordSizes( const CSVRow & row, SizeMap & sm ) {
+	for ( unsigned int i = 0; i < row.size(); i++ ) {
+		int sz = row[i].size();
+		SizeMap::iterator pos = sm.find( i );
+		if ( pos == sm.end() ) {
+			sm[ i ] = std::make_pair( INT_MAX, 0 );
+		}
+		sm[i].first = std::min( sm[i].first, sz );
+		sm[i].second = std::max( sm[i].second, sz );
+	}
+}
+
+//----------------------------------------------------------------------------
+// Print field index and mn/max lengths
+//----------------------------------------------------------------------------
+
+void SummaryCommand :: PrintSizes( IOManager & io, const SizeMap & sm ) {
+	SizeMap::const_iterator it = sm.begin();
+	while( it != sm.end() ) {
+		io.Out() << it->first + 1 << ": "
+				 << it->second.first << "," << it->second.second
+				 << "\n";
+		++it;
+	}
 }
 
 //----------------------------------------------------------------------------
 // Dispatch depending on flag type. Only one flag is allowed.
 //----------------------------------------------------------------------------
-
 
 void SummaryCommand :: Summarise( IOManager & io ) {
 	if ( mType == Min || mType == Max ) {
@@ -450,6 +491,9 @@ void SummaryCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 	else if ( cmd.HasFlag( FLAG_SUM ) ) {
 		mType = Sum;
 		GetFields( cmd, FLAG_SUM );
+	}
+	else if ( cmd.HasFlag( FLAG_SIZE ) ) {
+		mType = Size;
 	}
 	else {
 		CSVTHROW( "Should never happen in SummaryCommand::ProcessFlags" );
