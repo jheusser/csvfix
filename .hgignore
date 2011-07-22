@@ -16,4 +16,4 @@ doc/HTML
 desktop.ini
 csvfix/installer/Files/*
 csvfix/installer/Output/*
-
+*.zip
