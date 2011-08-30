@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 // csved_date.cpp
 //
-// read and write dates
+// read and write dates in iso format
 //
 // Copyright (C) 2009 Neil Butterworth
 //---------------------------------------------------------------------------

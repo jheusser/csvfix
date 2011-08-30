@@ -120,7 +120,7 @@ string ExecCommand :: MakeCmd( const CSVRow & row ) {
 }
 
 //----------------------------------------------------------------------------
-// Called with pos set to first chaarcter of parameter after '%' inro char.
+// Called with pos set to first charcter of parameter after '%' intro char.
 // We allow MAX_PARAM parameters - actual number is not significant.
 //----------------------------------------------------------------------------
 
@@ -144,7 +144,9 @@ string ExecCommand :: MakeParam( const CSVRow & row, unsigned int  & pos ) {
 		if ( n < 0 || n > MAX_PARAM ) {
 			CSVTHROW( "Invalid parameter: %" << p );
 		}
-		return (unsigned int) n < row.size() ? row[n] : "";
+		return (unsigned int) n < row.size()
+					? ALib::Escape( row[n], "\\'\"", "\\" )
+					: "";
 	}
 	else {
 		ATHROW( "Invalid parameter" );

@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 // csved_atable.cpp
 //
-// connvert csv input to ascii art tables
+// convert csv input to ascii art tables
 //
 // Copyright (C) 2009 Neil Butterworth
 //---------------------------------------------------------------------------

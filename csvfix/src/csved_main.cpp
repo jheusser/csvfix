@@ -13,7 +13,7 @@ using namespace CSVED;
 
 //---------------------------------------------------------------------------
 // For Windows builds we need to do our own globbing. This is mostly handled
-// for us by alib, but we may need to explicitly tirn off globbing. The
+// for us by alib, but we may need to explicitly turn off globbing. The
 // following  is for MinGW; for MSVC++ you will need something el;se.
 //----------------------------------------------------------------------------
 
