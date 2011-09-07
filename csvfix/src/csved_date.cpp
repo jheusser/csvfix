@@ -43,7 +43,7 @@ const char * const DREAD_HELP = {
 	"where flags are:\n"
 	"  -f fields\tspecify fields using numeric field indexes\n"
 	"  -m mask\tspecifies order of date components in d/m/y form\n"
-	"  -cy year\tspecifies base year for 2-digiy year values\n"
+	"  -cy year\tspecifies base year for 2-digit year values\n"
 	"  -mn names\tspecifies month names - default is English months\n"
 	"  -bxl\t\tlist only records containing invalid dates\n"
 	"  -bdx\t\tsliently exclude records containing invalid dates\n"
@@ -395,7 +395,7 @@ MaskedDateReader :: MaskedDateReader( const string & mask,
 
 
 //---------------------------------------------------------------------------
-// Throw if not a valid masc character
+// Throw if not a valid mask character
 //---------------------------------------------------------------------------
 
 static char CheckMask( char c ) {

@@ -28,7 +28,7 @@ const char * const GEN_IBL = "  -ibl\t\tignore blank input lines\n";
 const char * const GEN_IFN = "  -ifn\t\tignore field name record\n";
 const char * const GEN_SMQ = "  -smq\t\tuse smart quotes on output\n";
 const char * const GEN_SQF = "  -sqf fields\tspecify fields that must be quoted\n";
-const char * const GEN_OFL	= "  -o file\twrite output to file, "
+const char * const GEN_OFL	= "  -o file\twrite output to file "
 									"rather than standard output\n";
 
 

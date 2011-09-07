@@ -95,7 +95,7 @@ string CaseBase :: Help() const {
 		"  -ifn\t\tignore field name record\n"
 		"  -smq\t\tuse smart quotes on output\n"
 		"  -sep sep\tspecify CSV field separator character\n"
-		"  -o file\twrite output to file, rather than standard output\n";
+		"  -o file\twrite output to file rather than standard output\n";
 	return s;
 }
 

@@ -35,7 +35,7 @@ const char * const ATABLE_HELP = {
 	"format input CSV data as 'ASCII art' table (output is not CSV)\n"
 	"usage: csvfix echo [flags] [file ...]\n"
 	"where flags are:\n"
-	"  -h head\tcomma-separated list of taable headers\n"
+	"  -h head\tcomma-separated list of table headers\n"
 	"\t\tuse '-h @' to interpret first input line as the header\n"
 	"  -ra fields	list of field indexes to right-align\n"
 	"#IBL,IFN,OFL"

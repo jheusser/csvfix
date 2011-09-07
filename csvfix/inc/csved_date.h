@@ -50,7 +50,7 @@ class MaskedDateReader {
 
 
 //---------------------------------------------------------------------------
-// Read a date in some user format int ISO yyyy-mm-dd formar
+// Read a date in some user format into ISO yyyy-mm-dd format
 //---------------------------------------------------------------------------
 
 
