@@ -34,9 +34,8 @@ const char * const CHECK_HELP = {
 	"usage: csvfix check [flags] [files ...]\n"
 	"where flags are:\n"
 	"  -rfc\t\tcheck against RFC standard\n"
-	"  -f\t\tprint out records that fail test\n"
-	"  -p \t\tprint out records that pass the test\n"
-	"  -sep s\tspecify CSV input field separator\n"
+	"  -x\t\tfilter out bad records\n"
+	"  -ni\t\tdon't print file/line info\n"
 	"  -o ofn\twrite output to ofn instead of standard output\n"
 };
 
@@ -120,7 +119,12 @@ bool CheckRecord( const string & line, const State * states )  {
 
 CheckCommand :: CheckCommand( const string & name,
 								const string & desc )
-		: Command( name, desc, CHECK_HELP ) {
+		: Command( name, desc, CHECK_HELP ),
+			mPrintFileInfo( true ), mFilterBad( false ), mRFC( false )  {
+
+	AddFlag( ALib::CommandLineFlag( FLAG_FILTBAD, false, 0 ));
+	AddFlag( ALib::CommandLineFlag( FLAG_NOINFO, false, 0 ));
+	AddFlag( ALib::CommandLineFlag( FLAG_RFC, false, 0 ));
 
 }
 
@@ -134,17 +138,26 @@ int CheckCommand :: Execute( ALib::CommandLine & cmd ) {
 
 	IOManager io( cmd );
 	string line;
+	int errors = 0;
 
 	while( io.ReadLine( line ) ) {
 		if ( CheckRecord( line, CSVFixTrans ) ) {
-			io.Out()  << "PASS: " << line << "\n";
+			if ( mFilterBad ) {
+				io.Out()  << line << "\n";
+			}
 		}
 		else {
-			io.Out()  << "FAIL: " << line << "\n";
+			errors++;
+			if ( ! mFilterBad ) {
+				if ( mPrintFileInfo ) {
+					io.Out()  << io.CurrentFileName() << ":"
+								<< io.CurrentLine()  << " ";
+				}
+				io.Out() << line << "\n";
+			}
 		}
 	}
-
-	return 0;
+	return errors == 0 ? 0 : 1;
 }
 
 
@@ -154,6 +167,9 @@ int CheckCommand :: Execute( ALib::CommandLine & cmd ) {
 //---------------------------------------------------------------------------
 
 void CheckCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
+	mRFC = cmd.HasFlag( FLAG_RFC );
+	mPrintFileInfo = ! cmd.HasFlag( FLAG_NOINFO );
+	mFilterBad = cmd.HasFlag( FLAG_FILTBAD );
 }
 
 
