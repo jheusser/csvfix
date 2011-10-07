@@ -18,6 +18,7 @@ namespace CSVED {
 //---------------------------------------------------------------------------
 
 const char * const CMD_ATABLE	= "ascii_table";
+const char * const CMD_CHECK	= "check";
 const char * const CMD_DIFF		= "diff";
 const char * const CMD_DREAD	= "date_iso";
 const char * const CMD_DFMT		= "date_format";
