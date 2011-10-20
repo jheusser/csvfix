@@ -36,7 +36,7 @@ const char * const SUM_HELP = {
 	"usage: csvfix shuffle [flags] [files ...]\n"
 	"where flags are:\n"
 	"  -avg fields\tcalculate numeric average of specified fields\n"
-	"  -freq fields\tprepend frequencies of specified fields to output\n"
+	"  -frq fields\tprepend frequencies of specified fields to output\n"
 	"  -max fields\tfind and display maximum of fields\n"
 	"  -min fields\tfind and display minimum of fields\n"
 	"  -med fields\tcalculate median of fields\n"
