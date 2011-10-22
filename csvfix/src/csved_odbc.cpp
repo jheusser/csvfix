@@ -42,23 +42,30 @@ const char * const OGET_HELP = {
 	"  -sql stmt\tSQL statement to execute to extract data\n"
 	"  -tbl table\textract all data from table  rather than usie SQL\n"
 	"  -ns null\tstring to use to represent nulls (default is empty string)\n"
-	"#SMQ,OFL"
+	"#SMQ,OFL,SEP,IFN"
 };
 
 //----------------------------------------------------------------------------
 // base command ctor
 //----------------------------------------------------------------------------
 
-ODBCCommand :: ODBCCommand( const string & name,
+ODBCGetCommand :: ODBCGetCommand( const string & name,
 								const string & desc )
 		: Command( name, desc, OGET_HELP ), mStatement( 0 ) {
+
+	AddFlag( ALib::CommandLineFlag( FLAG_SQLQ, false, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_SQLTBL, false, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_CONSTR, false, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_NULLSTR, false, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_DIR, false, 1 ) );
+
 }
 
 //----------------------------------------------------------------------------
 // Junk statement
 //----------------------------------------------------------------------------
 
-ODBCCommand :: ~ODBCCommand() {
+ODBCGetCommand :: ~ODBCGetCommand() {
 	delete mStatement;
 }
 
@@ -66,7 +73,7 @@ ODBCCommand :: ~ODBCCommand() {
 // connect to database using connection string
 //----------------------------------------------------------------------------
 
-void ODBCCommand :: Connect() {
+void ODBCGetCommand :: Connect() {
 	delete mStatement;
 	mStatement = 0;
 	if ( ! mConnection.Connect( mConnStr ) ) {
@@ -79,7 +86,7 @@ void ODBCCommand :: Connect() {
 // execute any SQL command
 //----------------------------------------------------------------------------
 
-void ODBCCommand :: Exec( const string & sql ) {
+void ODBCGetCommand :: Exec( const string & sql ) {
 	assert( mStatement );
 	if ( ! mStatement->Exec( sql ) ) {
 		CSVTHROW( "SQL error: " << mStatement->Error() );
@@ -90,61 +97,57 @@ void ODBCCommand :: Exec( const string & sql ) {
 // get statement
 //----------------------------------------------------------------------------
 
-ALib::DbStatement * ODBCCommand :: Stmt() {
+ALib::DbStatement * ODBCGetCommand :: Stmt() {
 	return mStatement;
 }
 
 //----------------------------------------------------------------------------
-// handle connection string params
+// Flags now considerably complicated by addition of the -dir parameter, which
+// requires we synthesise a connection string to use the ODBC text driver.
 //----------------------------------------------------------------------------
 
-void ODBCCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
-	mConnStr = cmd.GetValue( FLAG_CONSTR, "" );
-	if ( mConnStr == "" ) {
-		CSVTHROW( "Connection string cannot be empty" );
-	}
-}
-
-//----------------------------------------------------------------------------
-// get command reads data from database
-//----------------------------------------------------------------------------
-
-ODBCGetCommand :: ODBCGetCommand( const string & name,
-									const string & desc )
-	: ODBCCommand( name, desc ) {
-
-	AddFlag( ALib::CommandLineFlag( FLAG_SQLQ, false, 1 ) );
-	AddFlag( ALib::CommandLineFlag( FLAG_SQLTBL, false, 1 ) );
-	AddFlag( ALib::CommandLineFlag( FLAG_CONSTR, true, 1 ) );
-	AddFlag( ALib::CommandLineFlag( FLAG_NULLSTR, false, 1 ) );
-}
-
-//----------------------------------------------------------------------------
-// use base to connect and then read all rows converting to csv
-//----------------------------------------------------------------------------
-
-int ODBCGetCommand :: Execute( ALib::CommandLine & cmd ) {
-	ProcessFlags( cmd );
-
-	ODBCCommand::Connect();;
-	ODBCCommand::Exec( mSql );
-
-	ALib::DbRow row;
-	IOManager io( cmd );
-	Stmt()->SetNull( mNull );
-	while( Stmt()->Fetch( row ) ) {
-		io.WriteRow( row );
-	}
-	return 0;
-}
-
-//----------------------------------------------------------------------------
-// use base to process commnin flags then process sql command flag
-// if -sql flag value prefixed by '@', treat as file containing command
-//----------------------------------------------------------------------------
+const string TEXT_DRIVER = "DRIVER={Microsoft Text Driver (*.txt; *.csv)};";
 
 void ODBCGetCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
-	ODBCCommand::ProcessFlags( cmd );
+	if ( cmd.HasFlag( FLAG_DIR ) && cmd.HasFlag( FLAG_CONSTR ) ) {
+		CSVTHROW( "Can specify " << FLAG_DIR << " or " << FLAG_CONSTR << " but not both" );
+	}
+	if ( ! cmd.HasFlag( FLAG_DIR ) && ! cmd.HasFlag( FLAG_CONSTR ) ) {
+		CSVTHROW( "Must specify one of " << FLAG_DIR << " or " << FLAG_CONSTR );
+	}
+
+	if ( cmd.HasFlag( FLAG_DIR ) ) {
+		string dir = cmd.GetValue( FLAG_DIR, "" );
+		if ( dir == "" ) {
+			CSVTHROW( "Directory string cannot be empty" );
+		}
+		if ( ! ALib::DirExists( dir ) ) {
+			CSVTHROW( "No such directory as " << dir );
+		}
+		mConnStr = TEXT_DRIVER + "DEFAULTDIR=" + dir + ";";
+
+/*  separator & header stuff currently won't work with driver connect
+
+		string sep = cmd.GetValue( FLAG_CSVSEP, "," );
+		if ( cmd.HasFlag( FLAG_CSVSEPR) ) {
+			sep = cmd.GetValue( FLAG_CSVSEPR, "" );
+		}
+
+		mConnStr += "FORMAT=DELIMITED(" + sep + ");";
+		mConnStr += "COLNAMEHEADER=";
+		mConnStr += cmd.HasFlag( FLAG_ICNAMES ) ? "FALSE;" : "TRUE;";
+		std::cout << mConnStr << std::endl;
+*/
+
+	}
+	else {
+		mConnStr = cmd.GetValue( FLAG_CONSTR, "" );
+		if ( mConnStr == "" ) {
+			CSVTHROW( "Connection string cannot be empty" );
+		}
+	}
+
+
 
 	if ( cmd.HasFlag( FLAG_SQLTBL ) && cmd.HasFlag( FLAG_SQLQ ) ) {
 		CSVTHROW( "Cannot specify both " << FLAG_SQLTBL
@@ -174,6 +177,26 @@ void ODBCGetCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 					<< " or " << FLAG_SQLQ << " flags" );
 	}
 	mNull = cmd.GetValue( FLAG_NULLSTR, "NULL" );
+}
+
+
+//----------------------------------------------------------------------------
+// Connect, exec SQL, and then read all rows converting to csv
+//----------------------------------------------------------------------------
+
+int ODBCGetCommand :: Execute( ALib::CommandLine & cmd ) {
+	ProcessFlags( cmd );
+
+	Connect();;
+	Exec( mSql );
+
+	ALib::DbRow row;
+	IOManager io( cmd );
+	Stmt()->SetNull( mNull );
+	while( Stmt()->Fetch( row ) ) {
+		io.WriteRow( row );
+	}
+	return 0;
 }
 
 //----------------------------------------------------------------------------

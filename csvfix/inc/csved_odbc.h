@@ -19,48 +19,29 @@ namespace CSVED {
 // Base command handles connectivity
 //----------------------------------------------------------------------------
 
-class ODBCCommand : public Command {
-
-	public:
-
-		ODBCCommand( const std::string & name,
-						const std::string & desc );
-		~ODBCCommand();
-
-	protected:
-
-		void Connect();
-		void Exec( const std::string & sql );
-		ALib::DbStatement * Stmt();
-		void ProcessFlags( const ALib::CommandLine & cmd );
-
-	private:
-
-		ALib::DbConnection mConnection;
-		ALib::DbStatement * mStatement;
-
-		std::string mConnStr;
-};
-
-//----------------------------------------------------------------------------
-// Currently only inplement get command
-//----------------------------------------------------------------------------
-
-class ODBCGetCommand : public ODBCCommand {
+class ODBCGetCommand : public Command {
 
 	public:
 
 		ODBCGetCommand( const std::string & name,
 						const std::string & desc );
-
-		int Execute( ALib::CommandLine & cmd );
+		~ODBCGetCommand();
 
 	private:
 
+		void Connect();
+		void Exec( const std::string & sql );
+		ALib::DbStatement * Stmt();
 		void ProcessFlags( const ALib::CommandLine & cmd );
+		int Execute( ALib::CommandLine & cmd );
 
+		ALib::DbConnection mConnection;
+		ALib::DbStatement * mStatement;
+
+		std::string mConnStr;
 		std::string mSql, mNull;
 };
+
 
 //------------------------------------------------------------------------
 
