@@ -42,7 +42,7 @@ const char * const OGET_HELP = {
 	"  -sql stmt\tSQL statement to execute to extract data\n"
 	"  -tbl table\textract all data from table  rather than usie SQL\n"
 	"  -ns null\tstring to use to represent nulls (default is empty string)\n"
-	"#SMQ,OFL,SEP,IFN"
+	"#SMQ,OFL"
 };
 
 //----------------------------------------------------------------------------
@@ -125,20 +125,6 @@ void ODBCGetCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 			CSVTHROW( "No such directory as " << dir );
 		}
 		mConnStr = TEXT_DRIVER + "DEFAULTDIR=" + dir + ";";
-
-/*  separator & header stuff currently won't work with driver connect
-
-		string sep = cmd.GetValue( FLAG_CSVSEP, "," );
-		if ( cmd.HasFlag( FLAG_CSVSEPR) ) {
-			sep = cmd.GetValue( FLAG_CSVSEPR, "" );
-		}
-
-		mConnStr += "FORMAT=DELIMITED(" + sep + ");";
-		mConnStr += "COLNAMEHEADER=";
-		mConnStr += cmd.HasFlag( FLAG_ICNAMES ) ? "FALSE;" : "TRUE;";
-		std::cout << mConnStr << std::endl;
-*/
-
 	}
 	else {
 		mConnStr = cmd.GetValue( FLAG_CONSTR, "" );
