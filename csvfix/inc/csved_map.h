@@ -28,12 +28,14 @@ class MapCommand : public Command {
 	private:
 
 		void ProcessFlags( ALib::CommandLine & cmd );
-		void DoMapping( CSVRow & row );
+		void DoMapping();
 		void MapValue( std::string & val );
+		std::string Expand( const std::string & val );
 
 		bool mIgnoreCase;
 		ALib::CommaList mFrom, mTo;
 		FieldList mFields;
+		CSVRow mRow;
 
 };
 

@@ -64,32 +64,31 @@ int MapCommand :: Execute( ALib::CommandLine & cmd ) {
 	ProcessFlags( cmd );
 
 	IOManager io( cmd );
-	CSVRow row;
 
-	while( io.ReadCSV( row ) ) {
-		DoMapping( row );
-		io.WriteRow( row );
+	while( io.ReadCSV( mRow ) ) {
+		DoMapping();
+		io.WriteRow( mRow );
 	}
 
 	return 0;
 }
 
 //---------------------------------------------------------------------------
-// Do mapping for single row. If  alist of fields was not specified on
+// Do mapping for single row. If a list of fields was not specified on
 // command line, map all fields.
 //---------------------------------------------------------------------------
 
-void MapCommand :: DoMapping( CSVRow & row )  {
+void MapCommand :: DoMapping()  {
 
 	if ( mFields.size() == 0 ) {
-		for ( unsigned int i = 0; i < row.size(); i++ ) {
-			MapValue( row[i] );
+		for ( unsigned int i = 0; i < mRow.size(); i++ ) {
+			MapValue( mRow[i] );
 		}
 	}
 	else {
 		for ( unsigned int i = 0; i < mFields.size(); i++ ) {
-			if ( mFields[i] < row.size() ) {
-				MapValue( row[ mFields[i] ] );
+			if ( mFields[i] < mRow.size() ) {
+				MapValue( mRow[ mFields[i] ] );
 			}
 		}
 	}
@@ -108,13 +107,40 @@ void MapCommand :: MapValue( std::string & val ) {
 				val = "";
 			}
 			else if ( mTo.Size() == mFrom.Size() ) {
-				val = mTo.At( i );
+				val = Expand( mTo.At( i ) );
 			}
 			else {
-				val = mTo.At( mTo.Size() - 1 );
+				val = Expand( mTo.At( mTo.Size() - 1 ) );
 			}
 			break;
 		}
+	}
+}
+
+//----------------------------------------------------------------------------
+// Expand a value being mapped to, which may be a field specifier such as
+// $1, $2 etc. To quote the $, use $$, so $$1.00 will be returned as $1.00
+//----------------------------------------------------------------------------
+
+string MapCommand :: Expand( const string & val ) {
+	if ( ALib::Peek( val, 0 ) == '$'  ) {
+		string field = val.substr( 1 );
+		if ( ALib::Peek( field, 0 ) == '$' ) {
+			return field;
+		}
+		else {
+			if ( ! ALib::IsInteger( field ) ) {
+				CSVTHROW( "Invalid field specifier " << val );
+			}
+			int n = ALib::ToInteger( field ) - 1;
+			if ( n < 0 ) {
+				CSVTHROW( "Field numbers must be greater than zero at " << val );
+			}
+			return (unsigned int) n > mRow.size() ? "" : mRow[n];
+		}
+	}
+	else {
+		return val;
 	}
 }
 
@@ -134,7 +160,7 @@ void MapCommand :: ProcessFlags( ALib::CommandLine & cmd ) {
 
 	mFrom = ALib::CommaList( cmd.GetValue( FLAG_FROMV ));
 	if ( mFrom.Size() == 0 ) {
-		CSVTHROW( "Need from values specified by " << FLAG_FROMV );
+		mFrom.Append("");
 	}
 	mTo = ALib::CommaList( cmd.GetValue( FLAG_TOV ));
 	if ( mTo.Size() > mFrom.Size() ) {

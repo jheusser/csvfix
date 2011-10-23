@@ -863,9 +863,16 @@ const CommaList & CommaList :: Append ( const CommaList & cl ) {
 	return *this;
 }
 
+const CommaList & CommaList :: Append ( const string & s ) {
+	mItems.push_back( s ) ;
+	return *this;
+}
+
 bool CommaList :: Contains( const string & s ) const {
 	return ALib::Contains( mItems, s );
 }
+
+
 
 //---------------------------------------------------------------------------
 // Character ranges like a-z
