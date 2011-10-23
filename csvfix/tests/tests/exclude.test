@@ -1,0 +1,1 @@
+$CSVED exclude -f 1,3 data/names.csv 

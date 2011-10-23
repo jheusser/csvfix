@@ -1,0 +1,1 @@
+$CSVED printf -fmt 'Name: %10.10s %@ Sex: %s' data/names.csv

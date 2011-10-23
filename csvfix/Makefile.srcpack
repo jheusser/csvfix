@@ -1,0 +1,25 @@
+# Makefile
+# This is the Makefile referenced by srcpack.bash
+# Build alib then csvix
+
+null:
+	@echo "must use 'make win', 'make lin' or 'make clean'"	
+
+win: 
+	cd alib; make win
+	cd csvfix; make win
+	mkdir -p bin
+	rm -f bin/csvfix.exe
+	mv csvfix/bin/csvfix.exe ./bin
+
+lin: 
+	cd alib; make lin
+	cd csvfix; make lin
+	mkdir -p bin
+	rm -f bin/csvfix.exe
+	mv csvfix/bin/csvfix ./bin
+
+clean:
+	cd alib; make clean
+	cd csvfix; make clean
+	rm -f bin/csvfix*
