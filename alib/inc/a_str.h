@@ -280,6 +280,7 @@ class CommaList {
 		const std::string & At( unsigned int i ) const;
 		const std::vector <std::string> & Items() const;
 		const CommaList & Append ( const CommaList & cl );
+		const CommaList & Append ( const std::string & s );
 		bool Contains( const std::string & s ) const;
 
 	private:
