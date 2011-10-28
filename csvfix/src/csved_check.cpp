@@ -2,6 +2,7 @@
 // csved_check.cpp
 //
 // Check CSV records actually are CSV
+// Currently only supports single-line records
 //
 // Copyright (C) 2009 Neil Butterworth
 //---------------------------------------------------------------------------
@@ -93,7 +94,7 @@ int NextState( int start, char c, const State * states ) {
 }
 
 //----------------------------------------------------------------------------
-// Check a record using the state transitio table 'states'.
+// Check a record using the state transition table 'states'.
 //----------------------------------------------------------------------------
 
 bool CheckRecord( const string & line, const State * states )  {
