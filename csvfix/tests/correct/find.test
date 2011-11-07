@@ -22,6 +22,8 @@
 "one","two","three"
 "one","two","three"
 "one"
+"1","lower","lower case"
+"^$","empty"
 "one","two","three"
 "one","two","three"
 "one","two","three"

@@ -67,8 +67,21 @@ RegEx::Pos :: Pos( unsigned int start,
 	: mStart(start), mLen(len), mFound( found ) {
 }
 
+//----------------------------------------------------------------------------
+// Static helper to escape all characters in string
+//----------------------------------------------------------------------------
+
+string RegEx :: Escape( const string & s ) {
+	string r;
+	for ( unsigned int i = 0; i < s.size(); i++ ) {
+		r += '\\';
+		r += s[i];
+	}
+	return r;
+}
+
 //------------------------------------------------------------------------
-// Zweo-based starting position for a match
+// Zero-based starting position for a match
 //------------------------------------------------------------------------
 
 unsigned int RegEx::Pos :: Start() const {

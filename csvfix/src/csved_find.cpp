@@ -48,6 +48,7 @@ const char * const FIND_HELP = {
 	"  -fc count\tspecify field count to find\n"
 	"  -r range\trange to search for - multiople -r flags are allowed\n"
 	"  -ei expr\tas for -e flag, but search ignoring case\n"
+	"  -si expr\tas for -e flag, but don't treat expr as regex\n"
 	"  -n\t\toutput count of matched rows only\n"
 	"  -l length\t search for fields of given length (may be a range)\n"
 };
@@ -61,6 +62,7 @@ const char * const REMOVE_HELP = {
 	"  -fc count\tspecify field count to remove\n"
 	"  -r range\trange to search for - multiople -r flags are allowed\n"
 	"  -ei expr\tas for -e flag, but search ignoring case\n"
+	"  -si expr\tas for -e flag, but don't treat expr as regex\n"
 	"  -n\t\toutput count of non-matching rows only\n"
 	"  -l length\t search for fields of given length (may be a range)\n"
 };
@@ -73,12 +75,14 @@ FindCommand :: FindCommand( const string & name,
 							const string & desc )
 
 		: Command( name, desc ), mRemove( name == CMD_REMOVE ),
-			mCountOnly( false ), mMinFields( 0 ), mMaxFields( INT_MAX ) {
+			mCountOnly( false ),
+			mMinFields( 0 ), mMaxFields( INT_MAX ) {
 
 	AddFlag( ALib::CommandLineFlag( FLAG_COLS, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_EXPR, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_RANGE, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_EXPRIC, false, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_STRIC, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_NUM, false, 0 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_LEN, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_FCOUNT, false, 1 ) );
@@ -371,13 +375,14 @@ void FindCommand :: CreateRanges( const ALib::CommandLine & cmd ) {
 }
 
 //---------------------------------------------------------------------------
-// Get regexes from command line and compile them
+// Get regexes from command line and compile them. Three flags are possible;
+// -e (normal regex), -ei (ignore case regex), -si (respect case, not regex)
 //---------------------------------------------------------------------------
 
 void FindCommand :: CreateRegExes( const ALib::CommandLine & cmd ) {
 	for ( int i = 2; i < cmd.Argc(); i++ ) {	// skip exe name & command
 		string flag = cmd.Argv( i );
-		if ( flag != FLAG_EXPR && flag != FLAG_EXPRIC ) {
+		if ( flag != FLAG_EXPR && flag != FLAG_EXPRIC  && flag != FLAG_STRIC ) {
 			continue;
 		}
 		if ( i == cmd.Argc() - 1 ) {
@@ -385,15 +390,15 @@ void FindCommand :: CreateRegExes( const ALib::CommandLine & cmd ) {
 		}
 
 		string es = cmd.Argv( ++i );	// get expr and skip it
-		ALib::RegEx::CaseSense cs = flag == FLAG_EXPR
+		ALib::RegEx::CaseSense cs = (flag == FLAG_EXPR  || flag == FLAG_STRIC )
 									? ALib::RegEx::Sensitive
 									: ALib::RegEx::Insensitive;
 
-		ALib::RegEx * rep = new ALib::RegEx( es, cs );
+		ALib::RegEx * rep = new ALib::RegEx( flag == FLAG_STRIC
+												? ALib::RegEx::Escape( es )
+												: es, cs );
 		mExprs.push_back( rep );
 	}
-
-
 }
 
 //---------------------------------------------------------------------------
