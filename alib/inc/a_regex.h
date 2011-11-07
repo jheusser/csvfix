@@ -70,7 +70,6 @@ class RegEx {
 		void Clear();
 
 		std::string GetEncoding() const;
-
 		Pos ReplaceIn( std::string & s, const std::string & v,
 									unsigned int start = 0 );
 
@@ -80,6 +79,8 @@ class RegEx {
 
 		std::string SavedMatch( unsigned int i ) const;
 		unsigned int SavedMatchCount() const;
+
+		static std::string Escape( const std::string & s );
 
 	private:
 

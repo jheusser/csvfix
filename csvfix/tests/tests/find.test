@@ -10,4 +10,6 @@ $CSVED find -l 1:5 -f 1  data/cities.csv
 $CSVED find -l 5 -f 1  data/cities.csv 
 $CSVED find -fc 3 data/varfields.csv 
 $CSVED find -fc 1 data/varfields.csv 
+$CSVED find -f 2 -ei 'LoWer' data/ulcase.csv 
+$CSVED find -f 1 -si '^$' data/rechars.csv 
 $CSVED remove -fc 1 data/varfields.csv 
