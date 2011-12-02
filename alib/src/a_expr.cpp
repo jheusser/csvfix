@@ -1271,6 +1271,10 @@ DEFTEST( BoolTest ) {
 	FAILNE( s, "1" );
 	s = e.Evaluate( "1 && 0;" );
 	FAILNE( s, "0" );
+	s = e.Evaluate( "1 < 2" );
+	FAILNE( s, "1" );
+//	s = e.Evaluate( "2 > 1" );
+//	FAILNE( s, "1" );
 }
 
 DEFTEST( IsEmptyTest ) {
