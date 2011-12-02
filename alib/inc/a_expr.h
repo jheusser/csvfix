@@ -73,31 +73,18 @@ class Expression {
 		// type for functions within expression
 		typedef std::string (*FuncImpl)( const std::deque <std::string> & );
 
-		/// create empty expression - evaluation will fail
 		Expression();
 		~Expression();
 
-		/// Compile expression into internal format. Returns string containing
-		/// error message, or empty string on success.
 		std::string Compile( const std::string & expr );
 		bool IsCompiled() const;
 
-		/// Evaluate compiled expression returning string containg result
 		std::string Evaluate();
-
-		/// Wrapper to both compile and evaluate
 		std::string Evaluate( const std::string & expr );
 
-		/// Clear any positional ($1, $2 etc.) parameters
 		void ClearPosParams();
-
-		/// Add possitional parameter. Firsty is $1, second $2 and so on.
 		void AddPosParam( const std::string & s );
-
-		/// Clear all named variables
 		void ClearVars();
-
-		/// Add named variable with value
 		void AddVar( const std::string & name, const std::string & val );
 
 		struct AddFunc {
@@ -110,7 +97,6 @@ class Expression {
 			}
 		};
 
-		/// Add named function with function descriptor struct
 		static void AddFunction( const std::string & name, const AddFunc & f );
 		static bool ToBool( const std::string & s );
 
