@@ -581,19 +581,19 @@ ExprToken ExprTokeniser :: ReadOp() {
 	}
 
 	while( const char * p = Ops[i].mOp ) {
-		if ( mCurrent == p[0] ) {
+		int pl = std::strlen(p);
+		if ( pl == 1 && mCurrent == p[0] ) {
 			Next();
-			if ( std::strlen(p) == 2 ) {
-				if ( mCurrent == p[1] ) {
-					Next();
-				}
-				else {
-					continue;
-				}
-			}
 			mCanBeUnaryMinus = true;
 			return ExprToken( ExprToken::etOp, p, Ops[i].mPrec  );
 		}
+		else if ( pl == 2 && mCurrent == p[0] && Peek() == p[1] ) {
+			Next();
+			Next();
+			mCanBeUnaryMinus = true;
+			return ExprToken( ExprToken::etOp, p, Ops[i].mPrec  );
+		}
+
 		i++;
 	}
 
@@ -1271,10 +1271,16 @@ DEFTEST( BoolTest ) {
 	FAILNE( s, "1" );
 	s = e.Evaluate( "1 && 0;" );
 	FAILNE( s, "0" );
+	s = e.Evaluate( "1 || 0;" );
+	FAILNE( s, "1" );
 	s = e.Evaluate( "1 < 2" );
 	FAILNE( s, "1" );
-//	s = e.Evaluate( "2 > 1" );
-//	FAILNE( s, "1" );
+	s = e.Evaluate( "2 > 1" );
+	FAILNE( s, "1" );
+	s = e.Evaluate( "1 <= 2" );
+	FAILNE( s, "1" );
+	s = e.Evaluate( "2 >= 1" );
+	FAILNE( s, "1" );
 }
 
 DEFTEST( IsEmptyTest ) {
