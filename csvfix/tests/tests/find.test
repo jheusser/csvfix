@@ -13,3 +13,5 @@ $CSVED find -fc 1 data/varfields.csv
 $CSVED find -f 2 -ei 'LoWer' data/ulcase.csv 
 $CSVED find -f 1 -si '^$' data/rechars.csv 
 $CSVED remove -fc 1 data/varfields.csv 
+$CSVED find -if '$2 == "GB" || $2 == "FR"' data/cities.csv 
+$CSVED find -if 'len($1) > 5' data/names.csv 
