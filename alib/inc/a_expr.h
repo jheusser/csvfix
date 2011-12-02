@@ -80,6 +80,7 @@ class Expression {
 		/// Compile expression into internal format. Returns string containing
 		/// error message, or empty string on success.
 		std::string Compile( const std::string & expr );
+		bool IsCompiled() const;
 
 		/// Evaluate compiled expression returning string containg result
 		std::string Evaluate();
@@ -109,7 +110,7 @@ class Expression {
 			}
 		};
 
-		/// Add anmed function with function descriptor struct
+		/// Add named function with function descriptor struct
 		static void AddFunction( const std::string & name, const AddFunc & f );
 		static bool ToBool( const std::string & s );
 

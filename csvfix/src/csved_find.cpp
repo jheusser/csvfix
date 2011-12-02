@@ -50,7 +50,8 @@ const char * const FIND_HELP = {
 	"  -ei expr\tas for -e flag, but search ignoring case\n"
 	"  -si expr\tas for -e flag, but don't treat expr as regex\n"
 	"  -n\t\toutput count of matched rows only\n"
-	"  -l length\t search for fields of given length (may be a range)\n"
+	"  -l length\tsearch for fields of given length (may be a range)\n"
+	"  -if expr\tonly output line if eval expression evaluates to true\n"
 };
 
 const char * const REMOVE_HELP = {
@@ -65,7 +66,16 @@ const char * const REMOVE_HELP = {
 	"  -si expr\tas for -e flag, but don't treat expr as regex\n"
 	"  -n\t\toutput count of non-matching rows only\n"
 	"  -l length\t search for fields of given length (may be a range)\n"
+	"  -if expr\tdon't output line if eval expression evaluates to true\n"
 };
+
+//----------------------------------------------------------------------------
+// Names of variables for expression evaluation
+//----------------------------------------------------------------------------
+
+const char * const LINE_VAR = "line";	// var containing current line no
+const char * const FILE_VAR = "file";	// var containing current file name
+const char * const FIELD_VAR = "fields"; // var containing CSV field count
 
 //------------------------------------------------------------------------
 // Standard comand ctor
@@ -86,6 +96,7 @@ FindCommand :: FindCommand( const string & name,
 	AddFlag( ALib::CommandLineFlag( FLAG_NUM, false, 0 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_LEN, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_FCOUNT, false, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_IF, false, 1 ) );
 }
 
 //---------------------------------------------------------------------------
@@ -131,11 +142,20 @@ int FindCommand :: Execute( ALib::CommandLine & cmd ) {
 	CreateLengths( cmd );
 	CreateFieldCounts( cmd );
 
-	if ( (! HaveRegex()) && (! cmd.HasFlag( FLAG_FCOUNT )) ) {
+	if ( cmd.HasFlag( FLAG_IF ) ) {
+		string e = cmd.GetValue( FLAG_IF, ""  );
+		mEvalExpr.Compile( e );
+	}
+
+
+	if ( (! HaveRegex())
+			&& (! cmd.HasFlag( FLAG_FCOUNT ))
+			&& (! cmd.HasFlag( FLAG_IF )) ) {
 		CSVTHROW( "Need at least one " << FLAG_EXPR
 					<< ", " << FLAG_RANGE
 					<< ", " << FLAG_LEN
 					<< ", " << FLAG_FCOUNT
+					<< ", " << FLAG_IF
 					<< " or "<< FLAG_EXPRIC << " flag" );
 	}
 
@@ -146,6 +166,19 @@ int FindCommand :: Execute( ALib::CommandLine & cmd ) {
 
 	unsigned int count = 0;
 	while( io.ReadCSV( row ) ) {
+		if ( mEvalExpr.IsCompiled() ) {
+			mEvalExpr.ClearPosParams();
+			mEvalExpr.AddVar( LINE_VAR, ALib::Str( io.CurrentLine() ));
+			mEvalExpr.AddVar( FILE_VAR, ALib::Str( io.CurrentFileName()));
+			mEvalExpr.AddVar( FIELD_VAR, ALib::Str( row.size()));
+			for ( unsigned int j = 0; j < row.size(); j++ ) {
+				mEvalExpr.AddPosParam( row.at( j ) );
+			}
+			bool es = ALib::Expression::ToBool( mEvalExpr.Evaluate() );
+			if ( (es && mRemove) || (!es && !mRemove)) {
+				continue;
+			}
+		}
 		// check field count is in range and remove if necessary
 		if ( cmd.HasFlag( FLAG_FCOUNT ) ) {
 			bool fcok = int(row.size()) >= mMinFields

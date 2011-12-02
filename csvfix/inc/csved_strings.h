@@ -115,6 +115,7 @@ const char * const FLAG_EXPRIC	= "-ei";
 const char * const FLAG_FROMV	= "-fv";
 const char * const FLAG_HEADER	= "-h";
 const char * const FLAG_ICASE	= "-ic";
+const char * const FLAG_IF		= "-if";
 const char * const FLAG_ICNAMES	= "-ifn";
 const char * const FLAG_ILTEXT	= "-ilt";
 const char * const FLAG_INC		= "-i";
