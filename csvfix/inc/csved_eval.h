@@ -28,10 +28,17 @@ class EvalCommand : public Command {
 
 	private:
 
+		struct FieldEx {
+			FieldEx( int field, const ALib::Expression & e )
+				: mField( field ), mExpr( e ) {}
+			int mField;
+			ALib::Expression mExpr;
+		};
+
 		void SetParams( const CSVRow & row, class IOManager & iom );
 		void Evaluate( CSVRow & row );
 		void GetExpressions( ALib::CommandLine & cmd );
-		std::vector <ALib::Expression> mExprs;
+		std::vector <FieldEx> mFieldExprs;
 
 };
 
