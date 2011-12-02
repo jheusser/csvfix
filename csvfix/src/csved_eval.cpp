@@ -105,7 +105,6 @@ void EvalCommand ::	SetParams( const CSVRow & row, IOManager & iom ) {
 		e.AddVar( FIELD_VAR, ALib::Str( row.size()));
 		for ( unsigned int j = 0; j < row.size(); j++ ) {
 			e.AddPosParam( row.at( j ) );
-
 		}
 	}
 }

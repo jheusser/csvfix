@@ -11,6 +11,8 @@
 
 #include "a_base.h"
 #include "a_regex.h"
+#include "a_expr.h"
+
 #include "csved_command.h"
 
 namespace CSVED {
@@ -64,6 +66,8 @@ class FindCommand : public Command {
 		bool mCountOnly;
 
 		int mMinFields, mMaxFields;
+
+		ALib::Expression mEvalExpr;
 };
 
 
