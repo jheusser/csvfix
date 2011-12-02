@@ -84,7 +84,7 @@ class Expression {
 		/// Evaluate compiled expression returning string containg result
 		std::string Evaluate();
 
-		/// Wrapper to botyh compile and evaluate
+		/// Wrapper to both compile and evaluate
 		std::string Evaluate( const std::string & expr );
 
 		/// Clear any positional ($1, $2 etc.) parameters
