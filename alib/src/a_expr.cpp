@@ -13,6 +13,7 @@
 #include "a_rand.h"
 #include "a_date.h"
 #include "a_time.h"
+#include "a_regex.h"
 
 #include <stack>
 #include <iostream>
@@ -283,6 +284,12 @@ static string FuncStrEq( const deque <string> & params ) {
 	return Str( Equal( params[0], params[1]) );
 }
 
+// see if regex matches string
+static string FuncMatch( const deque <string> & params ) {
+	RegEx re( params[1] );
+	RegEx::Pos pos = re.FindIn( params[0] );
+	return pos.Found() ? "1" : "0";
+}
 
 //----------------------------------------------------------------------------
 // Add all the functions to the function dictionary
@@ -292,7 +299,7 @@ ADD_FUNC( "abs", 		FuncAbs, 		1 );
 ADD_FUNC( "bool", 		FuncBool, 		1 );
 ADD_FUNC( "if", 		FuncIf, 		3 );
 ADD_FUNC( "int", 		FuncInt, 		1 );
-ADD_FUNC( "isempty`", 	FuncIsEmpty,	1 );
+ADD_FUNC( "isempty", 	FuncIsEmpty,	1 );
 ADD_FUNC( "isnum", 		FuncIsNum, 		1 );
 ADD_FUNC( "not", 		FuncNot, 		1 );
 ADD_FUNC( "pos",		FuncPos, 		2 );
@@ -306,7 +313,7 @@ ADD_FUNC( "upper", 		FuncUpper, 		1 );
 ADD_FUNC( "lower", 		FuncLower, 		1 );
 ADD_FUNC( "len", 		FuncLen, 		1 );
 ADD_FUNC( "streq", 		FuncStrEq, 		2 );
-
+ADD_FUNC( "match", 		FuncMatch, 		2 );
 
 
 //----------------------------------------------------------------------------
@@ -1258,6 +1265,27 @@ DEFTEST( BoolTest ) {
 	FAILNE( s, "0" );
 }
 
+DEFTEST( IsEmptyTest ) {
+	Expression e;
+	string s = e.Evaluate( "isempty('')" );
+	FAILNE( s, "1" );
+	s = e.Evaluate( "isempty('foo')" );
+	FAILNE( s, "0" );
+	s = e.Evaluate( "isempty(' \t')" );
+	FAILNE( s, "1" );
+}
+
+DEFTEST( RegExTest ) {
+	Expression e;
+	string s = e.Evaluate( "match('','^$' )" );
+	FAILNE( s, "1" );
+	s = e.Evaluate( "match('foo','^$')" );
+	FAILNE( s, "0" );
+	s = e.Evaluate( "match('foo','foo')" );
+	FAILNE( s, "1" );
+	s = e.Evaluate( "match('foo','f.*')" );
+	FAILNE( s, "1" );
+}
 
 struct ExprTest {
 	const char * expr;
