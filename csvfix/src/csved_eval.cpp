@@ -34,6 +34,7 @@ const char * const EVAL_HELP = {
 	"usage: csvfix eval [flags] [file ...]\n"
 	"where flags are:\n"
 	"  -e expr\texpression to evaluate\n"
+	"  -r f:expr\treplace field f with result of evaluationg expr\n"
 	"#ALL"
 };
 
@@ -44,7 +45,8 @@ const char * const EVAL_HELP = {
 EvalCommand ::	EvalCommand( const string & name,
 									 const string & desc )
 		: Command( name, desc, EVAL_HELP ) {
-		AddFlag( ALib::CommandLineFlag( FLAG_EXPR, true, 1, true ) );
+		AddFlag( ALib::CommandLineFlag( FLAG_EXPR, false, 1, true ) );
+		AddFlag( ALib::CommandLineFlag( FLAG_REMOVE, false, 1, true ) );
 }
 
 //----------------------------------------------------------------------------
@@ -68,13 +70,20 @@ int EvalCommand ::	Execute( ALib::CommandLine & cmd ) {
 }
 
 //----------------------------------------------------------------------------
-// evaluate expressions, appending them to row
+// Evaluate expressions. If the field index associated with the expression
+// is negative, append to row, otherwise replace field specified by the
+// index if possible.
 //----------------------------------------------------------------------------
 
 void EvalCommand ::	Evaluate( CSVRow & row ) {
-	for ( unsigned int i = 0; i < mExprs.size() ; i++ ) {
-		string r = mExprs[i].Evaluate();
-		row.push_back( r );
+	for ( unsigned int i = 0; i < mFieldExprs.size() ; i++ ) {
+		string r = mFieldExprs[i].mExpr.Evaluate();
+		if ( mFieldExprs[i].mField < 0 || mFieldExprs[i].mField >= row.size() ) {
+			row.push_back( r );
+		}
+		else {
+			row[ mFieldExprs[i].mField ] = r;
+		}
 	}
 }
 
@@ -88,24 +97,31 @@ const char * const FILE_VAR = "file";	// var containing current file name
 const char * const FIELD_VAR = "fields"; // var containing CSV field count
 
 void EvalCommand ::	SetParams( const CSVRow & row, IOManager & iom ) {
-	for ( unsigned int i = 0; i < mExprs.size(); i++ ) {
-		mExprs[i].ClearPosParams();
-		mExprs[i].AddVar( LINE_VAR, ALib::Str( iom.CurrentLine() ));
-		mExprs[i].AddVar( FILE_VAR, ALib::Str( iom.CurrentFileName()));
-		mExprs[i].AddVar( FIELD_VAR, ALib::Str( row.size()));
+	for ( unsigned int i = 0; i < mFieldExprs.size(); i++ ) {
+		ALib::Expression & e = mFieldExprs[i].mExpr;
+		e.ClearPosParams();
+		e.AddVar( LINE_VAR, ALib::Str( iom.CurrentLine() ));
+		e.AddVar( FILE_VAR, ALib::Str( iom.CurrentFileName()));
+		e.AddVar( FIELD_VAR, ALib::Str( row.size()));
 		for ( unsigned int j = 0; j < row.size(); j++ ) {
-			mExprs[i].AddPosParam( row.at( j ) );
+			e.AddPosParam( row.at( j ) );
 
 		}
 	}
 }
 
 //----------------------------------------------------------------------------
-// get expressions specified by -e expr and compile them
+// Options may be of the form:
+//
+//     -e expr
+//     -r field,expr
+//
+// In the first case, create a dummy field index with negative value.
 //----------------------------------------------------------------------------
 
 void EvalCommand ::	GetExpressions( ALib::CommandLine & cmd ) {
 	int i = 2;	// skip exe name and command name
+
 	while( i < cmd.Argc() ) {
 		if ( cmd.Argv( i ) == FLAG_EXPR ) {
 			if ( i + 1 >= cmd.Argc() ) {
@@ -115,9 +131,35 @@ void EvalCommand ::	GetExpressions( ALib::CommandLine & cmd ) {
 			string expr = cmd.Argv( i );
 			ALib::Expression ex;
 			ex.Compile( expr );
-			mExprs.push_back( ex );
+			mFieldExprs.push_back( FieldEx( -1, ex ) );
+		}
+		else if ( cmd.Argv( i ) == FLAG_REMOVE ) {
+			if ( i + 1 >= cmd.Argc() ) {
+				CSVTHROW( "Missimg field/expression" );
+			}
+			i++;
+			string::size_type pos = cmd.Argv(i).find_first_of( "," );
+			if ( pos == string::npos ) {
+				CSVTHROW( "Invalid field/index pair: " << cmd.Argv(i) );
+			}
+			string field = cmd.Argv(i).substr( 0, pos );
+			string expr = cmd.Argv(i).substr( pos + 1 );
+
+			if ( ! ALib::IsInteger( field ) ) {
+				CSVTHROW( "Invalid field (need integer): " << field );
+			}
+			int n = ALib::ToInteger( field );
+			if ( n <= 0 ) {
+				CSVTHROW( "Invalid field (must be greater than zero): " << field );
+			}
+			ALib::Expression ex;
+			ex.Compile( expr );
+			mFieldExprs.push_back( FieldEx( n - 1, ex ) );
 		}
 		i++;
+	}
+	if ( mFieldExprs.size() == 0 ) {
+		CSVTHROW( "Need at least one of -e or -r options" );
 	}
 }
 
