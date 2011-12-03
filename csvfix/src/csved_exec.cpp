@@ -144,9 +144,17 @@ string ExecCommand :: MakeParam( const CSVRow & row, unsigned int  & pos ) {
 		if ( n < 0 || n > MAX_PARAM ) {
 			CSVTHROW( "Invalid parameter: %" << p );
 		}
+
+// different quoting rules for windows and unix
+#ifdef _WIN32
+		return (unsigned int) n < row.size()
+					? row[n]
+					: "";
+#else
 		return (unsigned int) n < row.size()
 					? ALib::Escape( row[n], "\\'\"", "\\" )
 					: "";
+#endif
 	}
 	else {
 		ATHROW( "Invalid parameter" );
