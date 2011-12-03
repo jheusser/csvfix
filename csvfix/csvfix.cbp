@@ -89,6 +89,7 @@
 		<Unit filename="inc\csved_edit.h" />
 		<Unit filename="inc\csved_escape.h" />
 		<Unit filename="inc\csved_eval.h" />
+		<Unit filename="inc\csved_evalvars.h" />
 		<Unit filename="inc\csved_except.h" />
 		<Unit filename="inc\csved_exclude.h" />
 		<Unit filename="inc\csved_exec.h" />
@@ -139,6 +140,7 @@
 		<Unit filename="src\csved_edit.cpp" />
 		<Unit filename="src\csved_escape.cpp" />
 		<Unit filename="src\csved_eval.cpp" />
+		<Unit filename="src\csved_evalvars.cpp" />
 		<Unit filename="src\csved_except.cpp" />
 		<Unit filename="src\csved_exclude.cpp" />
 		<Unit filename="src\csved_exec.cpp" />
