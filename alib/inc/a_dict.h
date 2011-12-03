@@ -66,6 +66,18 @@ template <class TYPE, CaseSensitive CS = IgnoreCase> class Dictionary {
 			}
 		}
 
+		// get commands that begin with ab
+		void GetAbbreviations( const std::string & ab, std::vector <std::string> & names ) const {
+			typename MapType::const_iterator it = mMap.begin();
+			while( it != mMap.end() ) {
+				std::string n = it->first.substr( 0, ab.size() );
+				if ( ALib::Equal( ab, n ) ) {
+					names.push_back( it->first );
+				}
+				++it;
+			}
+		}
+
 		// return pointer to entry value if it exists, NULL if not
 		const TYPE * GetPtr( const std::string & name ) const {
 			typename MapType::const_iterator it = mMap.find( name );

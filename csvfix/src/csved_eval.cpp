@@ -11,7 +11,7 @@
 #include "csved_cli.h"
 #include "csved_eval.h"
 #include "csved_strings.h"
-#include "csved_evalvars.h".
+#include "csved_evalvars.h"
 
 using std::string;
 

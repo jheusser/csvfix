@@ -72,10 +72,39 @@ Command * CLIHandler :: FindCommand() {
 	if ( mCmdLine.Argc() == 1 ) {
 		CSVTHROW( "No command specified - try 'csvfix usage'" );
 	}
-	else if ( ! mDict->Contains( mCmdLine.Argv( 1 ) ) ) {
-		CSVTHROW( "Unknown command - try 'csvfix help'" );
+	else if ( mDict->Contains( mCmdLine.Argv( 1 ) )) {
+		return mDict->Get( mCmdLine.Argv( 1 ) );
 	}
-	return mDict->Get( mCmdLine.Argv( 1 ) );
+	else {
+		Command * c = FindAbb( mCmdLine.Argv( 1 ) );
+		if (  c == 0 ) {
+			CSVTHROW( "Unknown command - try 'csvfix help'" );
+		}
+		return c;
+	}
+}
+
+//----------------------------------------------------------------------------
+// Find possibly abbreviated command
+//----------------------------------------------------------------------------
+
+Command * CLIHandler :: FindAbb( const  string & ab ) {
+	vector <string> mPossibles;
+	mDict->GetAbbreviations( ab, mPossibles );
+	if ( mPossibles.size() == 0 ) {
+		return 0;
+	}
+	else if ( mPossibles.size() > 1 ) {
+		string msg = "Ambiguous command - possibles are: ";
+		for( unsigned int i = 0; i < mPossibles.size(); i++ ) {
+			msg += mPossibles[i] + " ";
+		}
+		CSVTHROW( msg );
+	}
+	else {
+		return mDict->Get( mPossibles[0] );
+	}
+
 }
 
 //----------------------------------------------------------------------------
