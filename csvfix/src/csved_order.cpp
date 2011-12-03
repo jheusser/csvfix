@@ -38,7 +38,7 @@ const char * const ORDER_HELP = {
 	"  -f fields\tspecify fields using numeric field indexes\n"
 	"  -nc\t\tdo not create fields missing in input\n"
 	"  -xf fields\tspecify all but excluded fields\n"
-	"  -rf fiels\tas for -f, but specify fields from end of record\n"
+	"  -rf fields\tas for -f, but specify fields from end of record\n"
 	"  -fn names\tspecify fields using list of field names\n"
 	"\t\tthis reguires that the input contains field name header\n"
 	"#SMQ,SEP,IBL,IFN,OFL"
