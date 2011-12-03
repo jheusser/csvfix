@@ -34,7 +34,7 @@ const char * const EVAL_HELP = {
 	"usage: csvfix eval [flags] [file ...]\n"
 	"where flags are:\n"
 	"  -e expr\texpression to evaluate\n"
-	"  -r f:expr\treplace field f with result of evaluationg expr\n"
+	"  -r f,expr\treplace field f with result of evaluating expr\n"
 	"#ALL"
 };
 

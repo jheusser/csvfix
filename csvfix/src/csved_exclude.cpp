@@ -11,6 +11,7 @@
 #include "csved_cli.h"
 #include "csved_exclude.h"
 #include "csved_strings.h"
+#include "csved_evalvars.h"
 
 using std::string;
 using std::vector;
@@ -35,6 +36,7 @@ const char * const EXCL_HELP = {
 	"usage: csvfix exclude  [flags] [file ...]\n"
 	"where flags are:\n"
 	"  -f fields\tlist of fields to exclude\n"
+	"  -e expr\texclude fields specified by -f if expr evaluates to true\n"
 	"#ALL"
 };
 
@@ -47,6 +49,7 @@ ExcludeCommand ::ExcludeCommand( const string & name,
 		: Command( name, desc, EXCL_HELP ) {
 
 	AddFlag( ALib::CommandLineFlag( FLAG_COLS, true, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_EXPR, false, 1 ) );
 }
 
 //---------------------------------------------------------------------------
@@ -61,11 +64,29 @@ int ExcludeCommand :: Execute( ALib::CommandLine & cmd ) {
 	CSVRow row;
 
 	while( io.ReadCSV( row ) ) {
-		CSVRow r = Exclude( row );
-		io.WriteRow( r );
+		if ( EvalExprOnRow( io, row ) ) {
+			CSVRow r = Exclude( row );
+			io.WriteRow( r );
+		}
 	}
 
 	return 0;
+}
+
+
+//----------------------------------------------------------------------------
+// See if row should be excluded based on expression
+//----------------------------------------------------------------------------
+
+bool ExcludeCommand :: EvalExprOnRow( IOManager & io, const CSVRow & row ) {
+
+	if ( mExpr.IsCompiled() ) {
+		AddVars( mExpr, io, row );
+		return ALib::Expression::ToBool( mExpr.Evaluate() );
+	}
+	else {
+		return true;
+	}
 }
 
 //---------------------------------------------------------------------------
@@ -74,6 +95,10 @@ int ExcludeCommand :: Execute( ALib::CommandLine & cmd ) {
 
 void ExcludeCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 
+	string es = cmd.GetValue( FLAG_EXPR, "" );
+	if ( es != "" ) {
+		mExpr.Compile( es );
+	}
 	string sn = cmd.GetValue( FLAG_COLS, ""  );
 	CommaListToIndex( ALib::CommaList( sn ), mFields );
 	if ( mFields.size() == 0 ) {

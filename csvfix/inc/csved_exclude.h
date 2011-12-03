@@ -10,6 +10,8 @@
 #define INC_CSVED_EXCLUDE_H
 
 #include "a_base.h"
+#include "a_expr.h"
+
 #include "csved_command.h"
 #include "csved_types.h"
 
@@ -30,9 +32,10 @@ class ExcludeCommand : public Command {
 
 		void ProcessFlags( const ALib::CommandLine & cmd );
 		CSVRow Exclude( const CSVRow & r ) const;
+		bool EvalExprOnRow( IOManager & io, const CSVRow & r );
 
 		FieldList mFields;
-
+		ALib::Expression mExpr;
 };
 
 //------------------------------------------------------------------------
