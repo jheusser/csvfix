@@ -95,7 +95,7 @@ Command * CLIHandler :: FindAbb( const  string & ab ) {
 		return 0;
 	}
 	else if ( mPossibles.size() > 1 ) {
-		string msg = "Ambiguous command - possibles are: ";
+		string msg = "Ambiguous command - candidates are: ";
 		for( unsigned int i = 0; i < mPossibles.size(); i++ ) {
 			msg += mPossibles[i] + " ";
 		}
