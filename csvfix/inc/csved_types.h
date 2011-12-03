@@ -11,10 +11,14 @@
 
 #include "a_base.h"
 
+namespace CSVED {
+
 typedef std::vector <std::string> CSVRow;
 typedef std::vector <CSVRow> CSVTable;
 typedef std::vector <unsigned int> FieldList;
 
+
+} // namespace
 
 #endif
 
