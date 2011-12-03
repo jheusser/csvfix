@@ -13,6 +13,8 @@
 #include "csved_cli.h"
 #include "csved_find.h"
 #include "csved_strings.h"
+#include "csved_evalvars.h"
+
 #include "a_debug.h"
 
 using std::string;
@@ -68,14 +70,6 @@ const char * const REMOVE_HELP = {
 	"  -l length\t search for fields of given length (may be a range)\n"
 	"  -if expr\tdon't output line if eval expression evaluates to true\n"
 };
-
-//----------------------------------------------------------------------------
-// Names of variables for expression evaluation
-//----------------------------------------------------------------------------
-
-const char * const LINE_VAR = "line";	// var containing current line no
-const char * const FILE_VAR = "file";	// var containing current file name
-const char * const FIELD_VAR = "fields"; // var containing CSV field count
 
 //------------------------------------------------------------------------
 // Standard comand ctor
@@ -167,13 +161,7 @@ int FindCommand :: Execute( ALib::CommandLine & cmd ) {
 	unsigned int count = 0;
 	while( io.ReadCSV( row ) ) {
 		if ( mEvalExpr.IsCompiled() ) {
-			mEvalExpr.ClearPosParams();
-			mEvalExpr.AddVar( LINE_VAR, ALib::Str( io.CurrentLine() ));
-			mEvalExpr.AddVar( FILE_VAR, ALib::Str( io.CurrentFileName()));
-			mEvalExpr.AddVar( FIELD_VAR, ALib::Str( row.size()));
-			for ( unsigned int j = 0; j < row.size(); j++ ) {
-				mEvalExpr.AddPosParam( row.at( j ) );
-			}
+			AddVars( mEvalExpr, io, row );
 			bool es = ALib::Expression::ToBool( mEvalExpr.Evaluate() );
 			if ( (es && mRemove) || (!es && !mRemove)) {
 				continue;

@@ -11,6 +11,7 @@
 #include "csved_cli.h"
 #include "csved_eval.h"
 #include "csved_strings.h"
+#include "csved_evalvars.h".
 
 using std::string;
 
@@ -92,20 +93,10 @@ void EvalCommand ::	Evaluate( CSVRow & row ) {
 // and special named constants
 //----------------------------------------------------------------------------
 
-const char * const LINE_VAR = "line";	// var containing current line no
-const char * const FILE_VAR = "file";	// var containing current file name
-const char * const FIELD_VAR = "fields"; // var containing CSV field count
-
 void EvalCommand ::	SetParams( const CSVRow & row, IOManager & iom ) {
 	for ( unsigned int i = 0; i < mFieldExprs.size(); i++ ) {
 		ALib::Expression & e = mFieldExprs[i].mExpr;
-		e.ClearPosParams();
-		e.AddVar( LINE_VAR, ALib::Str( iom.CurrentLine() ));
-		e.AddVar( FILE_VAR, ALib::Str( iom.CurrentFileName()));
-		e.AddVar( FIELD_VAR, ALib::Str( row.size()));
-		for ( unsigned int j = 0; j < row.size(); j++ ) {
-			e.AddPosParam( row.at( j ) );
-		}
+		AddVars( e, iom, row );
 	}
 }
 
