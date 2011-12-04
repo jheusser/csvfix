@@ -115,6 +115,7 @@
 		<Unit filename="inc\csved_seq.h" />
 		<Unit filename="inc\csved_shuffle.h" />
 		<Unit filename="inc\csved_sort.h" />
+		<Unit filename="inc\csved_sparse.h" />
 		<Unit filename="inc\csved_split.h" />
 		<Unit filename="inc\csved_sql.h" />
 		<Unit filename="inc\csved_strings.h" />
@@ -167,6 +168,7 @@
 		<Unit filename="src\csved_seq.cpp" />
 		<Unit filename="src\csved_shuffle.cpp" />
 		<Unit filename="src\csved_sort.cpp" />
+		<Unit filename="src\csved_sparse.cpp" />
 		<Unit filename="src\csved_split.cpp" />
 		<Unit filename="src\csved_sql.cpp" />
 		<Unit filename="src\csved_sum.cpp" />

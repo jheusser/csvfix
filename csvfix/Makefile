@@ -22,6 +22,7 @@ LINLIBS = ../alib/lib/alib.a
 _OBJS = csved_atable.o \
 		csved_case.o \
 		csved_cli.o \
+		csved_check.o \
 		csved_command.o \
 		csved_date.o \
 		csved_diff.o \
@@ -30,6 +31,7 @@ _OBJS = csved_atable.o \
 		csved_edit.o \
 		csved_escape.o \
 		csved_eval.o \
+		csved_evalvars.o \
 		csved_exclude.o \
 		csved_except.o \
 		csved_exec.o \
@@ -55,6 +57,7 @@ _OBJS = csved_atable.o \
 		csved_seq.o \
 		csved_shuffle.o \
 		csved_sort.o \
+		csved_sparse.o \
 		csved_split.o \
 		csved_sql.o \
 		csved_sum.o \
