@@ -29,6 +29,9 @@ class CheckCommand : public Command {
 
 		void ProcessFlags( const ALib::CommandLine & cmd );
 
+		bool mQuiet, mEmbedNLOk, mVerbose;
+		char mSep;
+
 };
 
 //------------------------------------------------------------------------

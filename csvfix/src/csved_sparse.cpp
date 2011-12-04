@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------
-// csvparse.h
+// csved_sparse.h
 //
-// Simple CSV parser class.
+// Simple CSV parser class used for checking CSV is syntactically correct.
 //
 // Copyright (C) 2011 Neil Butterworth
 //----------------------------------------------------------------------------
@@ -33,8 +33,10 @@ const char DQUOTE		= '"';
 // as special characters as per the IETF RFC.
 //----------------------------------------------------------------------------
 
-CSVParser :: CSVParser( std::istream & src, char fieldsep, bool dqspecial )
-	: mSrc( src ), mFieldSep( fieldsep ), mDQSpecial( dqspecial ), mLineNo( 1 ) {
+CSVChecker :: CSVChecker( const string & fname, std::istream & src,
+							char fieldsep, bool dqspecial, bool embednlok  )
+	: mFileName( fname ), mSrc( src ), mFieldSep( fieldsep ),
+		mDQSpecial( dqspecial ), mEmbedNLOK( embednlok ), mLineNo( 1 ) {
 	NextChar();
 }
 
@@ -45,7 +47,7 @@ CSVParser :: CSVParser( std::istream & src, char fieldsep, bool dqspecial )
 // error occurs, throws an exception.
 //----------------------------------------------------------------------------
 
-bool CSVParser :: NextRecord( CSVRow & r ) {
+bool CSVChecker :: NextRecord( CSVRow & r ) {
 	r.clear();
 	while ( ! AtEndRec() ) {
 		if ( HaveQuote() && mDQSpecial ) {
@@ -64,11 +66,11 @@ bool CSVParser :: NextRecord( CSVRow & r ) {
 // error, unless quoting has been turned off. Adds the field to the record.
 //----------------------------------------------------------------------------
 
-void CSVParser :: ReadField( CSVRow & r ) {
+void CSVChecker :: ReadField( CSVRow & r ) {
 	string field;
 	while ( ! AtEndField() ) {
 		if ( mNext == DQUOTE && mDQSpecial ) {
-			CSVTHROW( "Unexpected double-quote"  );
+			Error( "Unexpected double-quote", true  );
 		}
 		field += mNext;
 		NextChar();
@@ -85,7 +87,7 @@ void CSVParser :: ReadField( CSVRow & r ) {
 // input within a quoted field is always an error.
 //----------------------------------------------------------------------------
 
-void CSVParser :: ReadQuotedField( CSVRow & r ) {
+void CSVChecker :: ReadQuotedField( CSVRow & r ) {
 	string field;
 	NextChar();
 	while( mNext != END_INPUT ) {
@@ -104,22 +106,27 @@ void CSVParser :: ReadQuotedField( CSVRow & r ) {
 				return;
 			}
 			else {
-				CSVTHROW( "Illegal quoting" );
+				Error( "Unexpected double-quote", true );
 			}
 		}
 		else {
-			field += mNext;
+			if ( mEmbedNLOK ) {
+				field += mNext;
+			}
+			else {
+				Error( "Embedded newline", true );
+			}
 		}
 		NextChar();
 	}
-	CSVTHROW( "Unexpected end of input" );
+	Error( "Unexpected end of input (probably mis-matched quotes)", false );
 }
 
 //----------------------------------------------------------------------------
 // Is the current character a double-quote?
 //----------------------------------------------------------------------------
 
-bool CSVParser :: HaveQuote() const {
+bool CSVChecker :: HaveQuote() const {
 	return mNext == DQUOTE;
 }
 
@@ -128,7 +135,7 @@ bool CSVParser :: HaveQuote() const {
 // so discards the record-end character.
 //----------------------------------------------------------------------------
 
-bool CSVParser :: AtEndRec()  {
+bool CSVChecker :: AtEndRec()  {
 	if ( mNext == END_INPUT || mNext == REC_SEP ) {
 		NextChar();
 		return true;
@@ -142,7 +149,7 @@ bool CSVParser :: AtEndRec()  {
 // Is the current character one of the possible field terminators?
 //----------------------------------------------------------------------------
 
-bool CSVParser :: AtEndField() const {
+bool CSVChecker :: AtEndField() const {
 	return mNext == mFieldSep || mNext == REC_SEP || mNext == END_INPUT;
 }
 
@@ -153,7 +160,7 @@ bool CSVParser :: AtEndField() const {
 // used for error reporting.
 //----------------------------------------------------------------------------
 
-void CSVParser :: NextChar() {
+void CSVChecker :: NextChar() {
 
 	if ( ! mSrc.get( mNext ) ) {
 		mNext = END_INPUT;
@@ -176,10 +183,29 @@ void CSVParser :: NextChar() {
 // updating the mNext member.
 //----------------------------------------------------------------------------
 
-char CSVParser :: Peek() {
+char CSVChecker :: Peek() {
 	int c = mSrc.peek();
 	return c == std::char_traits<char>::eof() ? END_INPUT : c;
 }
+
+//----------------------------------------------------------------------------
+// Report error. If context is required, read remaining input line.
+//----------------------------------------------------------------------------
+
+void CSVChecker :: Error( const string & msg, bool context ) {
+	if ( context && (mLine.size() == 0 || mLine[mLine.size()-1] != '\n') ) {
+		string rest;
+		getline( mSrc, rest );
+		mLine += rest;
+	}
+	if ( context ) {
+		CSVTHROW(  msg << " in " << mFileName << " at line " << mLineNo << "\n" << mLine );
+	}
+	else {
+		CSVTHROW(  msg  << " in " << mFileName );
+	}
+}
+
 
 } // namespace
 
