@@ -29,10 +29,6 @@ class CheckCommand : public Command {
 
 		void ProcessFlags( const ALib::CommandLine & cmd );
 
-		bool mPrintFileInfo;
-		bool mFilterBad;
-		bool mRFC;
-
 };
 
 //------------------------------------------------------------------------
