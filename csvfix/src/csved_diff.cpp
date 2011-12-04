@@ -207,11 +207,6 @@ static RegisterCommand <DiffCommand> rc1_(
 	"compare two CSV files"
 );
 
-//----------------------------------------------------------------------------
-// Flag used to indicate no diff output wanted, just return value.
-//----------------------------------------------------------------------------
-
-const char * const FLAG_QUIET = "-q";
 
 //----------------------------------------------------------------------------
 // Help

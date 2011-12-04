@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 // csved_except.h
 //
-// CSVED exceptions 
+// CSVED exceptions
 //
 // Copyright (C) 2009 Neil Butterworth
 //---------------------------------------------------------------------------
@@ -43,9 +43,9 @@ class ExceptionHandler {
 
 #define CSVTHROW( msg )												\
 {																	\
-	std::ostringstream os;											\
-	os << msg;														\
-	throw CSVED::Exception( os.str() );								\
+	std::ostringstream os_;											\
+	os_<< msg;														\
+	throw CSVED::Exception( os_.str() );							\
 }																	\
 
 //---------------------------------------------------------------------------

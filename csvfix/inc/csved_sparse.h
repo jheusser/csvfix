@@ -18,12 +18,15 @@ namespace CSVED {
 
 //----------------------------------------------------------------------------
 
-class CSVParser {
+class CSVChecker {
 
 	public:
 
-		CSVParser( std::istream & src, char fieldsep = ',',
-						bool dqspecial = true  );
+		CSVChecker( const std::string & fname,
+					std::istream & src,
+					char fieldsep = ',',
+					bool dqspecial = true,
+					bool embednlok = true  );
 
 		bool NextRecord( CSVRow & r );
 
@@ -40,9 +43,12 @@ class CSVParser {
 		void NextChar();
 		char Peek();
 
+		void Error( const std::string & msg, bool context  );
+
+		std::string mFileName;
 		std::istream & mSrc;
 		char mNext, mFieldSep;
-		bool mDQSpecial;
+		bool mDQSpecial, mEmbedNLOK;
 		unsigned int mLineNo;
 		std::string mLine;
 };
