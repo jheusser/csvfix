@@ -31,7 +31,7 @@ class ExcludeCommand : public Command {
 	private:
 
 		void ProcessFlags( const ALib::CommandLine & cmd );
-		CSVRow Exclude( const CSVRow & r ) const;
+		void  Exclude( CSVRow & r ) const;
 		bool EvalExprOnRow( IOManager & io, const CSVRow & r );
 
 		FieldList mFields;

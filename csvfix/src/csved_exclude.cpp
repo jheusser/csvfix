@@ -36,7 +36,7 @@ const char * const EXCL_HELP = {
 	"usage: csvfix exclude  [flags] [file ...]\n"
 	"where flags are:\n"
 	"  -f fields\tlist of fields to exclude\n"
-	"  -e expr\texclude fields specified by -f if expr evaluates to true\n"
+	"  -if expr\texclude fields specified by -f if expr evaluates to true\n"
 	"#ALL"
 };
 
@@ -49,7 +49,7 @@ ExcludeCommand ::ExcludeCommand( const string & name,
 		: Command( name, desc, EXCL_HELP ) {
 
 	AddFlag( ALib::CommandLineFlag( FLAG_COLS, true, 1 ) );
-	AddFlag( ALib::CommandLineFlag( FLAG_EXPR, false, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_IF, false, 1 ) );
 }
 
 //---------------------------------------------------------------------------
@@ -65,9 +65,9 @@ int ExcludeCommand :: Execute( ALib::CommandLine & cmd ) {
 
 	while( io.ReadCSV( row ) ) {
 		if ( EvalExprOnRow( io, row ) ) {
-			CSVRow r = Exclude( row );
-			io.WriteRow( r );
+			Exclude( row );
 		}
+		io.WriteRow( row );
 	}
 
 	return 0;
@@ -82,7 +82,8 @@ bool ExcludeCommand :: EvalExprOnRow( IOManager & io, const CSVRow & row ) {
 
 	if ( mExpr.IsCompiled() ) {
 		AddVars( mExpr, io, row );
-		return ALib::Expression::ToBool( mExpr.Evaluate() );
+		string s = mExpr.Evaluate();
+		return ALib::Expression::ToBool( s );
 	}
 	else {
 		return true;
@@ -95,7 +96,7 @@ bool ExcludeCommand :: EvalExprOnRow( IOManager & io, const CSVRow & row ) {
 
 void ExcludeCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 
-	string es = cmd.GetValue( FLAG_EXPR, "" );
+	string es = cmd.GetValue( FLAG_IF, "" );
 	if ( es != "" ) {
 		mExpr.Compile( es );
 	}
@@ -111,7 +112,7 @@ void ExcludeCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 // Copy all fields that are not excluded to new row
 //---------------------------------------------------------------------------
 
-CSVRow ExcludeCommand :: Exclude( const CSVRow & r ) const {
+void ExcludeCommand :: Exclude(  CSVRow & r ) const {
 
 	CSVRow out;
 
@@ -120,7 +121,7 @@ CSVRow ExcludeCommand :: Exclude( const CSVRow & r ) const {
 			out.push_back( r.at( i ) );
 		}
 	}
-	return out;
+	std::swap( r, out );
 }
 
 
