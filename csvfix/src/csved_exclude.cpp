@@ -53,7 +53,8 @@ ExcludeCommand ::ExcludeCommand( const string & name,
 }
 
 //---------------------------------------------------------------------------
-// Get user specifie doptions and then read input, removing excluded cols
+// Get user specifie doptions and then read input, removing excluded cols.
+// Now does exclude only if expression specified by -if evaluates true.
 //---------------------------------------------------------------------------
 
 int ExcludeCommand :: Execute( ALib::CommandLine & cmd ) {
@@ -91,7 +92,8 @@ bool ExcludeCommand :: EvalExprOnRow( IOManager & io, const CSVRow & row ) {
 }
 
 //---------------------------------------------------------------------------
-// Handle all user options with error checking
+// Handle all user options with error checking. Currently possible to pass
+// empty expression, but probably shouldn't be.
 //---------------------------------------------------------------------------
 
 void ExcludeCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
@@ -109,7 +111,8 @@ void ExcludeCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 }
 
 //---------------------------------------------------------------------------
-// Copy all fields that are not excluded to new row
+// Copy all fields that are not excluded to new row. Change parameter
+// to have new row contents.
 //---------------------------------------------------------------------------
 
 void ExcludeCommand :: Exclude(  CSVRow & r ) const {
@@ -121,7 +124,7 @@ void ExcludeCommand :: Exclude(  CSVRow & r ) const {
 			out.push_back( r.at( i ) );
 		}
 	}
-	std::swap( r, out );
+	r.swap( out );
 }
 
 
