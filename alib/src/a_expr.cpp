@@ -1105,6 +1105,10 @@ void Expression :: ExecOp( const ExprToken & tok ) {
 	else if ( op == "+" ) {
 		mStack.push( Str( PopNum() + PopNum() ) );
 	}
+	else if ( op == "-" ) {
+		double n = PopNum();
+		mStack.push( Str( PopNum() - n ) );
+	}
 	else if ( op == "*" ) {
 		mStack.push( Str( PopNum() * PopNum() ) );
 	}
@@ -1147,7 +1151,7 @@ void Expression :: ExecOp( const ExprToken & tok ) {
 		mStack.push( CallFunction( fun ) );
 	}
 	else {
-		ATHROW( "Unknpwn operator"  << op );
+		ATHROW( "Unknown operator: "  << op );
 	}
 }
 
@@ -1235,12 +1239,16 @@ DEFTEST( ExpressionTest ) {
 	FAILNE( s, "5" );
 	s = e.Evaluate( "1;2;" );
 	FAILNE( s, "2" );
+	s = e.Evaluate( "3-1" );
+	FAILNE( s, "2" );
 }
 
 DEFTEST( UnaryMinusTest ) {
 	Expression e;
 	string s = e.Evaluate( "-2;" );
 	FAILNE( s, "-2" );
+	s = e.Evaluate( "1--2;" );
+	FAILNE( s, "3" );
 }
 
 DEFTEST( VarTest ) {
