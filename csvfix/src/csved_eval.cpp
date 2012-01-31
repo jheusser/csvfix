@@ -115,7 +115,7 @@ void EvalCommand ::	GetExpressions( ALib::CommandLine & cmd ) {
 	while( i < cmd.Argc() ) {
 		if ( cmd.Argv( i ) == FLAG_EXPR ) {
 			if ( i + 1 >= cmd.Argc() ) {
-				CSVTHROW( "Missimg expression" );
+				CSVTHROW( "Missing expression" );
 			}
 			i++;
 			string expr = cmd.Argv( i );
