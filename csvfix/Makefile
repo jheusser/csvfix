@@ -16,6 +16,7 @@ ODIR = obj
 SDIR = src
 INC = -Iinc -I../alib/inc
 
+ALIB = ../alib/lib/alib.a
 WINLIBS = ../alib/lib/alib.a -lodbc32 
 LINLIBS = ../alib/lib/alib.a 
 
@@ -81,11 +82,11 @@ null:
 $(ODIR)/%.o: $(SDIR)/%.cpp 
 	$(CC) -c $(INC) -o $@ $< $(CFLAGS) 
 
-$(WINOUT): $(OBJS) $(WINOBJS)
+$(WINOUT): $(OBJS) $(WINOBJS) $(ALIB)
 	$(CC) -o $@ $^ $(WINLIBS)
 	strip $(WINOUT)
 
-$(LINOUT): $(OBJS) 
+$(LINOUT): $(OBJS) $(ALIB)
 	$(CC) -o $@ $^ $(LINLIBS)
 	strip $(LINOUT)
 
