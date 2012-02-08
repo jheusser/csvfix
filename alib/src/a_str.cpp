@@ -819,7 +819,7 @@ bool In( const string & s, CaseSensitive cs, const char * list, ... ) {
 	const char * val = list;
 	va_list begin;
 	va_start( begin, list );
-	while( val != 0 ) {
+	while( val != NULL ) {
 		if ( Cmp( s, val, cs ) == 0 ) {
 			va_end( begin );
 			return true;
