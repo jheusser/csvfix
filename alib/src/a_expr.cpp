@@ -1128,11 +1128,10 @@ void Expression :: ExecOp( const ExprToken & tok ) {
 		int n = int(lhs) % int(rhs);
 		mStack.push( Str( n ) );
 	}
-
 	else if ( op == "*" ) {
 		mStack.push( Str( PopNum() * PopNum() ) );
 	}
-	else if ( In( op, IgnoreCase, "==", "<>", "<", ">", "<=", ">=", 0 ) ) {
+	else if ( In( op, IgnoreCase, "==", "<>", "<", ">", "<=", ">=", NULL ) ) {
 		DoCompare( op );
 	}
 	else if ( op == "&&" || op == "||" ) {
