@@ -253,20 +253,23 @@ string Date :: ShortDayName() const {
 Date::Error Date :: Validate( unsigned int y,
 								unsigned int m,
 								unsigned int d ) {
+	if ( y < MIN_YEAR || y > MAX_YEAR ) {
+		return BADYEAR;
+	}
 	if ( d < 1  || d > 31 ) {
 		return BADDAY;
 	}
-	else if ( m < 1 || m > 12 ) {
+	if ( m < 1 || m > 12 ) {
 		return BADMONTH;
 	}
-	else if ( m == 2 && IsLeapYear( y )  && ( d < 1 || d > 29 ) ) {
+	if ( m != 2 && (d < 1 || d > MDAYS[m-1] ) ) {
 		return BADDAYMONTH;
 	}
-	if ( d < 1 || d > MDAYS[m-1] ) {
-		return BADDAYMONTH;
-	}
-	if ( y < MIN_YEAR || y > MAX_YEAR ) {
-		return BADYEAR;
+	if ( m == 2 ) {
+		int n = IsLeapYear( y ) ? 1 : 0;
+		if (  d < 1 || d > 28 + n ) {
+			return BADDAYMONTH;
+		}
 	}
 	return DATEOK;
 }
@@ -406,6 +409,13 @@ DEFTEST( MathTest ) {
     d += 10;
 	FAILNE( d.Day(), 1 );
 	FAILNE( d.Month(), 9 );
+}
+
+DEFTEST( LeapTest ) {
+	bool yes = Date::IsLeapYear( 2012 );
+	FAILNE( yes, true );
+	bool no = Date::IsLeapYear( 2013 );
+	FAILNE( no, false );
 }
 
 #endif
