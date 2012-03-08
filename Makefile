@@ -3,14 +3,14 @@ default:
 
 win:
 	mkdir -p alib/obj alib/lib csvfix/obj csvfix/bin
-	cd alib; make win
-	cd csvfix; make win
+	cd alib; $(MAKE) win
+	cd csvfix; $(MAKE) win
 
 lin:
 	mkdir -p alib/obj alib/lib csvfix/obj csvfix/bin
-	cd alib; make lin
-	cd csvfix; make lin
+	cd alib; $(MAKE) lin
+	cd csvfix; $(MAKE) lin
 
 clean:
-	cd alib; make clean
-	cd csvfix; make clean
+	cd alib; $(MAKE) clean
+	cd csvfix; $(MAKE) clean
