@@ -353,6 +353,9 @@ ValuesRule :: ValuesRule( const string & name,
 		CSVTHROW( "Rule " << name << " needs values" );
 	}
 
+	for( unsigned int i = 0; i < params.size(); i++ ) {
+		mValues.push_back( params[i] );
+	}
 }
 
 //---------------------------------------------------------------------------
