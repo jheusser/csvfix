@@ -291,12 +291,19 @@ static string FuncMatch( const deque <string> & params ) {
 	return pos.Found() ? "1" : "0";
 }
 
+// get environment variable, or empty string
+static string FuncGetenv( const deque <string> & params ) {
+	const char * val = std::getenv( params[0].c_str() );
+	return val == NULL ? "" : val;
+}
+
 //----------------------------------------------------------------------------
 // Add all the functions to the function dictionary
 //----------------------------------------------------------------------------
 
 ADD_FUNC( "abs", 		FuncAbs, 		1 );
 ADD_FUNC( "bool", 		FuncBool, 		1 );
+ADD_FUNC( "env", 		FuncGetenv, 	1 );
 ADD_FUNC( "if", 		FuncIf, 		3 );
 ADD_FUNC( "int", 		FuncInt, 		1 );
 ADD_FUNC( "isempty", 	FuncIsEmpty,	1 );
@@ -849,7 +856,9 @@ bool Expression :: IsCompiled() const {
 }
 
 //----------------------------------------------------------------------------
-// call named function, returning result of call
+// Call named function, returning result of call.
+// If anything goes wrong with popping the stack it almost certainly means
+// the user didn't provide enough parameters.
 //----------------------------------------------------------------------------
 
 string Expression :: CallFunction( const string & name ) {
@@ -858,8 +867,14 @@ string Expression :: CallFunction( const string & name ) {
 		ATHROW( "Unknown function: " << name );
 	}
 	std::deque <string> params;
-	for ( unsigned int i = 0; i < af->mParamCount; i++ ) {
-		params.push_front( PopStr() );
+	try {
+		for ( unsigned int i = 0; i < af->mParamCount; i++ ) {
+			params.push_front( PopStr() );
+		}
+	}
+	catch( ... ) {
+		ATHROW( "Function " << name << "() given the wrong number of parameters."
+					<< " It takes "<< af->mParamCount << "." );
 	}
 	return af->mFunc( params );
 }
@@ -900,8 +915,9 @@ bool Expression :: EvalSingleExpr( unsigned int & ei, string & result ) {
 
 		if ( tok == ExprToken::MakeSep() ) {
 			if ( mStack.size() != 1 ) {
-				ATHROW( "Invalid expression in EvalSingleExpr stack "
-							<< ei << " " << mStack.size() );
+				ATHROW( "Invalid expression" );
+			//	ATHROW( "Invalid expression in EvalSingleExpr stack "
+			//				<< ei << " " << mStack.size() );
 			}
 			result = mStack.top();
 			return true;
@@ -930,7 +946,7 @@ bool Expression :: EvalSingleExpr( unsigned int & ei, string & result ) {
 
 string Expression :: PopStr() {
 	if ( mStack.size() == 0 ) {
-		ATHROW( "Stack underflow" );
+		ATHROW( "Invalid expression" );
 	}
 	string s = mStack.top();
 	mStack.pop();
