@@ -3,6 +3,7 @@ default:
 
 win:
 	-mkdir alib\\obj alib\\lib csvfix\\obj csvfix\\bin
+	@echo === Ignore errors above about existing directories ==
 	cd alib && $(MAKE) win
 	cd csvfix && $(MAKE) win
 
