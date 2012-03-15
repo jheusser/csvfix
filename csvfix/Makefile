@@ -101,6 +101,3 @@ lin:
 .PHONY: clean
 clean:
 	rm -Rf bin/* obj/* 
-
-.PHONY: cleanwin
-	del /s  bin/*.* obj/*.*

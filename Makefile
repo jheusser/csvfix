@@ -2,9 +2,9 @@ default:
 	@echo "use 'make win' or 'make lin'"
 
 win:
-	mkdir -p alib/obj alib/lib csvfix/obj csvfix/bin
-	cd alib; $(MAKE) win
-	cd csvfix; $(MAKE) win
+	-mkdir alib\\obj alib\\lib csvfix\\obj csvfix\\bin
+	cd alib && $(MAKE) win
+	cd csvfix && $(MAKE) win
 
 lin:
 	mkdir -p alib/obj alib/lib csvfix/obj csvfix/bin
