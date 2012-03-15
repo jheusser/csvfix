@@ -92,13 +92,15 @@ $(LINOUT): $(OBJS) $(ALIB)
 
 .PHONY: win
 win:
-	make $(WINOUT)
+	$(MAKE) $(WINOUT)
 
 .PHONY: lin
 lin:
-	make $(LINOUT)
+	$(MAKE) $(LINOUT)
 
 .PHONY: clean
 clean:
 	rm -Rf bin/* obj/* 
 
+.PHONY: cleanwin
+	del /s  bin/*.* obj/*.*
