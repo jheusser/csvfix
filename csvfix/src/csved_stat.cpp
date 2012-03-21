@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 // csved_stat.cpp
 //
-// produce recors/field stats for CSV files
+// produce record/field stats for CSV files
 //
 // Copyright (C) 2012 Neil Butterworth
 //---------------------------------------------------------------------------
@@ -11,9 +11,7 @@
 #include "csved_cli.h"
 #include "csved_stat.h"
 #include "csved_strings.h"
-
 #include <string>
-#include <vector>
 using std::string;
 
 namespace CSVED {
@@ -34,8 +32,8 @@ static RegisterCommand <StatCommand> rc1_(
 //----------------------------------------------------------------------------
 
 const char * const STAT_HELP = {
-	"produce field/record statistics  for CSV files\n"
-	"usage: csvfix stat [flags] file1 file2\n"
+	"produce record/field statistics for CSV files\n"
+	"usage: csvfix stat [flags] [file ...]\n"
 	"where flags are:\n"
 	"#ALL"
 };
@@ -56,7 +54,6 @@ StatCommand :: StatCommand( const string & name, const string & desc )
 
 int StatCommand :: Execute( ALib::CommandLine & cmd ) {
 
-	ProcessFlags( cmd );
 	IOManager io( cmd );
 
 	string filename;
@@ -69,7 +66,7 @@ int StatCommand :: Execute( ALib::CommandLine & cmd ) {
 				OutputStats( io, filename, lines, fmin, fmax );
 			}
 			filename = io.CurrentFileName();
-			lines = 0; fmin = INT_MAX, fmax = 0;
+			lines = 0; fmin = INT_MAX; fmax = 0;
 		}
 		lines++;
 		fmin = std::min( fmin, (int) row.size() );
@@ -93,13 +90,6 @@ void StatCommand :: OutputStats( IOManager & io, const string & fname,
 	row.push_back( ALib::Str( minf ) );
 	row.push_back( ALib::Str( maxf ) );
 	io.WriteRow( row );
-}
-//----------------------------------------------------------------------------
-// Get command line options
-//----------------------------------------------------------------------------
-
-void StatCommand :: ProcessFlags( ALib::CommandLine & cmd ) {
-
 }
 
 

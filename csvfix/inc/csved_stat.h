@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 // csved_stat.h
 //
-// produce recors/field stats for CSV files
+// produce record/field stats for CSV files
 //
 // Copyright (C) 2012 Neil Butterworth
 //---------------------------------------------------------------------------
@@ -27,7 +27,6 @@ class StatCommand : public Command {
 
 	private:
 
-		void ProcessFlags( ALib::CommandLine & cmd );
 		void OutputStats( IOManager & io, const std::string & fname,
 							int lines, int maxf, int minf );
 };
