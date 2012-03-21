@@ -61,6 +61,7 @@ const char * const CMD_SPLCHR	= "split_char";
 const char * const CMD_SQLDEL	= "sql_delete";
 const char * const CMD_SQLIN	= "sql_insert";
 const char * const CMD_SQLUP	= "sql_update";
+const char * const CMD_STAT		= "stat";
 const char * const CMD_SUMMARY	= "summary";
 const char * const CMD_TABLE	= "xml_table";
 const char * const CMD_TOXML	= "to_xml";

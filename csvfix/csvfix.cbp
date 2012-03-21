@@ -118,6 +118,7 @@
 		<Unit filename="inc\csved_sparse.h" />
 		<Unit filename="inc\csved_split.h" />
 		<Unit filename="inc\csved_sql.h" />
+		<Unit filename="inc\csved_stat.h" />
 		<Unit filename="inc\csved_strings.h" />
 		<Unit filename="inc\csved_sum.h" />
 		<Unit filename="inc\csved_template.h" />
@@ -171,6 +172,7 @@
 		<Unit filename="src\csved_sparse.cpp" />
 		<Unit filename="src\csved_split.cpp" />
 		<Unit filename="src\csved_sql.cpp" />
+		<Unit filename="src\csved_stat.cpp" />
 		<Unit filename="src\csved_sum.cpp" />
 		<Unit filename="src\csved_template.cpp" />
 		<Unit filename="src\csved_toxml.cpp" />
