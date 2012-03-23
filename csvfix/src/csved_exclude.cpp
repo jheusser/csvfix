@@ -100,7 +100,11 @@ void ExcludeCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 
 	string es = cmd.GetValue( FLAG_IF, "" );
 	if ( es != "" ) {
-		mExpr.Compile( es );
+		string emsg = mExpr.Compile( es );
+		if ( emsg != "" ) {
+			CSVTHROW( emsg + " " + es );
+		}
+
 	}
 	string sn = cmd.GetValue( FLAG_COLS, ""  );
 	CommaListToIndex( ALib::CommaList( sn ), mFields );

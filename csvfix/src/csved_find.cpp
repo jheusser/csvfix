@@ -138,7 +138,11 @@ int FindCommand :: Execute( ALib::CommandLine & cmd ) {
 
 	if ( cmd.HasFlag( FLAG_IF ) ) {
 		string e = cmd.GetValue( FLAG_IF, ""  );
-		mEvalExpr.Compile( e );
+		string emsg = mEvalExpr.Compile( e );
+		if ( emsg != "" ) {
+			CSVTHROW( emsg + " " + e );
+		}
+
 	}
 
 
