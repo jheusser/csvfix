@@ -83,12 +83,14 @@ const char * const CMD_XMLR		= "read_xml";
 
 const char * const FLAG_AVG		= "-avg";
 const char * const FLAG_ACTKEEP	= "-k";
+const char * const FLAG_ACTMARK	= "-m";
 const char * const FLAG_ACTREM	= "-r";
 const char * const FLAG_BASEN	= "-b";
 const char * const FLAG_BDEXCL	= "-bdx";
 const char * const FLAG_BDLIST	= "-bdl";
 const char * const FLAG_BEXPR	= "-be";
 const char * const FLAG_BLKEXC	= "-x";
+const char * const FLAG_BLKMARK	= "-m";
 const char * const FLAG_CDATE	= "-cy";
 const char * const FLAG_CHARS	= "-s";
 const char * const FLAG_CHAR	= "-c";

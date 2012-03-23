@@ -32,11 +32,12 @@ class BlockCommand : public Command {
 		bool AtEndBlock() ;
 		bool AtBeginBlock() ;
 
-		enum Action { None, Keep, Remove };
+		enum Action { None, Keep, Remove, Mark };
 
 		ALib::Expression mBeginEx, mEndEx;
 		Action mAction;
 		bool mExclusive;
+		std::string mBlockMark, mNotMark;
 
 };
 
