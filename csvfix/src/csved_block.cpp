@@ -36,6 +36,12 @@ const char * const BLOCK_HELP = {
 	"/ perform actions on blocks of CSV records\n"
 	"usage: csvfix block  [flags] [file ...]\n"
 	"where flags are:\n"
+	"  -be expr\texpression marking start of block (required)\n"
+	"  -ee expr\texpression marking end of block\n"
+	"  -r\t\tremove block from output\n"
+	"  -k\t\tkeep block in output\n"
+	"  -m mark\tmark block and non-block records\n"
+	"  -x\t\texclude begin/end records from block\n"
 	"#ALL"
 };
 
@@ -51,14 +57,22 @@ BlockCommand :: BlockCommand( const string & name, const string & desc )
 	AddFlag( ALib::CommandLineFlag( FLAG_EEXPR, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_ACTKEEP, false, 0 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_ACTREM, false, 0 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_ACTMARK, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_BLKEXC, false, 0 ) );
 }
 
 
 //----------------------------------------------------------------------------
-///----------------------------------------------------------------------------
+// Are we inside or outside a block?
+//----------------------------------------------------------------------------
 
 enum State { Outside, Inside };
+
+//----------------------------------------------------------------------------
+// Read rows and flip state depending on the return value of the begin/end
+// expressions. Need to take into account if we are in exclude mode, in
+// which case the begin and end marker rows are excluded from blocks.
+//----------------------------------------------------------------------------
 
 int BlockCommand :: Execute( ALib::CommandLine & cmd ) {
 
@@ -94,12 +108,22 @@ int BlockCommand :: Execute( ALib::CommandLine & cmd ) {
 		}
 
 		//std::cout << "Block is " << block << std::endl;
-		if ( (block && mAction == Keep) || (!block && mAction == Remove) ) {
+		if ( mAction == Mark ) {
+			CSVRow tmp;
+			tmp.push_back( block ? mBlockMark : mNotMark );
+			tmp.insert( tmp.end(), row.begin(), row.end() );
+			io.WriteRow( tmp );
+		}
+		else if ( (block && mAction == Keep) || (!block && mAction == Remove) ) {
 			io.WriteRow( row );
 		}
 	}
 	return 0;
 }
+
+//----------------------------------------------------------------------------
+// Are we at the rows marking begin/end of blocks?
+//----------------------------------------------------------------------------
 
 bool BlockCommand :: AtEndBlock()  {
 	return ALib::Expression::ToBool( mEndEx.Evaluate() );
@@ -110,7 +134,7 @@ bool BlockCommand :: AtBeginBlock()  {
 }
 
 //----------------------------------------------------------------------------
-// Get command line options.
+// Get command line options and report any problems  with them.
 //----------------------------------------------------------------------------
 
 void BlockCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
@@ -127,18 +151,46 @@ void BlockCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 		CSVTHROW( "Invalid expression for " << FLAG_EEXPR );
 	}
 
-	if ( cmd.HasFlag( FLAG_ACTREM ) && cmd.HasFlag( FLAG_ACTKEEP ) ) {
-		CSVTHROW( "Can specify only one of "
-						<< FLAG_ACTKEEP << " or " << FLAG_ACTREM );
-	}
+	int actions = 0;
 	if ( cmd.HasFlag( FLAG_ACTREM ) ) {
 		mAction = Remove;
+		actions++;
 	}
-	else if ( cmd.HasFlag( FLAG_ACTKEEP ) ) {
+	if ( cmd.HasFlag( FLAG_ACTKEEP ) ) {
 		mAction = Keep;
+		actions++;
+
 	}
-	else {
-		CSVTHROW( "Need one of " << FLAG_ACTKEEP << " or " << FLAG_ACTREM );
+	if ( cmd.HasFlag( FLAG_ACTMARK ) ) {
+		mAction = Mark;
+		actions++;
+		ALib::CommaList cl( cmd.GetValue( FLAG_ACTMARK, "" ) );
+		if ( cl.Size() == 0 ) {
+			CSVTHROW( "Need value for " << FLAG_ACTMARK );
+		}
+		else if ( cl.Size() == 1 ) {
+			mBlockMark = cl.At(0);
+			mNotMark = "";
+		}
+		else if ( cl.Size() == 2 ) {
+			mBlockMark = cl.At(0);
+			mNotMark = cl.At(1);
+		}
+		else {
+			CSVTHROW( "Invalid mark string for " << FLAG_ACTMARK );
+		}
+	}
+	if ( actions > 1  ) {
+		CSVTHROW( "Can specify only one of "
+					<< FLAG_ACTKEEP << ", "
+					<< FLAG_ACTREM <<" or "
+					<< FLAG_ACTMARK );
+	}
+	if ( actions == 0 ) {
+		CSVTHROW( "Need one of "
+					<< FLAG_ACTKEEP << ", "
+					<< FLAG_ACTREM <<" or "
+					<< FLAG_ACTMARK );
 	}
 	mExclusive = cmd.HasFlag( FLAG_BLKEXC );
 }
