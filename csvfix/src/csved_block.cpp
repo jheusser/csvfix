@@ -33,7 +33,7 @@ static RegisterCommand <BlockCommand> rc1_(
 //----------------------------------------------------------------------------
 
 const char * const BLOCK_HELP = {
-	"/ perform actions on blocks of CSV records\n"
+	"perform actions on blocks of CSV records\n"
 	"usage: csvfix block  [flags] [file ...]\n"
 	"where flags are:\n"
 	"  -be expr\texpression marking start of block (required)\n"
