@@ -29,12 +29,14 @@ class BlockCommand : public Command {
 	private:
 
 		void ProcessFlags( const ALib::CommandLine & cmd );
+		bool AtEndBlock() ;
+		bool AtBeginBlock() ;
 
-		enum Action { Keep, Remove };
+		enum Action { None, Keep, Remove };
 
 		ALib::Expression mBeginEx, mEndEx;
-		bool mExclusive;
 		Action mAction;
+		bool mExclusive;
 
 };
 
