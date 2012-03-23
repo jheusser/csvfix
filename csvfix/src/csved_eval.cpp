@@ -120,7 +120,10 @@ void EvalCommand ::	GetExpressions( ALib::CommandLine & cmd ) {
 			i++;
 			string expr = cmd.Argv( i );
 			ALib::Expression ex;
-			ex.Compile( expr );
+			string emsg = ex.Compile( expr );
+			if ( emsg != "" ) {
+				CSVTHROW( emsg + " in " + expr );
+			}
 			mFieldExprs.push_back( FieldEx( -1, ex ) );
 		}
 		else if ( cmd.Argv( i ) == FLAG_REMOVE ) {
@@ -143,7 +146,11 @@ void EvalCommand ::	GetExpressions( ALib::CommandLine & cmd ) {
 				CSVTHROW( "Invalid field (must be greater than zero): " << field );
 			}
 			ALib::Expression ex;
-			ex.Compile( expr );
+			string emsg = ex.Compile( expr );
+			if ( emsg != "" ) {
+				CSVTHROW( emsg + " in " + expr );
+			}
+
 			mFieldExprs.push_back( FieldEx( n - 1, ex ) );
 		}
 		i++;
