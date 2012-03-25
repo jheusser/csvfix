@@ -36,7 +36,7 @@ const char * const BLOCK_HELP = {
 	"perform actions on blocks of CSV records\n"
 	"usage: csvfix block  [flags] [file ...]\n"
 	"where flags are:\n"
-	"  -be expr\texpression marking start of block (required)\n"
+	"  -be expr\texpression marking start of block\n"
 	"  -ee expr\texpression marking end of block\n"
 	"  -r\t\tremove block from output\n"
 	"  -k\t\tkeep block in output\n"
@@ -54,7 +54,7 @@ BlockCommand :: BlockCommand( const string & name, const string & desc )
 					mAction( None ), mExclusive( false ) {
 
 	AddFlag( ALib::CommandLineFlag( FLAG_BEXPR, true, 1 ) );
-	AddFlag( ALib::CommandLineFlag( FLAG_EEXPR, false, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_EEXPR, true, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_ACTKEEP, false, 0 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_ACTREM, false, 0 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_ACTMARK, false, 1 ) );
@@ -134,22 +134,28 @@ bool BlockCommand :: AtBeginBlock()  {
 }
 
 //----------------------------------------------------------------------------
+// Helper to get begin/end expression
+//----------------------------------------------------------------------------
+
+static void GetBEExpr( const ALib::CommandLine & cmd, const string & which,
+							ALib::Expression & expr ) {
+
+	string exs = cmd.GetValue( which );
+	string emsg = expr.Compile( exs );
+	if ( emsg != "" ) {
+		CSVTHROW( "Invalid expression for " << which );
+	}
+}
+
+
+//----------------------------------------------------------------------------
 // Get command line options and report any problems  with them.
 //----------------------------------------------------------------------------
 
 void BlockCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 
-	string beginex = cmd.GetValue( FLAG_BEXPR );
-	string emsg = mBeginEx.Compile( beginex );
-	if ( emsg != "" ) {
-		CSVTHROW( "Invalid expression for " << FLAG_BEXPR );
-	}
-
-	string endex = cmd.GetValue( FLAG_EEXPR, beginex );
-	emsg = mEndEx.Compile( endex );
-	if ( emsg != "" ) {
-		CSVTHROW( "Invalid expression for " << FLAG_EEXPR );
-	}
+	GetBEExpr( cmd, FLAG_BEXPR, mBeginEx );
+	GetBEExpr( cmd, FLAG_EEXPR, mEndEx );
 
 	int actions = 0;
 	if ( cmd.HasFlag( FLAG_ACTREM ) ) {
