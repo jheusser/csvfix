@@ -21,6 +21,7 @@ WINLIBS = ../alib/lib/alib.a -lodbc32
 LINLIBS = ../alib/lib/alib.a 
 
 _OBJS = csved_atable.o \
+		csved_block.o \
 		csved_case.o \
 		csved_cli.o \
 		csved_check.o \
@@ -61,6 +62,7 @@ _OBJS = csved_atable.o \
 		csved_sparse.o \
 		csved_split.o \
 		csved_sql.o \
+		csved_stat.o \
 		csved_sum.o \
 		csved_template.o \
 		csved_toxml.o \
