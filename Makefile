@@ -1,9 +1,14 @@
+ifndef COMSPEC
+	CLEAN =	(cd alib; $(MAKE) clean) && (cd csvfix; $(MAKE) clean) 
+else
+	CLEAN = cmd.exe /c "clean.cmd"
+endif
+
 default:
 	@echo "use 'make win' or 'make lin'"
 
 win:
-	-mkdir alib\\obj alib\\lib csvfix\\obj csvfix\\bin
-	@echo === Ignore errors above about existing directories ==
+	cmd.exe /c "mkdirs.cmd"
 	cd alib && $(MAKE) win
 	cd csvfix && $(MAKE) win
 
@@ -13,5 +18,4 @@ lin:
 	cd csvfix; $(MAKE) lin
 
 clean:
-	cd alib; $(MAKE) clean
-	cd csvfix; $(MAKE) clean
+	$(CLEAN)
