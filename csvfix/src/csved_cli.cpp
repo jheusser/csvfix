@@ -25,7 +25,7 @@ namespace CSVED {
 CLIHandler::DictType * CLIHandler::mDict = 0;
 
 //---------------------------------------------------------------------------
-// Create command line handler from command line params
+// Create command line handler from command line params of main()
 //---------------------------------------------------------------------------
 
 CLIHandler :: CLIHandler( int argc, char * argv[] )
@@ -34,15 +34,8 @@ CLIHandler :: CLIHandler( int argc, char * argv[] )
 }
 
 //---------------------------------------------------------------------------
-// Do nothing dtor
-//---------------------------------------------------------------------------
-
-CLIHandler :: ~CLIHandler() {
-}
-
-//---------------------------------------------------------------------------
 // Run command based on command line parameters
-// The arg value indexed by 1 is the command.
+// The arg value indexed by 1 is the internal command.
 //---------------------------------------------------------------------------
 
 int CLIHandler :: ExecCommand() {

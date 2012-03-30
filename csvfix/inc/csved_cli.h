@@ -28,7 +28,6 @@ class CLIHandler {
 		typedef ALib::Dictionary <Command *> DictType;
 
 		CLIHandler( int argc, char * argv[] );
-		~CLIHandler();
 
 		int ExecCommand();
 
