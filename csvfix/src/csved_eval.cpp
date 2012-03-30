@@ -51,7 +51,7 @@ EvalCommand ::	EvalCommand( const string & name,
 }
 
 //----------------------------------------------------------------------------
-// compile all expressions and then evaluate for eaxh input row
+// Compile all expressions and then evaluate for each input row
 //----------------------------------------------------------------------------
 
 int EvalCommand ::	Execute( ALib::CommandLine & cmd ) {
