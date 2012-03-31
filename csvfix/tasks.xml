@@ -1,6 +1,0 @@
-<buttons caption="Project Tasks" ontop="no">
-	<button>
-		<text>Directory List</text>
-		<action>start python c:/bin/execpause.py "ls -l"</action>
-	</button>
-</buttons>
