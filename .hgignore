@@ -19,3 +19,4 @@ csvfix/installer/Output/*
 *.zip
 *backup
 *.orig
+*.smproj
