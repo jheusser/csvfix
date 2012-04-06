@@ -130,8 +130,77 @@ void EditCommand :: EditField( std::string & f ) {
 	}
 }
 
+//----------------------------------------------------------------------------
+// Helper to read a character from a string which must not be the EOS
+//----------------------------------------------------------------------------
+
+static char MustGet( const string & s, unsigned int  i ) {
+	char c = ALib::Peek( s, i );
+	if ( c == 0 ) {
+		CSVTHROW( "Invalid value for " << FLAG_EDIT << ": " << s );
+	}
+	return c;
+}
+
+//----------------------------------------------------------------------------
+// Helper to read a string up to the specified separator. Escaped separators
+// must be skipped over.
+//----------------------------------------------------------------------------
+
+static string ReadField( const string & s, unsigned int & i, char sep ) {
+	string f = "";
+	bool escaped = false;
+	while(1) {
+		char c = MustGet( s, i++ );
+		if ( escaped ) {
+			escaped = false;
+			f += c;
+		}
+		else if ( c == '\\' ) {
+			escaped = true;
+			f += c;
+		}
+		else if ( c != sep ) {
+			f += c;
+		}
+		else if ( c == sep ) {
+			break;
+		}
+	}
+	return f;
+}
+
+
+//----------------------------------------------------------------------------
+// Parse a subs command of the form cmd/pattern/subs/opt, where cmd is always
+// a single character, / may be any and character except the backslash, and
+// opt is optional.
+//----------------------------------------------------------------------------
+
+static void ParseSub( const string & s, char & cmd, vector <string> & fields ) {
+
+	unsigned int i = 0;
+	cmd = MustGet( s, i++ );
+	if ( cmd != SUB_CMD ) {
+		CSVTHROW( "Invalid value for " << FLAG_EDIT << ": " << s );
+	}
+	char sep = MustGet( s, i++ );
+	if (  sep == '\\' ) {
+		CSVTHROW( "Invalid value for " << FLAG_EDIT << ": " << s );
+	}
+
+	string f = ReadField( s, i, sep );
+	fields.push_back( f );
+	f = ReadField( s, i, sep );
+	fields.push_back( f );
+	f = s.substr( i );
+	fields.push_back( f );
+}
+
 //---------------------------------------------------------------------------
-// add sub command with some error checking
+// Add sub command with some error checking.
+// No longer uses Split() to parse command as that did  not deal correctly
+// with escaped separators and empty command fields.
 //---------------------------------------------------------------------------
 
 void EditCommand :: AddSubCmd( const string & ev ) {
@@ -143,16 +212,14 @@ void EditCommand :: AddSubCmd( const string & ev ) {
 		CSVTHROW( "Edit sub command missing from " << ev );
 	}
 
+	char cmd;
 	vector <string> tmp;
-	if ( ALib::Split( ev, ev[1], tmp ) != 4 ) {
-		CSVTHROW( "Invalid value for " << FLAG_EDIT << ": " << ev );
-	}
+	ParseSub( ev, cmd, tmp );
+//	for ( unsigned int i = 0; i < tmp.size(); i++ ) {
+//		std::cout << "[" << tmp[i] << "]" << std::endl;
+//	}
 
-	if ( ev[0] != SUB_CMD ) {
-		CSVTHROW( "Invalid edit sub-command '" << ev[0] << "' in '"
-						<< ev << "' " );
-	}
-	mSubCmds.push_back ( EditSubCmd( ev[0], tmp[1], tmp[2], tmp[3] ) );
+	mSubCmds.push_back ( EditSubCmd( cmd, tmp[0], tmp[1], tmp[2] ) );
 }
 
 //------------------------------------------------------------------------
