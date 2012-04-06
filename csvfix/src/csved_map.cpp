@@ -146,6 +146,8 @@ string MapCommand :: Expand( const string & val ) {
 
 //---------------------------------------------------------------------------
 // Process command line flags. Need a list of fields and from and to values
+// Need to treat comma list and single values a bit differently to take into
+// account empty and space-only items which CommaList screws up.
 //---------------------------------------------------------------------------
 
 void MapCommand :: ProcessFlags( ALib::CommandLine & cmd ) {
@@ -158,11 +160,22 @@ void MapCommand :: ProcessFlags( ALib::CommandLine & cmd ) {
 		}
 	}
 
-	mFrom = ALib::CommaList( cmd.GetValue( FLAG_FROMV ));
-	if ( mFrom.Size() == 0 ) {
-		mFrom.Append("");
+	string v = cmd.GetValue( FLAG_FROMV );
+	if ( v.find( ',' ) == std::string::npos ) {
+		mFrom.Append( v );
 	}
-	mTo = ALib::CommaList( cmd.GetValue( FLAG_TOV ));
+	else {
+		mFrom = ALib::CommaList( v );
+	}
+
+	v = cmd.GetValue( FLAG_TOV );
+	if ( v.find( ',' ) == std::string::npos ) {
+		mTo.Append( v );
+	}
+	else {
+		mTo = ALib::CommaList( v );
+	}
+
 	if ( mTo.Size() > mFrom.Size() ) {
 		CSVTHROW( "List of 'to values' longer than list of 'from values" );
 	}
