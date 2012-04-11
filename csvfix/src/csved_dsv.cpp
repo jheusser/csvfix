@@ -49,6 +49,7 @@ const char * const DSVR_HELP = {
 	"  -f fields\tspecify list of fields to convert (default is all)\n"
 	"  -s sep\tspecify DSV separator character (default is pipe symbol)\n"
 	"  -csv\t\ttreat field contents as CSV (double quotes are special)\n"
+	"  -cm\t\tcollapse multiple separators into single instance\n"
 	"#SMQ,IBL,OFL"
 };
 
@@ -141,9 +142,11 @@ void DSVBase ::	BuildCSVRow( const CSVRow & in, CSVRow & out ) const {
 
 DSVReadCommand :: DSVReadCommand( const string & name,
 									const string & desc )
-		: DSVBase( name, desc, DSVR_HELP ), mIsCSV( false ) {
+		: DSVBase( name, desc, DSVR_HELP ), mIsCSV( false ), mCollapseSep( false ) {
 
 	AddFlag( ALib::CommandLineFlag( FLAG_CSV, false, 0 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_CMULTI, false, 0 ) );
+
 }
 
 //---------------------------------------------------------------------------
@@ -154,6 +157,7 @@ int DSVReadCommand :: Execute( ALib::CommandLine & cmd ) {
 
 	ReadFlags( cmd );
 	mIsCSV = cmd.HasFlag( FLAG_CSV );
+	mCollapseSep = cmd.HasFlag( FLAG_CMULTI );
 	IOManager io( cmd );
 	CSVRow row;
 	string line;
@@ -200,7 +204,8 @@ string DSVReadCommand :: Unquote( const string & s ) const {
 
 //---------------------------------------------------------------------------
 // Chop line up into fields seoarated by mDelim. The delimitter can be
-// escaped with a backslash.
+// escaped with a backslash. If the mCollapseSep flag is set, multiple
+// occurences of a separator are treated as a asingle one.
 //---------------------------------------------------------------------------
 
 void DSVReadCommand :: ParseDSV( const string & line, CSVRow & rv ) {
@@ -213,6 +218,9 @@ void DSVReadCommand :: ParseDSV( const string & line, CSVRow & rv ) {
 	while( pos < len ) {
 		char c = line[ pos++ ];
 		if ( c == Delim() ) {
+			while( mCollapseSep && ALib::Peek( line, pos ) == Delim() ) {
+				pos++;
+			}
 			row.push_back( Unquote( val ) );
 			val = "";
 		}
