@@ -49,7 +49,7 @@ const char * const CHECK_HELP = {
 CheckCommand :: CheckCommand( const string & name,
 								const string & desc )
 		: Command( name, desc, CHECK_HELP ),
-		    mQuiet( false ), mSep( ',' ), mEmbedNLOk( false ), mVerbose( false ) {
+		    mQuiet( false ), mEmbedNLOk( false ), mVerbose( false ), mSep( ',' ) {
 	AddFlag( ALib::CommandLineFlag( FLAG_QUIET, false, 0 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_SEP, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_NLOK, false, 0 ) );

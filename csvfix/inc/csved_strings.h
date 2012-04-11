@@ -96,6 +96,7 @@ const char * const FLAG_CHARS	= "-s";
 const char * const FLAG_CHAR	= "-c";
 const char * const FLAG_CMD		= "-c";
 const char * const FLAG_COLS	= "-f";
+const char * const FLAG_CMULTI	= "-cm";
 const char * const FLAG_CONSTR	= "-cs";
 const char * const FLAG_CSV		= "-csv";
 const char * const FLAG_CSVSEP	= "-sep";

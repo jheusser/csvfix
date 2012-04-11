@@ -79,7 +79,7 @@ int EvalCommand ::	Execute( ALib::CommandLine & cmd ) {
 void EvalCommand ::	Evaluate( CSVRow & row ) {
 	for ( unsigned int i = 0; i < mFieldExprs.size() ; i++ ) {
 		string r = mFieldExprs[i].mExpr.Evaluate();
-		if ( mFieldExprs[i].mField < 0 || mFieldExprs[i].mField >= row.size() ) {
+		if ( mFieldExprs[i].mField < 0 || mFieldExprs[i].mField >= (int) row.size() ) {
 			row.push_back( r );
 		}
 		else {

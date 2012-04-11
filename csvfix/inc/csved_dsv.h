@@ -60,7 +60,7 @@ class DSVReadCommand : public DSVBase {
 
 		void ParseDSV( const std::string & line,
 							CSVRow & row );
-		bool mIsCSV;
+		bool mIsCSV, mCollapseSep;
 
 };
 
