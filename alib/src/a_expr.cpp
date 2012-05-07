@@ -668,7 +668,7 @@ void ExprCompiler :: PopSubExpr( Expression::RPNRep & rep) {
 	while( mStack.size() ) {
 		ExprToken st = mStack.top();
 		mStack.pop();
-//		st.DumpOn( std::cout );
+		//st.DumpOn( std::cout );
 		if ( st.Type() == ExprToken::etOp &&  st.Value() == "("  ) {
 			return;
 		}
@@ -686,7 +686,7 @@ void ExprCompiler :: PopSubExpr( Expression::RPNRep & rep) {
 			rep.push_back( st );
 		}
 	}
-	ATHROW( "Bad nesting" );
+	ATHROW( "Bad expression nesting or function call syntax" );
 }
 
 //----------------------------------------------------------------------------
