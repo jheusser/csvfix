@@ -106,8 +106,8 @@ Command * CLIHandler :: FindAbb( const  string & ab ) {
 
 int CLIHandler :: Info() {
 	cerr << "\n" << CSVED_NAME << " " << CSVED_VERS << " (" << CSVED_VDATE << ")\n";
-	cerr << CSVED_CPYR << "\n";
-	cerr << "\n";
+	cerr << CSVED_CPYR << "\n" << CSVED_NOWAR;
+	cerr << "\n\n";
 	cerr << "csvfix is a CSV stream editor\n";
 	cerr << "use 'csvfix help' to see a list of commands\n";
 	cerr << "use 'csvfix help command' to see help on a specific command\n";

@@ -13,6 +13,8 @@ const char * const CSVED_NAME 	= "CSVfix";
 const char * const CSVED_VERS 	= "1.3";
 const char * const CSVED_VDATE 	= __DATE__;
 const char * const CSVED_CPYR 	= "Copyright (C) 2012 Neil Butterworth";
-
+const char * const CSVED_NOWAR 	=
+	"This is free software; see the source for copying conditions. There is NO\n"
+	"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.";
 #endif
 

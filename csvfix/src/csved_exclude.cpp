@@ -12,6 +12,7 @@
 #include "csved_exclude.h"
 #include "csved_strings.h"
 #include "csved_evalvars.h"
+#include <algorithm>
 
 using std::string;
 using std::vector;
@@ -36,6 +37,7 @@ const char * const EXCL_HELP = {
 	"usage: csvfix exclude  [flags] [file ...]\n"
 	"where flags are:\n"
 	"  -f fields\tlist of fields to exclude\n"
+	"  -rf fields\tlist of fields to exclude, starting from end of record\n"
 	"  -if expr\texclude fields specified by -f if expr evaluates to true\n"
 	"#ALL"
 };
@@ -46,9 +48,10 @@ const char * const EXCL_HELP = {
 
 ExcludeCommand ::ExcludeCommand( const string & name,
 								const string & desc )
-		: Command( name, desc, EXCL_HELP ) {
+		: Command( name, desc, EXCL_HELP ), mReverse( false ) {
 
-	AddFlag( ALib::CommandLineFlag( FLAG_COLS, true, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_COLS, false, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_REVCOLS, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_IF, false, 1 ) );
 }
 
@@ -98,6 +101,14 @@ bool ExcludeCommand :: EvalExprOnRow( IOManager & io, const CSVRow & row ) {
 
 void ExcludeCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 
+	if ( cmd.HasFlag( FLAG_REVCOLS ) && cmd.HasFlag( FLAG_COLS ) ) {
+		CSVTHROW( "Only one of " << FLAG_COLS << " or " << FLAG_REVCOLS << " allowed" );
+	}
+
+	if ( ! cmd.HasFlag( FLAG_REVCOLS ) && ! cmd.HasFlag( FLAG_COLS ) ) {
+		CSVTHROW( "Need one of " << FLAG_COLS << " or " << FLAG_REVCOLS );
+	}
+
 	string es = cmd.GetValue( FLAG_IF, "" );
 	if ( es != "" ) {
 		string emsg = mExpr.Compile( es );
@@ -106,11 +117,15 @@ void ExcludeCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 		}
 
 	}
+	mReverse = cmd.HasFlag( FLAG_REVCOLS );
 	string sn = cmd.GetValue( FLAG_COLS, ""  );
+	if ( sn == "" ) {
+		sn = cmd.GetValue( FLAG_REVCOLS, ""  );
+	}
 	CommaListToIndex( ALib::CommaList( sn ), mFields );
 	if ( mFields.size() == 0 ) {
-		CSVTHROW( "Field list  specified by " << FLAG_COLS
-				<< " cannot be empty" );
+		CSVTHROW( "Field list  specified by " << FLAG_COLS << " or "
+						<< FLAG_REVCOLS << " cannot be empty" );
 	}
 }
 
@@ -123,11 +138,20 @@ void ExcludeCommand :: Exclude(  CSVRow & r ) const {
 
 	CSVRow out;
 
+	if ( mReverse ) {
+		std::reverse( r.begin(), r.end() );
+	}
+
 	for ( unsigned int i = 0; i < r.size(); i++ ) {
 		if ( ! ALib::Contains( mFields, i ) ) {
 			out.push_back( r.at( i ) );
 		}
 	}
+
+	if ( mReverse ) {
+		std::reverse( out.begin(), out.end() );
+	}
+
 	r.swap( out );
 }
 
