@@ -36,6 +36,7 @@ class ExcludeCommand : public Command {
 
 		FieldList mFields;
 		ALib::Expression mExpr;
+		bool mReverse;
 };
 
 //------------------------------------------------------------------------
