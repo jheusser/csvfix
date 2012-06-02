@@ -106,7 +106,7 @@ int FromXMLCommand :: Execute( ALib::CommandLine & cmd )  {
 void FromXMLCommand :: ProcessXMLFile( const string & file ) {
 
 	ALib::XMLTreeParser parser;
-	std::auto_ptr <ALib::XMLElement> tree(
+	std::unique_ptr <ALib::XMLElement> tree(
 		file  == STDINPUT_SPEC
 			? parser.ParseStream( std::cin )
 			: parser.ParseFile( file )

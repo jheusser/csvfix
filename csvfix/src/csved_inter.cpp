@@ -64,8 +64,8 @@ int InterCommand :: Execute( ALib::CommandLine & cmd ) {
 		CSVTHROW( "Command requires exactly two input streams" );
 	}
 
-	std::auto_ptr<ALib::CSVStreamParser> p0( io.CreateStreamParser( 0 ) );
-	std::auto_ptr<ALib::CSVStreamParser> p1( io.CreateStreamParser( 1 ) );
+	std::unique_ptr<ALib::CSVStreamParser> p0( io.CreateStreamParser( 0 ) );
+	std::unique_ptr<ALib::CSVStreamParser> p1( io.CreateStreamParser( 1 ) );
 
 	CSVRow row0, row1;
 

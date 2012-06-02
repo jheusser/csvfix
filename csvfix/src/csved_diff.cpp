@@ -21,6 +21,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 using std::string;
 
 namespace CSVED {
@@ -245,7 +246,7 @@ DiffCommand :: DiffCommand( const string & name, const string & desc )
 
 static void ReadCSV( IOManager & io, int index, CSVList & csvlist ) {
 
-	std::auto_ptr<ALib::CSVStreamParser> p( io.CreateStreamParser( index ) );
+	std::unique_ptr<ALib::CSVStreamParser> p( io.CreateStreamParser( index ) );
 
 	CSVRow row;
 	while( p->ParseNext( row ) ) {
