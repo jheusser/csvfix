@@ -149,6 +149,9 @@ class ToXMLCommand : public Command {
 		void MakeText( IOManager & io, const XMLSpecText * t,
 						const InSlice & is, unsigned int indent );
 
+		XMLSpecNode * MakeSpecNode( int indent,
+									const std::vector <std::string> &tokens );
+
 		std::string Indent( unsigned int i ) const;
 
 		std::string mXMLSpec;

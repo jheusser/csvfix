@@ -494,6 +494,24 @@ static int GetIndent( const std::string & line ) {
 }
 
 //----------------------------------------------------------------------------
+// Make specification node instance depending on type string
+//----------------------------------------------------------------------------
+
+XMLSpecNode * ToXMLCommand :: MakeSpecNode(
+								int indent,
+								const std::vector <string> &tokens ) {
+	if ( tokens[0] == TAG_STR ) {
+		return MakeTagSpec( indent, tokens );
+	}
+	else if ( tokens[0] == TEXT_STR || tokens[0] == CDATA_STR ) {
+		return MakeTextSpec( indent, tokens, tokens[0] == CDATA_STR );
+	}
+	else {
+		CSVTHROW( "Unknown type: " << tokens[0] );
+	}
+}
+
+//----------------------------------------------------------------------------
 // Read config file returning pointer to root tag.
 //----------------------------------------------------------------------------
 
@@ -513,7 +531,7 @@ XMLSpecTag * ToXMLCommand :: ReadSpec( const string & file ) {
 		int indent = GetIndent( line );
 		line = ALib::Trim( line );
 
-		if ( ALib::IsEmpty( line ) || ALib::Peek( line, 0 ) == COMMENT_CHAR) {
+		if ( ALib::IsEmpty( line ) || ALib::Peek( line, 0 ) == COMMENT_CHAR ) {
 			continue;
 		}
 
@@ -523,16 +541,7 @@ XMLSpecTag * ToXMLCommand :: ReadSpec( const string & file ) {
 			CSVTHROW( "Invalid specification: " << line );
 		}
 
-		XMLSpecNode * sn = 0;
-		if ( tokens[0] == TAG_STR ) {
-			sn = MakeTagSpec( indent, tokens );
-		}
-		else if ( tokens[0] == TEXT_STR || tokens[0] == CDATA_STR ) {
-			sn = MakeTextSpec( indent, tokens, tokens[0] == CDATA_STR );
-		}
-		else {
-			CSVTHROW( "Unknown type: " << tokens[0] );
-		}
+		XMLSpecNode * sn = MakeSpecNode( indent, tokens );
 
 		if ( root.get() == 0 ) {
 			if ( indent != 0 ) {
@@ -540,7 +549,7 @@ XMLSpecTag * ToXMLCommand :: ReadSpec( const string & file ) {
 			}
 			root = std::unique_ptr <XMLSpecTag>(dynamic_cast<XMLSpecTag*>( sn ));
 			if ( root.get() == 0 ) {
-				CSVTHROW( "Root must be a tag spec at " << line);
+				CSVTHROW( "Root must be a tag spec at " << line );
 			}
 		}
 		else {
