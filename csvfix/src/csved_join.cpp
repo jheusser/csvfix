@@ -101,7 +101,7 @@ int JoinCommand :: Execute( ALib::CommandLine & cmd ) {
 
 	CSVRow row;
 	for ( unsigned int i = 0; i < scount - 1; i++ ) {
-		std::auto_ptr <ALib::CSVStreamParser> p( io.CreateStreamParser( i ) );
+		std::unique_ptr <ALib::CSVStreamParser> p( io.CreateStreamParser( i ) );
 		while( p->ParseNext( row ) ) {
 			WriteJoinRows( io, row );
 		}
@@ -213,7 +213,7 @@ string JoinCommand :: MakeKey( const CSVRow & row, bool first ) {
 
 void JoinCommand :: BuildRowMap( ALib::CSVStreamParser * sp ) {
 	string line;
-	std::auto_ptr <ALib::CSVStreamParser> p( sp );
+	std::unique_ptr <ALib::CSVStreamParser> p( sp );
 	CSVRow row;
 	while( p->ParseNext( row ) ) {
 		string key = MakeKey( row, false );

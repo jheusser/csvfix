@@ -264,7 +264,7 @@ int ToXMLCommand :: Execute( ALib::CommandLine & cmd ) {
 		MakeTable( io );
 	}
 	else {
-		std::auto_ptr <XMLSpecTag> root( ReadSpec( mXMLSpec ) );
+		std::unique_ptr <XMLSpecTag> root( ReadSpec( mXMLSpec ) );
 		vector <CSVRow> input;
 		while( io.ReadCSV( row ) ) {
 			input.push_back( row );
@@ -506,7 +506,7 @@ XMLSpecTag * ToXMLCommand :: ReadSpec( const string & file ) {
 
 	string line;
 	XMLSpecNode * current = 0;
-	std::auto_ptr <XMLSpecTag> root;
+	std::unique_ptr <XMLSpecTag> root;
 
 	while( std::getline( ifs, line )) {
 
@@ -538,7 +538,7 @@ XMLSpecTag * ToXMLCommand :: ReadSpec( const string & file ) {
 			if ( indent != 0 ) {
 				CSVTHROW( "Invalid root indent: " << line );
 			}
-			root = std::auto_ptr <XMLSpecTag>(dynamic_cast<XMLSpecTag*>( sn ));
+			root = std::unique_ptr <XMLSpecTag>(dynamic_cast<XMLSpecTag*>( sn ));
 			if ( root.get() == 0 ) {
 				CSVTHROW( "Root must be a tag spec at " << line);
 			}
@@ -598,7 +598,7 @@ XMLSpecNode * ToXMLCommand :: MakeTagSpec( int indent,
 											const vector <string> & toks) {
 	unsigned int pos = 1;
 	string name = Peek( toks, pos++ );
-	std::auto_ptr <XMLSpecTag> tp( new  XMLSpecTag( indent, name ) );
+	std::unique_ptr <XMLSpecTag> tp( new  XMLSpecTag( indent, name ) );
 	while( pos < toks.size()  ) {
 		if ( toks[pos] == ATTRIB_STR ) {
 			tp->AddAttrib( MakeAttrib( toks, pos ) );
@@ -627,7 +627,7 @@ XMLSpecNode * ToXMLCommand :: MakeTextSpec( int indent,
 											bool cdata) {
 	unsigned int pos = 1;
 	int idx = ALib::ToInteger( Peek( toks, pos++ ) );
-	std::auto_ptr <XMLSpecText> tp( new  XMLSpecText( indent, idx, cdata ) );
+	std::unique_ptr <XMLSpecText> tp( new  XMLSpecText( indent, idx, cdata ) );
 	return tp.release();
 }
 

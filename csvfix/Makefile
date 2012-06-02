@@ -10,7 +10,7 @@
 WINOUT = bin/csvfix.exe
 LINOUT = bin/csvfix
 
-CC = g++
+CC = g++ -std=c++0x
 IDIR = inc
 ODIR = obj
 SDIR = src
