@@ -68,10 +68,7 @@ IOManager :: IOManager( const ALib::CommandLine & cmdline,
 
 void IOManager :: GetCSVSep( const ALib::CommandLine & cmd ) {
 
-	if ( cmd.HasFlag( FLAG_CSVSEP ) && cmd.HasFlag( FLAG_CSVSEPR )) {
-		ATHROW( "Cannot specify both " << FLAG_CSVSEP
-							<< " and " << FLAG_CSVSEPR ) ;
-	}
+	NotBoth( cmd, FLAG_CSVSEP, FLAG_CSVSEPR );
 
 	if ( cmd.HasFlag( FLAG_CSVSEP ) || cmd.HasFlag( FLAG_CSVSEPR ) ) {
 		string s = cmd.GetValue(

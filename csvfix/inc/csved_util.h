@@ -14,6 +14,7 @@
 #include "a_csv.h"
 #include "a_env.h"
 #include "a_str.h"
+#include "a_env.h"
 
 #include "csved_types.h"
 #include "csved_except.h"
@@ -21,7 +22,7 @@
 namespace CSVED {
 
 //---------------------------------------------------------------------------
-// Convert comma list to vecor of ints to be used as col index
+// Convert comma list to vector of ints to be used as column index
 //---------------------------------------------------------------------------
 
 void CommaListToIndex( const ALib::CommaList & cl,
@@ -40,6 +41,15 @@ int CmpRow( const CSVRow & a, const CSVRow & b,
 //----------------------------------------------------------------------------
 
 std::string GetField( const CSVRow & row, unsigned int  i );
+
+
+//----------------------------------------------------------------------------
+// Check that not both of two flags are specified, and throw if they are.
+//----------------------------------------------------------------------------
+
+void NotBoth( const ALib::CommandLine & cmd, const std::string & a,
+				const std::string & b, bool required = false );
+
 
 }	// end namespace
 

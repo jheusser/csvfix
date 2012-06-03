@@ -91,9 +91,7 @@ int SeqCommand :: Execute( ALib::CommandLine & cmd ) {
 
 void SeqCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 
-	if ( cmd.HasFlag( FLAG_INC ) &&  cmd.HasFlag(FLAG_DECR )) {
-		CSVTHROW( "Invalid increment/decrement flag combination" );
-	}
+	NotBoth( cmd, FLAG_INC, FLAG_DECR );
 
 	string sn = cmd.GetValue( FLAG_COLS, "1" );
 	if ( sn != "" && ! ALib::IsInteger( sn) ) {
