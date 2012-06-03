@@ -114,6 +114,23 @@ std:: string GetField( const CSVRow & row, unsigned int  i ) {
 	return i >= row.size() ? "" : row[i];
 }
 
+//----------------------------------------------------------------------------
+// Check that not both of two flags are specified, and throw if they are.
+//----------------------------------------------------------------------------
+
+void NotBoth( const ALib::CommandLine & cmd, const std::string & a,
+				const std::string & b, bool required  ) {
+
+	if ( cmd.HasFlag( a ) && cmd.HasFlag( b ) ) {
+		CSVTHROW( "Cannot specify both " << a << " and " << b << " options");
+	}
+
+	if ( required && ! ( cmd.HasFlag( a ) || cmd.HasFlag(b) ) ) {
+		CSVTHROW( "Need one of  " << a << " or " << b  << " options" );
+	}
+}
+
+
 //---------------------------------------------------------------------------
 
 }	// end namespace

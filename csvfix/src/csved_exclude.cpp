@@ -101,13 +101,7 @@ bool ExcludeCommand :: EvalExprOnRow( IOManager & io, const CSVRow & row ) {
 
 void ExcludeCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 
-	if ( cmd.HasFlag( FLAG_REVCOLS ) && cmd.HasFlag( FLAG_COLS ) ) {
-		CSVTHROW( "Only one of " << FLAG_COLS << " or " << FLAG_REVCOLS << " allowed" );
-	}
-
-	if ( ! cmd.HasFlag( FLAG_REVCOLS ) && ! cmd.HasFlag( FLAG_COLS ) ) {
-		CSVTHROW( "Need one of " << FLAG_COLS << " or " << FLAG_REVCOLS );
-	}
+	NotBoth( cmd, FLAG_REVCOLS, FLAG_COLS, true );
 
 	string es = cmd.GetValue( FLAG_IF, "" );
 	if ( es != "" ) {

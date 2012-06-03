@@ -160,10 +160,7 @@ void DateReadCommand :: ProcessFlags( ALib::CommandLine & cmd ) {
 	string mask = cmd.GetValue( FLAG_MASK, "" );
 	string cys = cmd.GetValue( FLAG_CDATE, ALib::Str( BASE_YEAR ) );
 
-	if ( cmd.HasFlag( FLAG_BDLIST ) && cmd.HasFlag( FLAG_BDEXCL ) ) {
-		CSVTHROW( "Cannot have both " << FLAG_BDLIST
-							<< " and " << FLAG_BDEXCL );
-	}
+	NotBoth( cmd, FLAG_BDLIST, FLAG_BDEXCL );
 
 	if ( cmd.HasFlag( FLAG_BDLIST )  ) {
 		mWriteAction = WriteBad;
