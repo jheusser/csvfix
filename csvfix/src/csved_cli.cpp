@@ -85,7 +85,7 @@ Command * CLIHandler :: FindAbb( const  string & ab ) {
 	vector <string> mPossibles;
 	mDict->GetAbbreviations( ab, mPossibles );
 	if ( mPossibles.size() == 0 ) {
-		return 0;
+		return nullptr;
 	}
 	else if ( mPossibles.size() > 1 ) {
 		string msg = "Ambiguous command - candidates are: ";
@@ -119,12 +119,12 @@ int CLIHandler :: Info() {
 //---------------------------------------------------------------------------
 
 int CLIHandler :: HelpCmd() {
-	if ( ! mDict->Contains( mCmdLine.Argv( 2 ) ) ) {
+	Command * cp = FindAbb( mCmdLine.Argv(2) );
+	if ( cp == nullptr ) {
 		cerr << "no such command: " << mCmdLine.Argv(2) << "\n";
 		cerr << "use 'csvfix help' to see a list of commands\n";
 		return 1;
 	}
-	Command * cp = mDict->Get( mCmdLine.Argv(2) );
 	if ( cp->Help() == "" ) {
 		cerr << "sorry, no help available on this command\n";
 		cerr << "the command may be slated for removal from CSVfix\n";
