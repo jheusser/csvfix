@@ -36,6 +36,7 @@ const char * const EVAL_HELP = {
 	"where flags are:\n"
 	"  -e expr\texpression to evaluate\n"
 	"  -r f,expr\treplace field f with result of evaluating expr\n"
+	"  -d\t\tdiscard input and only write result of -e evaluations\n"
 	"#ALL"
 };
 
@@ -45,9 +46,10 @@ const char * const EVAL_HELP = {
 
 EvalCommand ::	EvalCommand( const string & name,
 									 const string & desc )
-		: Command( name, desc, EVAL_HELP ) {
+		: Command( name, desc, EVAL_HELP ), mDiscardInput( false ) {
 		AddFlag( ALib::CommandLineFlag( FLAG_EXPR, false, 1, true ) );
 		AddFlag( ALib::CommandLineFlag( FLAG_REMOVE, false, 1, true ) );
+		AddFlag( ALib::CommandLineFlag( FLAG_DISCARD, false, 0, true) );
 }
 
 //----------------------------------------------------------------------------
@@ -59,16 +61,38 @@ int EvalCommand ::	Execute( ALib::CommandLine & cmd ) {
 	IOManager io( cmd );
 	CSVRow row;
 
+	mDiscardInput = cmd.HasFlag( FLAG_DISCARD );
 	GetExpressions( cmd );
 
 	while( io.ReadCSV( row ) ) {
 		SetParams( row, io );
-		Evaluate( row );
+		if ( mDiscardInput ) {
+			row = EvaluateAndDiscard();
+		}
+		else {
+			Evaluate( row );
+		}
 		io.WriteRow( row );
 	}
 
 	return 0;
 }
+
+
+//----------------------------------------------------------------------------
+// Evaluate -e expressions (not -r) and produce a new row which contains
+// only the result of these evaluations - input data is discarded.
+//----------------------------------------------------------------------------
+
+CSVRow EvalCommand :: EvaluateAndDiscard() {
+	CSVRow newrow;
+	for ( unsigned int i = 0; i < mFieldExprs.size() ; i++ ) {
+		string r = mFieldExprs[i].mExpr.Evaluate();
+		newrow.push_back( r );
+	}
+	return newrow;
+}
+
 
 //----------------------------------------------------------------------------
 // Evaluate expressions. If the field index associated with the expression
@@ -127,6 +151,10 @@ void EvalCommand ::	GetExpressions( ALib::CommandLine & cmd ) {
 			mFieldExprs.push_back( FieldEx( -1, ex ) );
 		}
 		else if ( cmd.Argv( i ) == FLAG_REMOVE ) {
+			if ( mDiscardInput ) {
+				CSVTHROW( "Cannot specify both " << FLAG_REMOVE
+							<< " and " << FLAG_DISCARD );
+			}
 			if ( i + 1 >= cmd.Argc() ) {
 				CSVTHROW( "Missimg field/expression" );
 			}
