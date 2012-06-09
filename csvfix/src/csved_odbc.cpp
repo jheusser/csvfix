@@ -109,12 +109,8 @@ ALib::DbStatement * ODBCGetCommand :: Stmt() {
 const string TEXT_DRIVER = "DRIVER={Microsoft Text Driver (*.txt; *.csv)};";
 
 void ODBCGetCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
-	if ( cmd.HasFlag( FLAG_DIR ) && cmd.HasFlag( FLAG_CONSTR ) ) {
-		CSVTHROW( "Can specify " << FLAG_DIR << " or " << FLAG_CONSTR << " but not both" );
-	}
-	if ( ! cmd.HasFlag( FLAG_DIR ) && ! cmd.HasFlag( FLAG_CONSTR ) ) {
-		CSVTHROW( "Must specify one of " << FLAG_DIR << " or " << FLAG_CONSTR );
-	}
+
+	NotBoth( cmd, FLAG_DIR, FLAG_CONSTR, ReqOp::Required );
 
 	if ( cmd.HasFlag( FLAG_DIR ) ) {
 		string dir = cmd.GetValue( FLAG_DIR, "" );
@@ -133,12 +129,7 @@ void ODBCGetCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 		}
 	}
 
-
-
-	if ( cmd.HasFlag( FLAG_SQLTBL ) && cmd.HasFlag( FLAG_SQLQ ) ) {
-		CSVTHROW( "Cannot specify both " << FLAG_SQLTBL
-						<< " and " << FLAG_SQLQ << " flags" );
-	}
+	NotBoth( cmd, FLAG_SQLTBL, FLAG_SQLQ, ReqOp::Required );
 
 	if ( cmd.HasFlag( FLAG_SQLTBL ) ) {
 		string table = cmd.GetValue( FLAG_SQLTBL, "" );
@@ -158,10 +149,7 @@ void ODBCGetCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 			ALib::FileRead( file, mSql );
 		}
 	}
-	else {
-		CSVTHROW( "Need one of " << FLAG_SQLTBL
-					<< " or " << FLAG_SQLQ << " flags" );
-	}
+
 	mNull = cmd.GetValue( FLAG_NULLSTR, "NULL" );
 }
 

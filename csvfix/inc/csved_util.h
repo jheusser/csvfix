@@ -47,8 +47,12 @@ std::string GetField( const CSVRow & row, unsigned int  i );
 // Check that not both of two flags are specified, and throw if they are.
 //----------------------------------------------------------------------------
 
+enum class ReqOp {
+	Required, Optional
+};
+
 void NotBoth( const ALib::CommandLine & cmd, const std::string & a,
-				const std::string & b, bool required = false );
+				const std::string & b, ReqOp ro = ReqOp::Optional );
 
 
 }	// end namespace
