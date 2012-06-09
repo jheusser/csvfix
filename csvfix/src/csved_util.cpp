@@ -119,13 +119,13 @@ std:: string GetField( const CSVRow & row, unsigned int  i ) {
 //----------------------------------------------------------------------------
 
 void NotBoth( const ALib::CommandLine & cmd, const std::string & a,
-				const std::string & b, bool required  ) {
+				const std::string & b, ReqOp  r  ) {
 
 	if ( cmd.HasFlag( a ) && cmd.HasFlag( b ) ) {
 		CSVTHROW( "Cannot specify both " << a << " and " << b << " options");
 	}
 
-	if ( required && ! ( cmd.HasFlag( a ) || cmd.HasFlag(b) ) ) {
+	if ( r == ReqOp::Required  && ! ( cmd.HasFlag( a ) || cmd.HasFlag(b) ) ) {
 		CSVTHROW( "Need one of  " << a << " or " << b  << " options" );
 	}
 }

@@ -101,7 +101,7 @@ bool ExcludeCommand :: EvalExprOnRow( IOManager & io, const CSVRow & row ) {
 
 void ExcludeCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 
-	NotBoth( cmd, FLAG_REVCOLS, FLAG_COLS, true );
+	NotBoth( cmd, FLAG_REVCOLS, FLAG_COLS, ReqOp::Required );
 
 	string es = cmd.GetValue( FLAG_IF, "" );
 	if ( es != "" ) {
