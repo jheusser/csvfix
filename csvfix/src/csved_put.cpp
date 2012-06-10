@@ -94,9 +94,8 @@ int PutCommand ::	Execute( ALib::CommandLine & cmd ) {
 
 
 void PutCommand :: ProcessFlags( ALib::CommandLine & cmd ) {
-	if ( cmd.HasFlag( FLAG_VAL ) == cmd.HasFlag( FLAG_VALENV ) ) {
-		CSVTHROW( "Need one of " << FLAG_VAL << " or " << FLAG_VALENV );
-	}
+
+	NotBoth( cmd, FLAG_VAL, FLAG_VALENV, ReqOp::Required );
 
 	if ( cmd.HasFlag( FLAG_VAL ) ) {
 		mValue = cmd.GetValue( FLAG_VAL, "" );

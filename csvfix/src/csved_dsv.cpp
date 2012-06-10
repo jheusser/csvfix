@@ -75,7 +75,7 @@ DSVBase ::	DSVBase( const string & name, const string & desc,
 
 
 //----------------------------------------------------------------------------
-// Get field selimitter = default is pipe character.
+// Get field delimiter = default is pipe character.
 //----------------------------------------------------------------------------
 
 char DSVBase ::	Delim() const {
@@ -203,9 +203,9 @@ string DSVReadCommand :: Unquote( const string & s ) const {
 }
 
 //---------------------------------------------------------------------------
-// Chop line up into fields seoarated by mDelim. The delimitter can be
+// Chop line up into fields seoarated by mDelim. The delimiter can be
 // escaped with a backslash. If the mCollapseSep flag is set, multiple
-// occurences of a separator are treated as a asingle one.
+// occurences of a separator are treated as a single one.
 //---------------------------------------------------------------------------
 
 void DSVReadCommand :: ParseDSV( const string & line, CSVRow & rv ) {
@@ -290,7 +290,7 @@ string DSVWriteCommand :: MakeDSV( const CSVRow & in )  {
 }
 
 //---------------------------------------------------------------------------
-// Create field contaents, quoting any delimitter
+// Create field contaents, quoting any delimiter
 //---------------------------------------------------------------------------
 
 string DSVWriteCommand :: MakeField( const string & val ) {

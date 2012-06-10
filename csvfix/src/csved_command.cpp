@@ -77,6 +77,8 @@ void Command :: AddHelp( const string & help ) {
 // Process help text. May contain a terminal section preceded by a # char
 // containing names of the generic flags applicable to this command. The
 // name "ALL" means the command can support all generic flags.
+//
+// ToDo: This is a mess and needs rethinking. But it does "work".
 //----------------------------------------------------------------------------
 
 const char GFL_DELIM = '#';

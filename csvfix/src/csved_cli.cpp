@@ -69,7 +69,7 @@ Command * CLIHandler :: FindCommand() {
 		return mDict->Get( mCmdLine.Argv( 1 ) );
 	}
 	else {
-		Command * c = FindAbb( mCmdLine.Argv( 1 ) );
+		Command * c = FindAbbrev( mCmdLine.Argv( 1 ) );
 		if (  c == 0 ) {
 			CSVTHROW( "Unknown command - try 'csvfix help'" );
 		}
@@ -81,7 +81,7 @@ Command * CLIHandler :: FindCommand() {
 // Find possibly abbreviated command
 //----------------------------------------------------------------------------
 
-Command * CLIHandler :: FindAbb( const  string & ab ) {
+Command * CLIHandler :: FindAbbrev( const  string & ab ) {
 	vector <string> mPossibles;
 	mDict->GetAbbreviations( ab, mPossibles );
 	if ( mPossibles.size() == 0 ) {
@@ -119,7 +119,7 @@ int CLIHandler :: Info() {
 //---------------------------------------------------------------------------
 
 int CLIHandler :: HelpCmd() {
-	Command * cp = FindAbb( mCmdLine.Argv(2) );
+	Command * cp = FindAbbrev( mCmdLine.Argv(2) );
 	if ( cp == nullptr ) {
 		cerr << "no such command: " << mCmdLine.Argv(2) << "\n";
 		cerr << "use 'csvfix help' to see a list of commands\n";

@@ -66,7 +66,7 @@ BlockCommand :: BlockCommand( const string & name, const string & desc )
 // Are we inside or outside a block?
 //----------------------------------------------------------------------------
 
-enum State { Outside, Inside };
+enum class InOut { Outside, Inside };
 
 //----------------------------------------------------------------------------
 // Read rows and flip state depending on the return value of the begin/end
@@ -79,25 +79,25 @@ int BlockCommand :: Execute( ALib::CommandLine & cmd ) {
 	ProcessFlags( cmd );
 	IOManager io( cmd );
 	CSVRow row;
-	State state = Outside;
+	InOut state = InOut::Outside;
 	bool block = true;
 
 	while( io.ReadCSV( row ) ) {
-		if ( state == Outside ) {
+		if ( state == InOut::Outside ) {
 			AddVars( mBeginEx, io, row );
 			if ( AtBeginBlock() ) {
 				block = ! mExclusive;
-				state = Inside;
+				state = InOut::Inside;
 			}
 			else {
 				block = false;
 			}
 		}
-		else if ( state == Inside ) {
+		else if ( state == InOut::Inside ) {
 			AddVars( mEndEx, io, row );
 			if ( AtEndBlock() ) {
 				block = ! mExclusive;
-				state = Outside;
+				state = InOut::Outside;
 			}
 			else {
 				block = true;
@@ -186,18 +186,13 @@ void BlockCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 			CSVTHROW( "Invalid mark string for " << FLAG_ACTMARK );
 		}
 	}
-	if ( actions > 1  ) {
-		CSVTHROW( "Can specify only one of "
+	if ( actions != 1 ) {
+		CSVTHROW( "Need only one of "
 					<< FLAG_ACTKEEP << ", "
 					<< FLAG_ACTREM <<" or "
 					<< FLAG_ACTMARK );
 	}
-	if ( actions == 0 ) {
-		CSVTHROW( "Need one of "
-					<< FLAG_ACTKEEP << ", "
-					<< FLAG_ACTREM <<" or "
-					<< FLAG_ACTMARK );
-	}
+
 	mExclusive = cmd.HasFlag( FLAG_BLKEXC );
 }
 

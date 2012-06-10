@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 // csved_case.cpp
 //
-// Case conversion for csvfix
+// Character case conversion for csvfix
 //
 // Copyright (C) 2009 Neil Butterworth
 //---------------------------------------------------------------------------

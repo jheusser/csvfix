@@ -36,7 +36,7 @@ class CLIHandler {
 	private:
 
 		Command * FindCommand();
-		Command * FindAbb( const std::string & ab );
+		Command * FindAbbrev( const std::string & ab );
 
 		int Help();
 		int HelpCmd();
