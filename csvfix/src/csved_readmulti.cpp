@@ -99,16 +99,8 @@ int ReadMultiCommand :: Execute( ALib::CommandLine & cmd ) {
 void ReadMultiCommand :: ProcessFlags( ALib::CommandLine & cmd ) {
 
 	const unsigned int MAX_LINES = 200;	    // max allowed multi lines
-	int nf = cmd.HasFlag( FLAG_NUM ) ? 1 : 0;
-	nf += cmd.HasFlag( FLAG_SEP ) ? 1 : 0;
 
-	if ( nf == 0 ) {
-		CSVTHROW( "Need " << FLAG_NUM << " or " << FLAG_SEP << " flag" );
-	}
-	else if ( nf == 2 ) {
-		CSVTHROW( "Can have " << FLAG_NUM << " or " << FLAG_SEP
-					<< " but not both" );
-	}
+	NotBoth( cmd, FLAG_SEP, FLAG_NUM, ReqOp::Required );
 
 	if ( cmd.HasFlag( FLAG_NUM ) ) {
 		string ns = cmd.GetValue( FLAG_NUM );

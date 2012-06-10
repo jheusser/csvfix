@@ -94,7 +94,7 @@ void EditCommand :: EditRow( CSVRow & row ) {
 }
 
 //---------------------------------------------------------------------------
-// Edit single field using suncommands. Currently only the 's' command
+// Edit single field using subcommands. Currently only the 's' subcommand
 // is supported, which works like that in vi. e.g.
 //
 //		s/abc/XXX/g
