@@ -1,6 +1,5 @@
-Tests for CSVfix. These require the bash shell to run. They have only
-been tested with the MSYS version of bash on Windows. To run all the
-tests, use:
+Tests for CSVfix. These require the bash shell to run. 
+To run all the tests, use:
 
 	runall
 
