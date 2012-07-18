@@ -40,8 +40,9 @@ const char * const OGET_HELP = {
 	"where flags are:\n"
 	"  -cs cstr\tODBC connection string\n"
 	"  -sql stmt\tSQL statement to execute to extract data\n"
-	"  -tbl table\textract all data from table  rather than usie SQL\n"
+	"  -tbl table\textract all data from table  rather than use SQL\n"
 	"  -ns null\tstring to use to represent nulls (default is empty string)\n"
+	"  -h\t\toutput SQL column headers as CSV field name header\n"
 	"#SMQ,OFL"
 };
 
@@ -51,14 +52,14 @@ const char * const OGET_HELP = {
 
 ODBCGetCommand :: ODBCGetCommand( const string & name,
 								const string & desc )
-		: Command( name, desc, OGET_HELP ), mStatement( 0 ) {
+	: Command( name, desc, OGET_HELP ), mStatement( 0 ), mUseColNames( false ) {
 
 	AddFlag( ALib::CommandLineFlag( FLAG_SQLQ, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_SQLTBL, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_CONSTR, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_NULLSTR, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_DIR, false, 1 ) );
-
+	AddFlag( ALib::CommandLineFlag( FLAG_HEADER, false, 0 ) );
 }
 
 //----------------------------------------------------------------------------
@@ -110,6 +111,7 @@ const string TEXT_DRIVER = "DRIVER={Microsoft Text Driver (*.txt; *.csv)};";
 
 void ODBCGetCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 
+	mUseColNames = cmd.HasFlag( FLAG_HEADER );
 	NotBoth( cmd, FLAG_DIR, FLAG_CONSTR, ReqOp::Required );
 
 	if ( cmd.HasFlag( FLAG_DIR ) ) {
@@ -155,7 +157,9 @@ void ODBCGetCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 
 
 //----------------------------------------------------------------------------
-// Connect, exec SQL, and then read all rows converting to csv
+// Connect, exec SQL, and then read all rows converting to csv.
+// Added column names as header. AFAIK, SQL column names will not contain
+// special characters, so no quoting needed.
 //----------------------------------------------------------------------------
 
 int ODBCGetCommand :: Execute( ALib::CommandLine & cmd ) {
@@ -166,7 +170,20 @@ int ODBCGetCommand :: Execute( ALib::CommandLine & cmd ) {
 
 	ALib::DbRow row;
 	IOManager io( cmd );
+
 	Stmt()->SetNull( mNull );
+
+	if ( mUseColNames ) {
+		int colcount = Stmt()->ColumnCount();
+		for ( int i = 0; i < colcount; i++ ) {
+			if ( i ) {
+				io.Out() << ",";
+			}
+			io.Out() << Stmt()->ColumnInfo(i).Name();
+		}
+		io.Out() << "\n";
+	}
+
 	while( Stmt()->Fetch( row ) ) {
 		io.WriteRow( row );
 	}
