@@ -40,6 +40,7 @@ class ODBCGetCommand : public Command {
 
 		std::string mConnStr;
 		std::string mSql, mNull;
+		bool mUseColNames;
 };
 
 
