@@ -71,12 +71,18 @@ int MoneyCommand :: Execute( ALib::CommandLine & cmd ) {
 	CSVRow row;
 
 	while( io.ReadCSV( row ) ) {
+		CSVRow out( row );
 		for ( unsigned int i = 0; i < row.size(); i++ ) {
 			if ( mFields.empty() || ALib::Contains( mFields, i ) ) {
-				row[i] = FormatValue( row[i] );
+				if ( mReplace ) {
+					out[i] = FormatValue( row[i] );
+				}
+				else {
+					out.push_back( FormatValue( row[i] ) );
+				}
 			}
 		}
-		io.WriteRow( row );
+		io.WriteRow( out );
 	}
 
 	return 0;
@@ -85,10 +91,23 @@ int MoneyCommand :: Execute( ALib::CommandLine & cmd ) {
 //---------------------------------------------------------------------------
 
 void MoneyCommand :: ProcessFlags( ALib::CommandLine & cmd ) {
+	mSymbol = cmd.GetValue( FLAG_CURSYM, "" );
 	string fields = cmd.GetValue( FLAG_COLS, "" );
+	string dp = cmd.GetValue( FLAG_DPOINT, "." );
+	if ( dp.size() != 1 ) {
+		CSVTHROW( "Invalid decimal point value" );
+	}
+	string ts = cmd.GetValue( FLAG_KSEP, "," );
+	if ( dp.size() > 1 ) {
+		CSVTHROW( "Invalid thousand separator value" );
+	}
+	mDecimalPoint = dp[0];
+	mThouSep = ts == "" ? 0 : ts[0];
+
 	if ( ! fields.empty() ) {
 		CommaListToIndex( ALib::CommaList( fields ), mFields );
 	}
+	mReplace = cmd.HasFlag( FLAG_REPLACE );
 }
 
 //----------------------------------------------------------------------------
@@ -100,7 +119,7 @@ string MoneyCommand :: FormatValue( const string & v ) const {
 	double m = ALib::ToReal( v );
 	std::ostringstream os;
 	os << std::fixed << std::setprecision(2) << m;
-	return mSymbol + AddSeparators( os.str() );
+	return AddSeparators( os.str() );
 }
 
 
@@ -114,7 +133,9 @@ string MoneyCommand :: AddSeparators( const string & v ) const {
 	for ( int i = (int) dollars.size() - 1; i >= 0; i-- ) {
 		dsep += dollars[i];
 		if ( ++dcount == 3 && i != 0 ) {
-			dsep += mThouSep;
+			if ( mThouSep ) {
+				dsep += mThouSep;
+			}
 			dcount = 0;
 		}
 	}
