@@ -37,7 +37,7 @@ const char * const EDIT_HELP = {
 	"performs sed-style editing on CSV data\n"
 	"usage: csvfix edit [flags] [file ...]\n"
 	"where flags are:\n"
-	"  -f fields\tfields to apply edits to (default is al fields)\n"
+	"  -f fields\tfields to apply edits to (default is all fields)\n"
 	"  -e cmd\tspecify edit command - currently only s(ubstitute) implemented\n"
 	"#ALL"
 };

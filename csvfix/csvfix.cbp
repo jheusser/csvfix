@@ -103,6 +103,7 @@
 		<Unit filename="inc\csved_join.h" />
 		<Unit filename="inc\csved_map.h" />
 		<Unit filename="inc\csved_merge.h" />
+		<Unit filename="inc\csved_money.h" />
 		<Unit filename="inc\csved_odbc.h" />
 		<Unit filename="inc\csved_order.h" />
 		<Unit filename="inc\csved_printf.h" />
@@ -158,6 +159,7 @@
 		<Unit filename="src\csved_main.cpp" />
 		<Unit filename="src\csved_map.cpp" />
 		<Unit filename="src\csved_merge.cpp" />
+		<Unit filename="src\csved_money.cpp" />
 		<Unit filename="src\csved_odbc.cpp" />
 		<Unit filename="src\csved_order.cpp" />
 		<Unit filename="src\csved_printf.cpp" />
