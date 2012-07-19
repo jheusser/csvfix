@@ -1,0 +1,1 @@
+$CSVED shuffle -rs 1 data/names.csv
