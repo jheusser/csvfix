@@ -66,7 +66,6 @@
 		<Unit filename="..\alib\inc\a_sort.h" />
 		<Unit filename="..\alib\inc\a_str.h" />
 		<Unit filename="..\alib\inc\a_table.h" />
-		<Unit filename="..\alib\inc\a_test.h" />
 		<Unit filename="..\alib\inc\a_time.h" />
 		<Unit filename="..\alib\inc\a_valptr.h" />
 		<Unit filename="..\alib\inc\a_xmlevents.h" />
@@ -291,7 +290,6 @@
 		<Unit filename="tests\rules\val_names.txt" />
 		<Unit filename="tests\rules\values.txt" />
 		<Unit filename="tests\run1" />
-		<Unit filename="tests\runall" />
 		<Unit filename="tests\runall.cmd" />
 		<Unit filename="tests\runsrc" />
 		<Unit filename="tests\tests\atable.test" />
