@@ -51,7 +51,7 @@ TrimCommand ::	TrimCommand( const string & name,
 	AddFlag( ALib::CommandLineFlag( FLAG_COLS, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_TRLEAD, false, 0 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_TRTRAIL, false, 0 ) );
-	AddFlag( ALib::CommandLineFlag( FLAG_WIDTHS, false, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_WIDTH, false, 1 ) );
 }
 
 //----------------------------------------------------------------------------
@@ -84,8 +84,8 @@ int TrimCommand ::	Execute( ALib::CommandLine & cmd ) {
 		mTrimLead = mTrimTrail = true;
 	}
 
-	if ( cmd.HasFlag( FLAG_WIDTHS ) ) {
-		GetWidths( cmd.GetValue( FLAG_WIDTHS ) );
+	if ( cmd.HasFlag( FLAG_WIDTH ) ) {
+		GetWidths( cmd.GetValue( FLAG_WIDTH ) );
 	}
 
 	ALib::CommaList cl( cmd.GetValue( FLAG_COLS, "" ) );

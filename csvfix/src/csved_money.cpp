@@ -44,7 +44,7 @@ const char * const MONEY_HELP = {
 	"  -cs sym\tuse string sym as currency symbol - default is none\n"
 	"  -ms minus\tuse string minus as prefix for negative values - default is \"-\"\n"
 	"  -ps plus\tuse string plus as prefix for positive values - default is none\n"
-	"  -r\t\treplace fields with new format - default is to append fields\n"
+	"  -r\t\treplace fields with new format - default is to append fields to output\n"
 	"#ALL"
 };
 
@@ -55,7 +55,7 @@ const char * const MONEY_HELP = {
 MoneyCommand :: MoneyCommand( const string & name,
 							const string & desc )
 	: Command( name, desc, MONEY_HELP ),
-			mDecimalPoint( '.' ), mThouSep( ',' ), mSymbol( "" ) {
+			mDecimalPoint( '.' ), mThouSep( ',' ), mSymbol( "" ), mWidth( 0 ) {
 	AddFlag( ALib::CommandLineFlag( FLAG_DPOINT, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_KSEP, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_COLS, false, 1 ) );
@@ -63,6 +63,7 @@ MoneyCommand :: MoneyCommand( const string & name,
 	AddFlag( ALib::CommandLineFlag( FLAG_REPLACE, false, 0 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_PLUS, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_MINUS, false, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_WIDTH, false, 1 ) );
 }
 
 //---------------------------------------------------------------------------
@@ -99,6 +100,7 @@ int MoneyCommand :: Execute( ALib::CommandLine & cmd ) {
 //----------------------------------------------------------------------------
 
 void MoneyCommand :: ProcessFlags( ALib::CommandLine & cmd ) {
+
 	mSymbol = cmd.GetValue( FLAG_CURSYM, "" );
 	mPlus = cmd.GetValue( FLAG_PLUS, "" );
 	mMinus = cmd.GetValue( FLAG_MINUS, "-" );
@@ -118,18 +120,33 @@ void MoneyCommand :: ProcessFlags( ALib::CommandLine & cmd ) {
 		CommaListToIndex( ALib::CommaList( fields ), mFields );
 	}
 	mReplace = cmd.HasFlag( FLAG_REPLACE );
+
+	string ws = cmd.GetValue( FLAG_WIDTH, "0" );
+	if ( ALib::IsInteger( ws ) ) {
+		mWidth = ALib::ToInteger( ws );
+	}
+	else {
+		CSVTHROW( "Width specifid by " << FLAG_WIDTH << " must be integer" );
+	}
+	if ( mWidth < 0 || mWidth > 50 ) {		// arbitrary max width
+		CSVTHROW( "Invalid width specified by " << FLAG_WIDTH << ": "  << ws );
+	}
 }
 
-
 //----------------------------------------------------------------------------
-// Turn string (if it is a number) into currency format.
+// Turn string (if it is a number) into currency format. Non-numerics are not
+// formatted. Numerics are formatted as positive numbers, and then a custom
+// sign value is prepended.
 //----------------------------------------------------------------------------
 
 string MoneyCommand :: FormatValue( const string & v ) const {
 
+	// must be a number
 	if ( ! ALib::IsNumber( v ) ) {
 		return v;
 	}
+
+	// do all formatting with positive numbers and adjust sign at end
 	string sign = "";
 	double m = ALib::ToReal( v );
 	if ( m < 0.0 ) {
@@ -137,10 +154,12 @@ string MoneyCommand :: FormatValue( const string & v ) const {
 		m = std::fabs( m );
 	}
 
+	// get the value into xx...xx.yy format
 	std::ostringstream os;
 	os << std::fixed << std::setprecision(2) << m;
 	string fs  = os.str();
 
+	// replace thousands sep and decimal point
 	string cents = fs.substr( fs.size() - 2, 2 );
 	string dollars = fs.substr( 0, fs.size() - 3 );
 	string dsep = "";
@@ -148,18 +167,26 @@ string MoneyCommand :: FormatValue( const string & v ) const {
 	for ( int i = (int) dollars.size() - 1; i >= 0; i-- ) {
 		dsep += dollars[i];
 		if ( ++dcount == 3 && i != 0 ) {
-			if ( mThouSep ) {
+			if ( mThouSep ) {	// possible to have empty thousands sep
 				dsep += mThouSep;
 			}
 			dcount = 0;
 		}
 	}
-
 	std::reverse( dsep.begin(), dsep.end() );
-//	std::cout << "[" << dollars << "][" << cents << "][" << dsep << "]\n";
-	std::ostringstream rv;
-	rv << ( sign == "-" ? mMinus : mPlus ) << mSymbol << dsep << mDecimalPoint << cents;
-	return rv.str();
+
+	// right align the numeric money element
+	std::ostringstream money;
+	if ( mWidth ) {
+		money << std::setw( mWidth );
+	}
+	money <<  dsep << mDecimalPoint << cents;
+	string smoney = money.str();
+
+	// add in the sign and currency symbols
+	os.str("");
+	os << ( sign == "-" ? mMinus : mPlus ) << mSymbol << smoney;
+	return os.str();
 }
 
 //----------------------------------------------------------------------------

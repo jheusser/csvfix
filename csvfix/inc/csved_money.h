@@ -34,6 +34,7 @@ class MoneyCommand : public Command {
 		char mDecimalPoint, mThouSep;
 		std::string mSymbol, mPlus, mMinus;
 		bool mReplace;
+		int mWidth;
 };
 
 
