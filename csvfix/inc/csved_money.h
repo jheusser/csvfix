@@ -29,11 +29,10 @@ class MoneyCommand : public Command {
 
 		void ProcessFlags( ALib::CommandLine & cmd );
 		std::string FormatValue( const std::string & v ) const;
-		std::string AddSeparators( const std::string & v ) const;
 
 		FieldList mFields;
 		char mDecimalPoint, mThouSep;
-		std::string mSymbol;
+		std::string mSymbol, mPlus, mMinus;
 		bool mReplace;
 };
 
