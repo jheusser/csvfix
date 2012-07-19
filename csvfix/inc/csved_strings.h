@@ -196,7 +196,7 @@ const char * const FLAG_VALENV	= "-e";
 const char * const FLAG_VERBOSE	= "-v";
 const char * const FLAG_VFILE	= "-vf";
 const char * const FLAG_WHERE	= "-w";
-const char * const FLAG_WIDTHS	= "-w";
+const char * const FLAG_WIDTH	= "-w";
 
 const char * const FLAG_XMLSPEC		= "-xf";
 const char * const FLAG_XMLEREC		= "-re";
