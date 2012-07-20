@@ -76,6 +76,7 @@
 		</Unit>
 		<Unit filename="inc\csved_atable.h" />
 		<Unit filename="inc\csved_block.h" />
+		<Unit filename="inc\csved_call.h" />
 		<Unit filename="inc\csved_case.h" />
 		<Unit filename="inc\csved_check.h" />
 		<Unit filename="inc\csved_cli.h" />
@@ -130,6 +131,7 @@
 		<Unit filename="inc\csved_version.h" />
 		<Unit filename="src\csved_atable.cpp" />
 		<Unit filename="src\csved_block.cpp" />
+		<Unit filename="src\csved_call.cpp" />
 		<Unit filename="src\csved_case.cpp" />
 		<Unit filename="src\csved_check.cpp" />
 		<Unit filename="src\csved_cli.cpp" />
