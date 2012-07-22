@@ -48,9 +48,7 @@ const char * const CALL_HELP = {
 	"where flags are:\n"
 	"  -fnc name\tname of function to call\n"
 	"  -dll name\tfilename of DLL containing function\n"
-	"  -f fields\tfields to pass to mthe function\n"
-	"  -r \t\treplace fields/rows - default is to append to existing data\n"
-
+	"  -f fields\tfields to pass to the function\n"
 	"#ALL"
 };
 
