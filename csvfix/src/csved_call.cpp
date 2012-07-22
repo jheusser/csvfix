@@ -104,15 +104,32 @@ int CallCommand :: Execute( ALib::CommandLine & cmd ) {
 	return 0;
 }
 
+static string ExtractField( const char * s, int & pos ) {
+	string field;
+	while( s[pos] ) {
+		field += s[pos++];
+	}
+	return field;
+}
+
 int CallCommand :: CallOnFields( CSVRow & row ) {
 	string fields;
+	int fc = 0;
 	for ( unsigned int i = 0; i < row.size(); i++ ) {
 		if ( mFields.size() == 0 || ALib::Contains( mFields, i ) ) {
 			fields += row[i];
 			fields += '\0';
+			fc++;
 		}
 	}
-	int rv = mFunc( (char*)fields.c_str(), mOutBuf, OUTBUF_SIZE );
+	int ofc = 0;
+	int rv = mFunc( fc, fields.c_str(), &ofc, mOutBuf, OUTBUF_SIZE );
+	int pos = 0;
+	while( ofc-- ) {
+		string field = ExtractField( mOutBuf, pos );
+		pos++;
+		row.push_back( field );
+	}
 	return rv;
 }
 
