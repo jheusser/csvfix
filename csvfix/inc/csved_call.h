@@ -42,12 +42,8 @@ class CallCommand : public Command {
 
 		void ProcessFlags( const ALib::CommandLine & cmd );
 		int CallOnFields( CSVRow & row );
-		int CallOnRow( CSVRow & row );
-		enum class ArgType { Field, Row };
 		std::string mDLL, mFuncName;
-		ArgType mArgType;
 		FieldList mFields;
-		bool mReplace;
 		FuncType mFunc;
 
 		static const unsigned int OUTBUF_SIZE = 2048;
