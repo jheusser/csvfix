@@ -19,8 +19,9 @@
 
 using std::string;
 
-namespace CSVED {
+//----------------------------------------------------------------------------
 
+namespace CSVED {
 
 //---------------------------------------------------------------------------
 // Register block command
@@ -47,7 +48,6 @@ const char * const CALL_HELP = {
 	"where flags are:\n"
 	"  -fnc name\tname of function to call\n"
 	"  -dll name\tfilename of DLL containing function\n"
-	"  -arg mode\thow to pass data - allowed values are 'field' and 'row' \n"
 	"  -f fields\tfields to pass to mthe function\n"
 	"  -r \t\treplace fields/rows - default is to append to existing data\n"
 
@@ -63,16 +63,14 @@ CallCommand :: CallCommand( const string & name, const string & desc )
 
 	AddFlag( ALib::CommandLineFlag( FLAG_DLL, true, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_FUNC, true, 1 ) );
-	AddFlag( ALib::CommandLineFlag( FLAG_ARG, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_COLS, false, 1 ) );
-	AddFlag( ALib::CommandLineFlag( FLAG_REPLACE, false, 0 ) );
-
 }
 
-
-
 //----------------------------------------------------------------------------
-
+// Load function from DLL and then call it on fields. A non-zero return value
+// from function of means either skip this row on output ( for
+// negative return values), or report an error (positive values).
+//----------------------------------------------------------------------------
 
 int CallCommand :: Execute( ALib::CommandLine & cmd ) {
 
@@ -91,18 +89,23 @@ int CallCommand :: Execute( ALib::CommandLine & cmd ) {
 	CSVRow row;
 	int rv;
 	while( io.ReadCSV( row ) ) {
-		if ( mArgType == ArgType::Field ) {
-			rv = CallOnFields( row );
+		int rv = CallOnFields( row );
+		if ( rv == 0 ) {
+			io.WriteRow( row );
+		}
+		else if ( rv > 0 ) {
+			CSVTHROW( mFuncName << " returned error code " << rv );
 		}
 		else {
-			rv = CallOnRow( row );
+			// do nothing - negative values just mean skip output
 		}
-		io.WriteRow( row );
 	}
-
-
 	return 0;
 }
+
+//----------------------------------------------------------------------------
+// Helper to extract single field  from output data
+//----------------------------------------------------------------------------
 
 static string ExtractField( const char * s, int & pos ) {
 	string field;
@@ -111,6 +114,12 @@ static string ExtractField( const char * s, int & pos ) {
 	}
 	return field;
 }
+
+//----------------------------------------------------------------------------
+// Call DLL function on specified fields. If none are specified, call it on
+// all fields. Fields returned from DLL are appended to the existing data on
+// output, provided the function returned zero.
+//----------------------------------------------------------------------------
 
 int CallCommand :: CallOnFields( CSVRow & row ) {
 	string fields;
@@ -124,18 +133,17 @@ int CallCommand :: CallOnFields( CSVRow & row ) {
 	}
 	int ofc = 0;
 	int rv = mFunc( fc, fields.c_str(), &ofc, mOutBuf, OUTBUF_SIZE );
-	int pos = 0;
-	while( ofc-- ) {
-		string field = ExtractField( mOutBuf, pos );
-		pos++;
-		row.push_back( field );
+	if ( rv == 0  ) {
+		int pos = 0;
+		while( ofc-- ) {
+			string field = ExtractField( mOutBuf, pos );
+			pos++;
+			row.push_back( field );
+		}
 	}
 	return rv;
 }
 
-int CallCommand :: CallOnRow( CSVRow & row ) {
-	return 0;
-}
 
 //----------------------------------------------------------------------------
 // Handle command line options
@@ -148,18 +156,8 @@ void CallCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 	mDLL = cmd.GetValue( FLAG_DLL );
 	mFuncName = cmd.GetValue( FLAG_FUNC );
 	string mode = cmd.GetValue( FLAG_ARG, FIELD_MODE );
-	if ( mode == FIELD_MODE ) {
-		mArgType = ArgType::Field;
-	}
-	else if ( mode == ROW_MODE ) {
-		mArgType = ArgType::Row;
-	}
-	else {
-		CSVTHROW( "Invalid argument mode: " << mode );
-	}
 	ALib::CommaList cl( cmd.GetValue( FLAG_COLS ) );
 	CommaListToIndex( cl, mFields );
-	mReplace = cmd.HasFlag( FLAG_REPLACE );
 }
 
 
