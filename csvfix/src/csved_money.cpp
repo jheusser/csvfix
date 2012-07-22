@@ -38,7 +38,7 @@ const char * const MONEY_HELP = {
 	"format fields as money/currency values\n"
 	"usage: csvfix money [flags] [file ...]\n"
 	"where flags are:\n"
-	"  -f fields\tfields to apply edits to - default is all fields\n"
+	"  -f fields\tfields to apply format to - default is all fields\n"
 	"  -dp chr\tuse character chr as decimal point symbol - default is full-stop\n"
 	"  -ts chr\tuse character chr as thousands separator - default is comma\n"
 	"  -cs sym\tuse string sym as currency symbol - default is none\n"
@@ -126,7 +126,7 @@ void MoneyCommand :: ProcessFlags( ALib::CommandLine & cmd ) {
 		mWidth = ALib::ToInteger( ws );
 	}
 	else {
-		CSVTHROW( "Width specifid by " << FLAG_WIDTH << " must be integer" );
+		CSVTHROW( "Width specified by " << FLAG_WIDTH << " must be integer" );
 	}
 	if ( mWidth < 0 || mWidth > 50 ) {		// arbitrary max width
 		CSVTHROW( "Invalid width specified by " << FLAG_WIDTH << ": "  << ws );
