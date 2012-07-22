@@ -21,7 +21,7 @@ namespace CSVED {
 //----------------------------------------------------------------------------
 
 extern "C" {
-	typedef int (*FuncType)( char * input, char * output, int outsize  );
+	typedef int (*FuncType)( int ifc, const char * input, int * ofc, char * output, int outsize  );
 }
 
 //----------------------------------------------------------------------------
