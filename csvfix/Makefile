@@ -22,6 +22,7 @@ LINLIBS = ../alib/lib/alib.a
 
 _OBJS = csved_atable.o \
 		csved_block.o \
+		csved_call.o \
 		csved_case.o \
 		csved_cli.o \
 		csved_check.o \
@@ -73,7 +74,7 @@ _OBJS = csved_atable.o \
 		csved_util.o \
 		csved_valid.o \
 
-_WINOBJS = csved_odbc.o
+_WINOBJS = csved_odbc.o csved_call.o
 
 OBJS = $(patsubst %,$(ODIR)/%,$(_OBJS))
 WINOBJS = $(patsubst %,$(ODIR)/%,$(_WINOBJS))
