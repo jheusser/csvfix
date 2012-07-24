@@ -19,6 +19,7 @@ namespace CSVED {
 
 const char * const CMD_ATABLE	= "ascii_table";
 const char * const CMD_BLOCK	= "block";
+const char * const CMD_CALL		= "call";
 const char * const CMD_CHECK	= "check";
 const char * const CMD_DIFF		= "diff";
 const char * const CMD_DREAD	= "date_iso";
@@ -82,6 +83,7 @@ const char * const CMD_XMLR		= "read_xml";
 // Flag names
 //---------------------------------------------------------------------------
 
+const char * const FLAG_ARG		= "-arg";
 const char * const FLAG_AVG		= "-avg";
 const char * const FLAG_ACTKEEP	= "-k";
 const char * const FLAG_ACTMARK	= "-m";
@@ -107,6 +109,7 @@ const char * const FLAG_DUPES	= "-d";
 const char * const FLAG_DATE	= "-d";
 const char * const FLAG_DISCARD	= "-d";
 const char * const FLAG_DIR		= "-dir";
+const char * const FLAG_DLL		= "-dll";
 const char * const FLAG_DTIME 	= "-dt";
 const char * const FLAG_DECR	= "-d";
 const char * const FLAG_DPOINT	= "-dp";
@@ -125,6 +128,7 @@ const char * const FLAG_FSPRE	= "-fp";
 const char * const FLAG_FSEXT	= "-fx";
 const char * const FLAG_FSDIR	= "-fd";
 const char * const FLAG_FREQ	= "-frq";
+const char * const FLAG_FUNC	= "-fnc";
 const char * const FLAG_EXPRIC	= "-ei";
 const char * const FLAG_FROMV	= "-fv";
 const char * const FLAG_HEADER	= "-h";
