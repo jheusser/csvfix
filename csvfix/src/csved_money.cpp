@@ -45,6 +45,7 @@ const char * const MONEY_HELP = {
 	"  -ms minus\tuse string minus as prefix for negative values - default is \"-\"\n"
 	"  -ps plus\tuse string plus as prefix for positive values - default is none\n"
 	"  -r\t\treplace fields with new format - default is to append fields to output\n"
+	"  -w width\tspecify width of output, which will be right-aligned\n"
 	"#ALL"
 };
 
