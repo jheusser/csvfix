@@ -38,7 +38,10 @@ const char * const TSTAMP_HELP = {
 	"adds a timestamp field to CSV input data\n"
 	"usage: csvfix timestam  [flags] [file ...]\n"
 	"where flags are:\n"
-	"  -rt \t\tubdate stamp in real time as records are written\n"
+	"  -d \t\tdisplay only date part of timestamp\n"
+	"  -t \t\tdisplay only time part of timestamp\n"
+	"  -n \t\tdisplay timestamp as numeric value with no separators\n"
+	"  -rt \t\tupdate stamp in real time as records are written\n"
 	"#ALL"
 };
 
@@ -47,9 +50,16 @@ const char * const TSTAMP_HELP = {
 //----------------------------------------------------------------------------
 
 TimestampCommand :: TimestampCommand( const string & name, const string & desc )
-						: Command( name, desc, TSTAMP_HELP ) {
+		: Command( name, desc, TSTAMP_HELP ),
+		  mRealTime( false ),
+		  mShowDate( true ),
+		  mShowTime( true ),
+		  mNumericStamp( false ) {
 
 	AddFlag( ALib::CommandLineFlag( FLAG_RTIME, false, 0 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_TONLY, false, 0 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_DONLY, false, 0 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_NUM, false, 0 ) );
 }
 
 
@@ -62,15 +72,24 @@ string TimestampCommand :: FormatStamp( std::time_t t ) const {
 
     std::tm tm = * std::localtime( & t );
     std::ostringstream os;
+	string ysep = mNumericStamp ? "" : "-";
+	string tsep = mNumericStamp ? "" : ":";
 
-    os << tm.tm_year + 1900 << "-"
-       << std::setw(2) << std::setfill( '0' ) <<  tm.tm_mon + 1<< "-"
-       << std::setw(2) << std::setfill( '0' ) <<  tm.tm_mday + 1
-       << " "
-       << std::setw(2) << std::setfill( '0' ) <<  tm.tm_hour << ":"
-       << std::setw(2) << std::setfill( '0' ) <<  tm.tm_min << ":"
-       << std::setw(2) << std::setfill( '0' ) <<  tm.tm_sec
-	;
+	if ( mShowDate ) {
+		os << tm.tm_year + 1900 << ysep
+			<< std::setw(2) << std::setfill( '0' ) <<  tm.tm_mon + 1 << ysep
+			<< std::setw(2) << std::setfill( '0' ) <<  tm.tm_mday + 1;
+	}
+
+	if ( mShowDate && mShowTime  && ! mNumericStamp ) {
+		os << " ";
+	}
+
+	if ( mShowTime ) {
+		os << std::setw(2) << std::setfill( '0' ) <<  tm.tm_hour << tsep
+			<< std::setw(2) << std::setfill( '0' ) <<  tm.tm_min << tsep
+			<< std::setw(2) << std::setfill( '0' ) <<  tm.tm_sec;
+	}
 
 	return os.str();
 }
@@ -91,6 +110,9 @@ int TimestampCommand :: Execute( ALib::CommandLine & cmd ) {
 	string stamp = FormatStamp( std::time(0) );
 
 	while( io.ReadCSV( row ) ) {
+		if ( mRealTime ) {
+			stamp = FormatStamp( std::time(0) );
+		}
 		CSVRow out;
 		out.push_back( stamp );
 		ALib::Append( out, row );
@@ -106,6 +128,11 @@ int TimestampCommand :: Execute( ALib::CommandLine & cmd ) {
 //----------------------------------------------------------------------------
 
 void TimestampCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
+	NotBoth( cmd, FLAG_DONLY, FLAG_TONLY );
+	mShowDate  = ! cmd.HasFlag( FLAG_TONLY );
+	mShowTime = ! cmd.HasFlag( FLAG_DONLY );
+	mRealTime = cmd.HasFlag( FLAG_RTIME );
+	mNumericStamp = cmd.HasFlag( FLAG_NUM );
 }
 
 

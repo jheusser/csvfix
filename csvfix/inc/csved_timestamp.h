@@ -36,7 +36,7 @@ class TimestampCommand : public Command {
 		void ProcessFlags( const ALib::CommandLine & cmd );
 		std::string FormatStamp( std::time_t t ) const;
 
-		bool mRealTime;
+		bool mRealTime, mShowDate, mShowTime, mNumericStamp;
 
 };
 
