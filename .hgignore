@@ -20,3 +20,4 @@ csvfix/installer/Output/*
 *backup
 *.orig
 *.smproj
+*.swp
