@@ -44,6 +44,7 @@ const char * const MONEY_HELP = {
 	"  -cs sym\tuse string sym as currency symbol - default is none\n"
 	"  -ms minus\tuse string minus as prefix for negative values - default is \"-\"\n"
 	"  -ps plus\tuse string plus as prefix for positive values - default is none\n"
+	"  -cn\t\ttreat the amount being formatted as if it were cents, not dollars\n"
 	"  -r\t\treplace fields with new format - default is to append fields to output\n"
 	"#ALL"
 };
@@ -55,7 +56,8 @@ const char * const MONEY_HELP = {
 MoneyCommand :: MoneyCommand( const string & name,
 							const string & desc )
 	: Command( name, desc, MONEY_HELP ),
-			mDecimalPoint( '.' ), mThouSep( ',' ), mSymbol( "" ), mWidth( 0 ) {
+			mDecimalPoint( '.' ), mThouSep( ',' ), mSymbol( "" ),
+			mWidth( 0 ), mCents( false ) {
 	AddFlag( ALib::CommandLineFlag( FLAG_DPOINT, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_KSEP, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_COLS, false, 1 ) );
@@ -64,6 +66,7 @@ MoneyCommand :: MoneyCommand( const string & name,
 	AddFlag( ALib::CommandLineFlag( FLAG_PLUS, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_MINUS, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_WIDTH, false, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_CENTS, false, 0 ) );
 }
 
 //---------------------------------------------------------------------------
@@ -101,6 +104,7 @@ int MoneyCommand :: Execute( ALib::CommandLine & cmd ) {
 
 void MoneyCommand :: ProcessFlags( ALib::CommandLine & cmd ) {
 
+	mCents = cmd.HasFlag( FLAG_CENTS );
 	mSymbol = cmd.GetValue( FLAG_CURSYM, "" );
 	mPlus = cmd.GetValue( FLAG_PLUS, "" );
 	mMinus = cmd.GetValue( FLAG_MINUS, "-" );
@@ -149,6 +153,12 @@ string MoneyCommand :: FormatValue( const string & v ) const {
 	// do all formatting with positive numbers and adjust sign at end
 	string sign = "";
 	double m = ALib::ToReal( v );
+
+	// is value to be treated as cents i.e. 123 rather than 1.23?
+	if ( mCents ) {
+		m /= 100;
+	}
+
 	if ( m < 0.0 ) {
 		sign = "-";
 		m = std::fabs( m );
