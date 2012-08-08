@@ -1,6 +1,7 @@
 syntax: glob
 *.o
 *.exe
+*.dll
 csvfix/test/tmp
 *.a
 alib/lib
@@ -20,3 +21,4 @@ csvfix/installer/Output/*
 *backup
 *.orig
 *.smproj
+*.swp

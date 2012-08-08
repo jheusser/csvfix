@@ -19,6 +19,7 @@ namespace CSVED {
 
 const char * const CMD_ATABLE	= "ascii_table";
 const char * const CMD_BLOCK	= "block";
+const char * const CMD_CALL		= "call";
 const char * const CMD_CHECK	= "check";
 const char * const CMD_DIFF		= "diff";
 const char * const CMD_DREAD	= "date_iso";
@@ -70,6 +71,7 @@ const char * const CMD_TOXML	= "to_xml";
 const char * const CMD_TPLATE	= "template";
 const char * const CMD_TRIM		= "trim";
 const char * const CMD_TRUNC	= "truncate";
+const char * const CMD_TSTAMP	= "timestamp";
 const char * const CMD_UPPER	= "upper";
 const char * const CMD_UNFLATTEN = "unflatten";
 const char * const CMD_UNIQUE	= "unique";
@@ -82,6 +84,7 @@ const char * const CMD_XMLR		= "read_xml";
 // Flag names
 //---------------------------------------------------------------------------
 
+const char * const FLAG_ARG		= "-arg";
 const char * const FLAG_AVG		= "-avg";
 const char * const FLAG_ACTKEEP	= "-k";
 const char * const FLAG_ACTMARK	= "-m";
@@ -108,6 +111,8 @@ const char * const FLAG_DUPES	= "-d";
 const char * const FLAG_DATE	= "-d";
 const char * const FLAG_DISCARD	= "-d";
 const char * const FLAG_DIR		= "-dir";
+const char * const FLAG_DLL		= "-dll";
+const char * const FLAG_DONLY	= "-d";
 const char * const FLAG_DTIME 	= "-dt";
 const char * const FLAG_DECR	= "-d";
 const char * const FLAG_DPOINT	= "-dp";
@@ -126,6 +131,7 @@ const char * const FLAG_FSPRE	= "-fp";
 const char * const FLAG_FSEXT	= "-fx";
 const char * const FLAG_FSDIR	= "-fd";
 const char * const FLAG_FREQ	= "-frq";
+const char * const FLAG_FUNC	= "-fnc";
 const char * const FLAG_EXPRIC	= "-ei";
 const char * const FLAG_FROMV	= "-fv";
 const char * const FLAG_HEADER	= "-h";
@@ -173,6 +179,7 @@ const char * const FLAG_RFC		= "-rfc";
 const char * const FLAG_REMOVE	= "-r";
 const char * const FLAG_REVCOLS	= "-rf";
 const char * const FLAG_RSEED	= "-rs";
+const char * const FLAG_RTIME	= "-rt";
 const char * const FLAG_RULER	= "-ru";
 const char * const FLAG_RALIGN	= "-ra";
 const char * const FLAG_SEP		= "-s";
@@ -187,6 +194,7 @@ const char * const FLAG_STRIC	= "-si";
 const char * const FLAG_TABLE	= "-t";
 const char * const FLAG_SQLTBL	= "-tbl";
 const char * const FLAG_TFILE	= "-tf";
+const char * const FLAG_TONLY	= "-t";
 const char * const FLAG_TOV		= "-tv";
 const char * const FLAG_TRLEAD	= "-l";
 const char * const FLAG_TRTRAIL	= "-t";

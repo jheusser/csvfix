@@ -21,7 +21,7 @@ using std::vector;
 namespace CSVED {
 
 //---------------------------------------------------------------------------
-// Register find command
+// Register validate  command
 //---------------------------------------------------------------------------
 
 static RegisterCommand <ValidateCommand> rc1_(
@@ -56,7 +56,7 @@ ValidateCommand ::	ValidateCommand( const string & name,
 }
 
 //---------------------------------------------------------------------------
-// Needed becauyse we own the created rules
+// Needed because we own the created rules
 //---------------------------------------------------------------------------
 
 ValidateCommand ::	~ValidateCommand() {
@@ -86,24 +86,26 @@ int ValidateCommand :: Execute( ALib::CommandLine & cmd ) {
 	CSVRow row;
 
 	while( io.ReadCSV( row ) ) {
+		int errcount = 0;
 		for ( unsigned int i = 0; i < mRules.size(); i++ ) {
 			ValidationRule::Results res = mRules[i]->Apply( row );
 
-			if ( mOutMode == Reports ) {
-				Report( io, res );
+			if ( res.size() && mOutMode == Reports ) {
+				Report( io, res, errcount );
+				errcount++;
+				continue;
 			}
 
 			if ( res.size() ) {
+				errcount++;
 				if ( mOutMode == Fails ) {
 					io.WriteRow( row );
-				}
-				break;
-			}
-			else {
-				if ( mOutMode == Passes ) {
-					io.WriteRow( row );
+					break;
 				}
 			}
+		}
+		if ( mOutMode == Passes && errcount == 0 ) {
+			io.WriteRow( row );
 		}
 	}
 
@@ -139,13 +141,16 @@ void ValidateCommand :: GetOutputMode( const ALib::CommandLine & cl ) {
 //---------------------------------------------------------------------------
 
 void ValidateCommand :: Report( IOManager & io,
-								const ValidationRule::Results & res ) const {
+								const ValidationRule::Results & res,
+								int errcount ) const {
 	if ( res.size() == 0 ) {
 		return;
 	}
 	else {
-		io.Out() << io.CurrentFileName() << " (" << io.CurrentLine () << "): ";
-		io.Out() << io.CurrentInput() << "\n";
+		if ( errcount == 0 ) {
+			io.Out() << io.CurrentFileName() << " (" << io.CurrentLine () << "): ";
+			io.Out() << io.CurrentInput() << "\n";
+		}
 		for ( unsigned int i = 0; i < res.size(); i++ ) {
 			if ( res[i].Field() > 0 ) {
 				io.Out() << "    field: " << res[i].Field() << " - ";

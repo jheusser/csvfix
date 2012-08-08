@@ -1,5 +1,6 @@
 # test find ad remove
 $CSVED find -e GB -f 1  data/countries.csv 
+$CSVED find -s GB -s FR -f 1  data/countries.csv 
 $CSVED remove -e GB -f 1  data/countries.csv 
 $CSVED find -f 2 -e 'GB' -n data/cities.csv
 $CSVED find -f 2 -e '.*'  data/f2empty.csv

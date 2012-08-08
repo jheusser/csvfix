@@ -36,7 +36,8 @@ class ValidateCommand : public Command {
 		void Clear();
 
 		void Report( IOManager & io,
-						const ValidationRule::Results & res ) const;
+						const ValidationRule::Results & res,
+						int errcount  ) const;
 
 		std::string ReadName( const std::string & line,
 								unsigned int & pos ) const;

@@ -46,6 +46,7 @@ const char * const MONEY_HELP = {
 	"  -ps plus\tuse string plus as prefix for positive values - default is none\n"
 	"  -cn\t\ttreat the amount being formatted as if it were cents, not dollars\n"
 	"  -r\t\treplace fields with new format - default is to append fields to output\n"
+	"  -w width\tspecify width of output, which will be right-aligned\n"
 	"#ALL"
 };
 
