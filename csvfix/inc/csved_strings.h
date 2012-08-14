@@ -177,6 +177,7 @@ const char * const FLAG_REPLACE	= "-r";
 const char * const FLAG_RANGE	= "-r";
 const char * const FLAG_RFC		= "-rfc";
 const char * const FLAG_REMOVE	= "-r";
+const char * const FLAG_REPINV	= "-rin";
 const char * const FLAG_REVCOLS	= "-rf";
 const char * const FLAG_RSEED	= "-rs";
 const char * const FLAG_RTIME	= "-rt";
