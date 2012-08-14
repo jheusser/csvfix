@@ -85,7 +85,6 @@ int CallCommand :: Execute( ALib::CommandLine & cmd ) {
 
 	IOManager io( cmd );
 	CSVRow row;
-	int rv;
 	while( io.ReadCSV( row ) ) {
 		int rv = CallOnFields( row );
 		if ( rv == 0 ) {

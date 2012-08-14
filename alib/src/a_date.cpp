@@ -267,7 +267,7 @@ Date::Error Date :: Validate( unsigned int y,
 	}
 	if ( m == 2 ) {
 		int n = IsLeapYear( y ) ? 1 : 0;
-		if (  d < 1 || d > 28 + n ) {
+		if (  d < 1U || d > 28U + n ) {
 			return BADDAYMONTH;
 		}
 	}
