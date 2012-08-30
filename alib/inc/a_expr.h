@@ -100,6 +100,8 @@ class Expression {
 		static void AddFunction( const std::string & name, const AddFunc & f );
 		static bool ToBool( const std::string & s );
 
+		static void SetIVNReplace( double d );
+
 	private:
 
 		std::string PopStr();
@@ -119,6 +121,10 @@ class Expression {
 		RPNRep mRPN;
 
 		static Dictionary <AddFunc> mFuncs;
+
+		// invalid number hack
+		static bool mUseIVNHack;
+		static double mIVNReplace;
 
 
 };
