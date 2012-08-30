@@ -1,0 +1,2 @@
+# test template
+$CSVED template -tf data/template.txt  data/names.csv 
