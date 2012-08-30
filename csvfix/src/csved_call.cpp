@@ -23,6 +23,12 @@ using std::string;
 
 namespace CSVED {
 
+//----------------------------------------------------------------------------
+// Default size of buffer used to communicate with DLL
+//----------------------------------------------------------------------------
+
+const unsigned int DEF_OUTBUF_SIZE = 4096;
+
 //---------------------------------------------------------------------------
 // Register block command
 //---------------------------------------------------------------------------
@@ -31,12 +37,6 @@ static RegisterCommand <CallCommand> rc1_(
 	CMD_CALL,
 	"call function in DLL"
 );
-
-//----------------------------------------------------------------------------
-// Fixed sized output buffer for DLL functions
-//----------------------------------------------------------------------------
-
-char CallCommand :: mOutBuf[ CallCommand::OUTBUF_SIZE ];
 
 //----------------------------------------------------------------------------
 // Help
@@ -49,6 +49,7 @@ const char * const CALL_HELP = {
 	"  -fnc name\tname of function to call\n"
 	"  -dll name\tfilename of DLL containing function\n"
 	"  -f fields\tfields to pass to the function\n"
+	"  -bs size\tsize in Kbytes of buffer used to communicate with DLL (default 4K)\n "
 	"#ALL"
 };
 
@@ -57,11 +58,13 @@ const char * const CALL_HELP = {
 //----------------------------------------------------------------------------
 
 CallCommand :: CallCommand( const string & name, const string & desc )
-				: Command( name, desc, CALL_HELP ) {
+				: Command( name, desc, CALL_HELP ),
+					mOutBufSize( DEF_OUTBUF_SIZE ) {
 
 	AddFlag( ALib::CommandLineFlag( FLAG_DLL, true, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_FUNC, true, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_COLS, false, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_BSIZE, false, 1 ) );
 }
 
 //----------------------------------------------------------------------------
@@ -73,6 +76,7 @@ CallCommand :: CallCommand( const string & name, const string & desc )
 int CallCommand :: Execute( ALib::CommandLine & cmd ) {
 
 	ProcessFlags( cmd );
+	std::vector <char> outbuf( mOutBufSize );
 
 	HMODULE dll = LoadLibrary( mDLL.c_str() );
 	if ( dll == NULL ) {
@@ -85,9 +89,9 @@ int CallCommand :: Execute( ALib::CommandLine & cmd ) {
 
 	IOManager io( cmd );
 	CSVRow row;
-	int rv;
+
 	while( io.ReadCSV( row ) ) {
-		int rv = CallOnFields( row );
+		int rv = CallOnFields( row, &outbuf[0] );
 		if ( rv == 0 ) {
 			io.WriteRow( row );
 		}
@@ -119,7 +123,7 @@ static string ExtractField( const char * s, int & pos ) {
 // output, provided the function returned zero.
 //----------------------------------------------------------------------------
 
-int CallCommand :: CallOnFields( CSVRow & row ) {
+int CallCommand :: CallOnFields( CSVRow & row, char * buffer ) {
 	string fields;
 	int fc = 0;
 	for ( unsigned int i = 0; i < row.size(); i++ ) {
@@ -130,11 +134,11 @@ int CallCommand :: CallOnFields( CSVRow & row ) {
 		}
 	}
 	int ofc = 0;
-	int rv = mFunc( fc, fields.c_str(), &ofc, mOutBuf, OUTBUF_SIZE );
+	int rv = mFunc( fc, fields.c_str(), &ofc, buffer, mOutBufSize );
 	if ( rv == 0  ) {
 		int pos = 0;
 		while( ofc-- ) {
-			string field = ExtractField( mOutBuf, pos );
+			string field = ExtractField( buffer, pos );
 			pos++;
 			row.push_back( field );
 		}
@@ -147,15 +151,21 @@ int CallCommand :: CallOnFields( CSVRow & row ) {
 // Handle command line options
 //----------------------------------------------------------------------------
 
-const char * const FIELD_MODE = "field";
-const char * const ROW_MODE = "row";
-
 void CallCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
+
+	string bs = cmd.GetValue( FLAG_BSIZE, ALib::Str( DEF_OUTBUF_SIZE ) );
+	if ( ! ALib::IsInteger( bs )) {
+		CSVTHROW( "Value for buffer size must be integer" );
+	}
+	mOutBufSize = ALib::ToInteger( bs ) * 1024;
+	if ( mOutBufSize < DEF_OUTBUF_SIZE ) {
+		CSVTHROW( "Output buffer size too small" );
+	}
 	mDLL = cmd.GetValue( FLAG_DLL );
 	mFuncName = cmd.GetValue( FLAG_FUNC );
-	string mode = cmd.GetValue( FLAG_ARG, FIELD_MODE );
 	ALib::CommaList cl( cmd.GetValue( FLAG_COLS ) );
 	CommaListToIndex( cl, mFields );
+
 }
 
 

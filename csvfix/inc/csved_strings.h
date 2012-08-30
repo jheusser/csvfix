@@ -95,6 +95,7 @@ const char * const FLAG_BDLIST	= "-bdl";
 const char * const FLAG_BEXPR	= "-be";
 const char * const FLAG_BLKEXC	= "-x";
 const char * const FLAG_BLKMARK	= "-m";
+const char * const FLAG_BSIZE	= "-bs";
 const char * const FLAG_CDATE	= "-cy";
 const char * const FLAG_CHARS	= "-s";
 const char * const FLAG_CHAR	= "-c";

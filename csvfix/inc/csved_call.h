@@ -60,15 +60,13 @@ class CallCommand : public Command {
 	private:
 
 		void ProcessFlags( const ALib::CommandLine & cmd );
-		int CallOnFields( CSVRow & row );
+		int CallOnFields( CSVRow & row, char * buffer );
 
 		std::string mDLL, mFuncName;
 		FieldList mFields;
 		FuncType mFunc;
 
-		static const unsigned int OUTBUF_SIZE = 4096;
-		static char mOutBuf[ OUTBUF_SIZE ];
-
+		unsigned int mOutBufSize;
 };
 
 //----------------------------------------------------------------------------

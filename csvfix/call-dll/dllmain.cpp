@@ -31,7 +31,7 @@ string ExtractField( const char * p, int & pos ) {
 // around each field that was passed to it, and returns the result.
 //----------------------------------------------------------------------------
 
-int  __declspec(dllexport)  MyFunc( 
+extern "C" int  __declspec(dllexport)  MyFunc( 
 		int infc, 					// number of fields in input
 		const char * in, 			// input fields, each null terminated
 		int * outfc, 				// number of fields being returned
