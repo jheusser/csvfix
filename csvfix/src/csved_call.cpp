@@ -30,7 +30,7 @@ namespace CSVED {
 const unsigned int DEF_OUTBUF_SIZE = 4096;
 
 //---------------------------------------------------------------------------
-// Register block command
+// Register call  command
 //---------------------------------------------------------------------------
 
 static RegisterCommand <CallCommand> rc1_(
@@ -48,13 +48,13 @@ const char * const CALL_HELP = {
 	"where flags are:\n"
 	"  -fnc name\tname of function to call\n"
 	"  -dll name\tfilename of DLL containing function\n"
-	"  -f fields\tfields to pass to the function\n"
+	"  -f fields\tindexes of fields to pass to the function\n"
 	"  -bs size\tsize in Kbytes of buffer used to communicate with DLL (default 4K)\n "
 	"#ALL"
 };
 
 //----------------------------------------------------------------------------
-// The block command
+// The call  command
 //----------------------------------------------------------------------------
 
 CallCommand :: CallCommand( const string & name, const string & desc )
@@ -71,6 +71,8 @@ CallCommand :: CallCommand( const string & name, const string & desc )
 // Load function from DLL and then call it on fields. A non-zero return value
 // from function of means either skip this row on output ( for
 // negative return values), or report an error (positive values).
+//
+// ??? Need to thnk more about return value
 //----------------------------------------------------------------------------
 
 int CallCommand :: Execute( ALib::CommandLine & cmd ) {

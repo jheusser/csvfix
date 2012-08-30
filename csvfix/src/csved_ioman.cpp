@@ -9,6 +9,8 @@
 #include "a_base.h"
 #include "a_csv.h"
 #include "a_collect.h"
+#include "a_expr.h"
+
 #include <assert.h>
 #include <fstream>
 #include "csved_except.h"
@@ -60,6 +62,15 @@ IOManager :: IOManager( const ALib::CommandLine & cmdline,
 		CommaListToIndex( cl, mQuoteFields );
 	}
 
+	// invalid number replacement hack for expressions
+	if ( cmdline.HasFlag( FLAG_REPINV ) ) {
+		string rin = cmdline.GetValue( FLAG_REPINV);
+		if ( rin.empty() || ! ALib::IsNumber( rin ) ) {
+			CSVTHROW( "Value for " << FLAG_REPINV << " must be numeric" );
+		}
+		double d = ALib::ToReal( rin );
+		ALib::Expression::SetIVNReplace( d );
+	}
 }
 
 //----------------------------------------------------------------------------

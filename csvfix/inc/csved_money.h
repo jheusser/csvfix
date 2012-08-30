@@ -35,6 +35,7 @@ class MoneyCommand : public Command {
 		std::string mSymbol, mPlus, mMinus;
 		bool mReplace;
 		int mWidth;
+		bool mCents;
 };
 
 
