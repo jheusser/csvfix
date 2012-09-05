@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 // csved_sort.h
 //
-// sort command for CSVED 
+// sort command for CSVED
 //
 // Copyright (C) 2009 Neil Butterworth
 //---------------------------------------------------------------------------
@@ -27,7 +27,7 @@ class SortCommand : public Command {
 		int Execute( ALib::CommandLine & cmd );
 
 	private:
-		
+
 		void BuildFieldSpecs( const ALib::CommandLine & cmd );
 		void Sort( std::vector <CSVRow> & rows );
 

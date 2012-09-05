@@ -175,6 +175,7 @@ const char * const FLAG_QLIST	= "-sqf";
 const char * const FLAG_QNULLS	= "-qn";
 const char * const FLAG_QUIET	= "-q";
 const char * const FLAG_REPLACE	= "-r";
+const char * const FLAG_RHEAD	= "-rh";
 const char * const FLAG_RANGE	= "-r";
 const char * const FLAG_RFC		= "-rfc";
 const char * const FLAG_REMOVE	= "-r";

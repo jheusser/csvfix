@@ -12,3 +12,11 @@
 "George","Elliot","F"
 "Flann","O'Brien","M"
 "Charles","Dickens","M"
+Forename,Surname,Sex
+"Charles","Dickens","M"
+"Flann","O'Brien","M"
+"George","Elliot","F"
+"Herman","Melville","M"
+"Jane","Austen","F"
+"Oscar","Wilde","M"
+"Virginia","Woolf","F"
