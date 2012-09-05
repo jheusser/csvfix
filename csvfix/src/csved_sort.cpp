@@ -13,6 +13,7 @@
 #include "csved_sort.h"
 #include "csved_strings.h"
 
+
 using std::string;
 using std::vector;
 
@@ -36,6 +37,7 @@ const char * const SORT_HELP = {
 	"usage: csvfix sort [flags] [files ...]\n"
 	"where flags are:\n"
 	"  -f  fields\tspecify fields on which to sort\n"
+	"  -rh\t\tretain header in output\n"
 	"\t\tfields  consist of index, and optional colon and two flags:\n"
 	"\t\tN,S or I - numeric or alpha sort\n"
 	"\t\tA or D   - ascending or descending sort\n"
@@ -49,10 +51,25 @@ const char * const SORT_HELP = {
 
 SortCommand :: SortCommand( const string & name,
 							const string & desc )
-		: Command( name, desc, SORT_HELP ) {
+		: Command( name, desc, SORT_HELP ){
 
 	AddFlag( ALib::CommandLineFlag( FLAG_COLS, false, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_RHEAD, false, 0 ) );
 
+}
+
+//----------------------------------------------------------------------------
+// really need a unified header writing strategy - quick fix for now
+//----------------------------------------------------------------------------
+
+static void WriteHeader( std::ostream & os, const CSVRow & header ) {
+	for ( unsigned int i = 0; i < header.size(); i++ ) {
+		os << header[i];
+		if ( i != header.size() - 1 ) {
+			os << ",";
+		}
+	}
+	os << "\n";
 }
 
 //---------------------------------------------------------------------------
@@ -61,18 +78,27 @@ SortCommand :: SortCommand( const string & name,
 
 int SortCommand :: Execute( ALib::CommandLine & cmd ) {
 
+	bool rhead = cmd.HasFlag( FLAG_RHEAD );
 	BuildFieldSpecs( cmd );
 
 	std::vector <CSVRow> rows;
 
 	IOManager io( cmd );
-	CSVRow row;
+	CSVRow row, header;
 
-	while( io.ReadCSV( row ) ) {
+	while ( io.ReadCSV( row ) ) {
+		if ( rhead && header.size() == 0 ) {
+			header = row;
+			continue;
+		}
 		rows.push_back( row );
 	}
 
 	Sort( rows );
+
+	if ( rhead ) {
+		WriteHeader( io.Out(), header );
+	}
 
 	for ( unsigned int i = 0; i < rows.size(); i++ ) {
 		io.WriteRow( rows[i] );
