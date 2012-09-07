@@ -22,7 +22,6 @@ LINLIBS = ../alib/lib/alib.a
 
 _OBJS = csved_atable.o \
 		csved_block.o \
-		csved_call.o \
 		csved_case.o \
 		csved_cli.o \
 		csved_check.o \

@@ -3,7 +3,7 @@
 //
 // Version information for CSVED
 //
-// Copyright (C) 2010 Neil Butterworth
+// Copyright (C) 2012 Neil Butterworth
 //---------------------------------------------------------------------------
 
 #ifndef INC_CSVED_VERSION_H
