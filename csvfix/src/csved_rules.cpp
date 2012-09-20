@@ -60,7 +60,7 @@ ValidationRule * RuleFactory ::  CreateRule( const string & name,
 								const ValidationRule::Params & params ) {
 	InitDict();
 	if ( ! mDict->Contains( name ) ) {
-		return false;
+		return nullptr;
 	}
 	else {
 		CreateFunc cf = mDict->Get( name );

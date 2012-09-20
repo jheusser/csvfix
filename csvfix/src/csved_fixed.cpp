@@ -208,7 +208,7 @@ int WriteFixedCommand :: Execute( ALib::CommandLine & cmd ) {
 //
 //	 field:width,field:width,...
 //
-// Fields may appera zero or more times. If a field is missing from
+// Fields may appear zero or more times. If a field is missing from
 // input it is assumed to contain empty string.
 //---------------------------------------------------------------------------
 
