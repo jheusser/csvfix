@@ -85,7 +85,7 @@ Command * CLIHandler :: FindAbbrev( const  string & ab ) {
 	vector <string> mPossibles;
 	mDict->GetAbbreviations( ab, mPossibles );
 	if ( mPossibles.size() == 0 ) {
-		return nullptr;
+		return NULL;
 	}
 	else if ( mPossibles.size() > 1 ) {
 		string msg = "Ambiguous command - candidates are: ";
@@ -120,7 +120,7 @@ int CLIHandler :: Info() {
 
 int CLIHandler :: HelpCmd() {
 	Command * cp = FindAbbrev( mCmdLine.Argv(2) );
-	if ( cp == nullptr ) {
+	if ( cp == NULL ) {
 		cerr << "no such command: " << mCmdLine.Argv(2) << "\n";
 		cerr << "use 'csvfix help' to see a list of commands\n";
 		return 1;
