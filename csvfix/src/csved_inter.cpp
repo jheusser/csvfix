@@ -51,7 +51,7 @@ InterCommand :: InterCommand( const string & name,
 
 //---------------------------------------------------------------------------
 // Read until first stream exhausted - streams don't have to have same
-// number of records. Can't use normal iomaan stuff for this as we deal
+// number of records. Can't use normal IOMan stuff for this as we deal
 // with two input streams at same time.
 //---------------------------------------------------------------------------
 

@@ -26,11 +26,12 @@ static RegisterCommand <FileSplitCommand> rc1_(
 );
 
 //----------------------------------------------------------------------------
-// Default file components
+// Default filename and path components. These can be changed by the user
+// via command line parameters.
 //----------------------------------------------------------------------------
 
 const char * const DEF_DIR 	= "";			// directory path
-const char * const DEF_PREF 	= "file_";		// file name prefix
+const char * const DEF_PREF = "file_";		// file name prefix
 const char * const DEF_EXT 	= "csv";		// file extension
 
 //----------------------------------------------------------------------------
@@ -67,7 +68,7 @@ FileSplitCommand :: FileSplitCommand( const string & name,
 }
 
 //----------------------------------------------------------------------------
-// Do the splits, baby!
+// Read input and split into separate files
 //----------------------------------------------------------------------------
 
 int FileSplitCommand :: Execute( ALib::CommandLine & cmd ) {
@@ -111,7 +112,6 @@ string FileSplitCommand :: MakeKey( const CSVRow & row ) {
 void FileSplitCommand :: WriteRow( IOManager & ioman, const CSVRow & row ) {
 
 	string key = MakeKey( row );
-	//std::cerr << "Key: " << key << "\n";
 	const string * p = mDict.GetPtr( key );
 	string fname = (p == 0) ? NewFileName( key ) : * p;
 
@@ -121,7 +121,7 @@ void FileSplitCommand :: WriteRow( IOManager & ioman, const CSVRow & row ) {
 
 	if ( fname != mCurrentFile ) {
 		mOutFile.close();
-		mOutFile.clear();	// seems to be needed - why?
+		mOutFile.clear();	// close does not reset state
 		mOutFile.open( fname.c_str(), std::ios::out | std::ios::app );   // append
 
 		if ( ! mOutFile.is_open() ) {
@@ -130,17 +130,16 @@ void FileSplitCommand :: WriteRow( IOManager & ioman, const CSVRow & row ) {
 		mCurrentFile = fname;
 	}
 
-//	if ( ! mOutFile.is_open() ) {
-//		CSVTHROW( "Not open " << fname );
-//	}
-
 	mOutFile << ioman.CurrentInput() << "\n";
 }
 
 //----------------------------------------------------------------------------
 // Generate new unique file name. If the -ufn flag was specified, use the
 // key value to generate the file names, otherwise number them sequentially.
+// Assumes the i/o library is happy with forward slash path separators.
 //----------------------------------------------------------------------------
+
+const int FILE_NUM_LEN = 4;    // how many digits for numbered files
 
 string FileSplitCommand :: NewFileName( const string & key ) {
 	string f;
@@ -155,7 +154,7 @@ string FileSplitCommand :: NewFileName( const string & key ) {
 		}
 	}
 	else {
-		f += ALib::ZeroPad( mFileNo++, 4 );
+		f += ALib::ZeroPad( mFileNo++, FILE_NUM_LEN );
 	}
 	f += ".";
 	f += mFileExt;
