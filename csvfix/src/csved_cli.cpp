@@ -15,6 +15,7 @@
 using std::string;
 using std::vector;
 using std::cerr;
+using std::cout;
 
 namespace CSVED {
 
@@ -105,12 +106,12 @@ Command * CLIHandler :: FindAbbrev( const  string & ab ) {
 //----------------------------------------------------------------------------
 
 int CLIHandler :: Info() {
-	cerr << "\n" << CSVED_NAME << " " << CSVED_VERS << " (" << CSVED_VDATE << ")\n";
-	cerr << CSVED_CPYR << "\n" << CSVED_NOWAR;
-	cerr << "\n\n";
-	cerr << "csvfix is a CSV stream editor\n";
-	cerr << "use 'csvfix help' to see a list of commands\n";
-	cerr << "use 'csvfix help command' to see help on a specific command\n";
+	cout << "\n" << CSVED_NAME << " " << CSVED_VERS << " (" << CSVED_VDATE << ")\n";
+	cout << CSVED_CPYR << "\n" << CSVED_NOWAR;
+	cout << "\n\n";
+	cout << "csvfix is a CSV stream editor\n";
+	cout << "use 'csvfix help' to see a list of commands\n";
+	cout << "use 'csvfix help command' to see help on a specific command\n";
 	return 0;
 }
 
@@ -131,7 +132,7 @@ int CLIHandler :: HelpCmd() {
 		return 1;
 	}
 	else {
-		cerr << cp->Help() << "\n";
+		cout << cp->Help() << "\n";
 	}
 	return 0;
 }
@@ -141,7 +142,7 @@ int CLIHandler :: HelpCmd() {
 //---------------------------------------------------------------------------
 
 int CLIHandler :: Help() {
-	cerr << "\nusage: csvfix command [flags] file ...\n"
+	cout << "\nusage: csvfix command [flags] file ...\n"
 				<< "where 'command' is one of: \n\n";
 
 	vector <string> cmds;
@@ -155,7 +156,7 @@ int CLIHandler :: Help() {
 
 	for ( unsigned int i = 0; i < cmds.size(); i++ ) {
 		Command * cp = mDict->Get( cmds[i] );
-		cerr << "    " << cmds[i]
+		cout << "    " << cmds[i]
 				<<  spaces.substr( 0, (width + 2) - cmds[i].size() )
 				<< cp->Desc() << std::endl;
 	}
