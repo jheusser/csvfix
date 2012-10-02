@@ -19,3 +19,13 @@
 "3","zod"
 ---- join issue #12 stuff
 "2","true","3,4"
+---- join -ic option original data ----
+"Paris","FR"
+"Rome","IT"
+"Athens","GR"
+"Berlin","DE"
+---- join -ic option lowercase data ----
+"Paris","FR"
+"Rome","IT"
+"Athens","GR"
+"Berlin","DE"

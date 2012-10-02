@@ -39,6 +39,7 @@ const char * const JOIN_HELP = {
 	"  -f jlist\tlist of fields to perform join on\n"
 	"  -oj\t\tperform outer join\n"
 	"  -inv\t\tinvert sense of join to exclude matching rows\n"
+	"  -ic\t\tignore character case in join columns\n"
 	"#ALL"
 };
 
@@ -48,11 +49,13 @@ const char * const JOIN_HELP = {
 
 JoinCommand :: JoinCommand( const string & name,
 							const string & desc )
-			: Command( name, desc, JOIN_HELP), mOuterJoin( false ) {
+			: Command( name, desc, JOIN_HELP),
+					mOuterJoin( false ), mIgnoreCase( false ) {
 
 	AddFlag( ALib::CommandLineFlag( FLAG_COLS, true, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_OUTERJ, false, 0 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_INVERT, false, 0 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_ICASE, false, 0 ) );
 
 }
 
@@ -83,7 +86,7 @@ int JoinCommand :: Execute( ALib::CommandLine & cmd ) {
 
 	mOuterJoin = cmd.HasFlag( FLAG_OUTERJ );
 	mInvert = cmd.HasFlag( FLAG_INVERT );
-
+	mIgnoreCase = cmd.HasFlag( FLAG_ICASE );
 	if ( mOuterJoin && mInvert ) {
 		CSVTHROW( "Cannot have both " << FLAG_OUTERJ
 					<< " and " << FLAG_INVERT << " flags" );
@@ -189,7 +192,8 @@ bool JoinCommand :: IsJoinCol( unsigned int ci ) const {
 //---------------------------------------------------------------------------
 // Construct a key from a row. The columns used to construct the key are
 // taken from the join specs. The 'first' parameter specifies if we are
-// taking the first pair value (the left-hand key) or the second (right-hand)
+// taking the first pair value (the LHS key) or the second (RHS). If
+// the user specified the -ic option, keys are converted to uppercase.
 //---------------------------------------------------------------------------
 
 string JoinCommand :: MakeKey( const CSVRow & row, bool first ) {
@@ -200,7 +204,7 @@ string JoinCommand :: MakeKey( const CSVRow & row, bool first ) {
 		if ( col >= row.size() ) {
 			continue;
 		}
-		key += row[col];
+		key += mIgnoreCase ? ALib::Upper( row[col] ) : row[col];
 		key += '\0';		// key element separator
 	}
 	return key;

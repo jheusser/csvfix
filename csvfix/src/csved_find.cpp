@@ -42,14 +42,14 @@ static RegisterCommand <FindCommand> rc2_(
 //----------------------------------------------------------------------------
 
 const char * const FIND_HELP = {
-	"perform grep-like search uising regular expressions on CSV data\n"
+	"perform grep-like search using regular expressions on CSV data\n"
 	"usage: csvfix find  [flags] [file ...]\n"
 	"where flags are:\n"
 	"  -f fields\tfields to search\n"
 	"  -e expr\tregex to search for - multiple  -e flags are allowed\n"
 	"  -s expr\tas for -e, but don't treat expr as regex\n"
 	"  -fc count\tspecify field count to find\n"
-	"  -r range\trange to search for - multiople -r flags are allowed\n"
+	"  -r range\trange to search for - multiple -r flags are allowed\n"
 	"  -ei expr\tas for -e flag, but search ignoring case\n"
 	"  -si expr\tas for -e flag, but don't treat expr as regex\n"
 	"  -n\t\toutput count of matched rows only\n"
@@ -65,7 +65,7 @@ const char * const REMOVE_HELP = {
 	"  -e expr\tregex to search for - multiple  -e flags are allowed\n"
 	"  -s expr\tas for -e, but don't treat expr as regex\n"
 	"  -fc count\tspecify field count to remove\n"
-	"  -r range\trange to search for - multiople -r flags are allowed\n"
+	"  -r range\trange to search for - multiple -r flags are allowed\n"
 	"  -ei expr\tas for -e flag, but search ignoring case\n"
 	"  -si expr\tas for -e flag, but don't treat expr as regex\n"
 	"  -n\t\toutput count of non-matching rows only\n"

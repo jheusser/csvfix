@@ -367,10 +367,10 @@ void IOManager :: OpenInputFile( const string & fname ) {
 	if ( fname == NAME_STDIN ) {
 		for ( unsigned int i = 0; i < mInputs.size(); i++ ) {
 			if ( mInputs[i].mFileName == DISP_STDIN ) {
-				CSVTHROW( "Can use '-' once only" );
+				CSVTHROW( "Can use " << NAME_STDIN << " once only" );
 			}
 		}
-		mInputs.push_back( Input( "<stdin>", & std::cin ) );
+		mInputs.push_back( Input( DISP_STDIN, & std::cin ) );
 	}
 	else {
 		std::ifstream * ifs = new std::ifstream( fname.c_str() );

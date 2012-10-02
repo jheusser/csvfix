@@ -20,14 +20,8 @@ using std::string;
 
 namespace CSVED {
 
-void DumpRow( const CSVRow & r ) {
-	for ( unsigned int i = 0; i < r.size(); i++ ) {
-		std::cout << r[i] << " ";
-	}
-	std::cout << std::endl;
-}
 //---------------------------------------------------------------------------
-// Register fmerge  command
+// Register fmerge command
 //---------------------------------------------------------------------------
 
 static RegisterCommand <FMergeCommand> rc1_(

@@ -56,7 +56,7 @@ ExcludeCommand ::ExcludeCommand( const string & name,
 }
 
 //---------------------------------------------------------------------------
-// Get user specifie doptions and then read input, removing excluded cols.
+// Get user-specified options and then read input, removing excluded cols.
 // Now does exclude only if expression specified by -if evaluates true.
 //---------------------------------------------------------------------------
 
