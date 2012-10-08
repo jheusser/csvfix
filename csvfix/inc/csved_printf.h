@@ -43,8 +43,10 @@ class PrintfCommand : public Command {
 		Format GetLiteral( unsigned int & pos, const std::string & fmt );
 		void DumpFmt();
 		std::string FormatRow( const CSVRow & row );
+		std::string GetField( const CSVRow & row, unsigned int i );
 
 		std::vector <Format> mFmtLine;
+		FieldList mOrder;
 
 };
 
