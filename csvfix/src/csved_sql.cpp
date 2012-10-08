@@ -49,7 +49,7 @@ const char * const INS_HELP = {
 	"  -f fields\tfields to use to generate the SQL statement\n"
 	"  -t table\tname of table to insert into\n"
 	"  -s sep\tspecifies statement separator (default ';')\n"
-	"  -nq fields\tspecifies fields not to quoute on output\n"
+	"  -nq fields\tspecifies fields not to quote on output\n"
 	"  -qn\t\tforce quoting of NULL values\n"
 	"#IBN,SEP,OFL,IFN"
 };
@@ -62,7 +62,7 @@ const char * const UPD_HELP = {
 	"  -w fields\tfields to use to generate the SQL WHERE clause\n"
 	"  -t table\tname of table to update\n"
 	"  -s sep\tspecifies statement separator (default ';')\n"
-	"  -nq fields\tspecifies fields not to quoute on output\n"
+	"  -nq fields\tspecifies fields not to quote on output\n"
 	"  -qn\t\tforce quoting of NULL values\n"
 	"#IBN,SEP,OFL,IFN"
 };
@@ -74,7 +74,7 @@ const char * const DEL_HELP = {
 	"  -w fields\tfields to use to generate the SQL WHERE clause\n"
 	"  -t table\tname of table to update\n"
 	"  -s sep\tspecifies statement separator (default ';')\n"
-	"  -nq fields\tspecifies fields not to quoute on output\n"
+	"  -nq fields\tspecifies fields not to quote on output\n"
 	"  -qn\t\tforce quoting of NULL values\n"
 	"#IBN,SEP,OFL,IFN"
 };
@@ -249,7 +249,7 @@ void SQLCommand ::  MustHaveWhereNames() const {
 
 //---------------------------------------------------------------------------
 // Build the WHERE clause from the column specs. Note that referenced
-// fields must exist.
+// CSV record fields must exist, unlike most other csvfix commands.
 //---------------------------------------------------------------------------
 
 string SQLCommand :: MakeWhereClause( const CSVRow & row  ) const {
@@ -389,8 +389,8 @@ string SQLInsertCommand :: CreateInsertSQL( const string & table,
 
 
 //---------------------------------------------------------------------------
-// Update command is similar to minsert, but will have a WHERE clause - we
-// don't support UPDATE withot WHERE.
+// Update command is similar to insert, but will have a WHERE clause - we
+// don't support UPDATE without WHERE, for safety reasons.
 //---------------------------------------------------------------------------
 
 SQLUpdateCommand ::	SQLUpdateCommand( const string & name,

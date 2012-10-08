@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 // csved_truncpad.cpp
 //
-// truncation and padding for CSVED
+// truncation and padding for csvfix
 //
 // Copyright (C) 2009 Neil Butterworth
 //---------------------------------------------------------------------------
@@ -47,7 +47,7 @@ const char * const PAD_HELP = {
 	"usage: csvfix pad [flags] [file ...]\n"
 	"where flags are:\n"
 	"  -n count\tnumber of fields to pad to\n"
-	"  -p vals\tvalues  to use for paddding (default is e,mpty string)\n"
+	"  -p vals\tvalues  to use for paddding (default is empty string)\n"
 	"#ALL"
 };
 
@@ -78,7 +78,7 @@ TruncCommand :: TruncCommand( const string & name,
 }
 
 //---------------------------------------------------------------------------
-// Perform truncation on row. CommList param not used.
+// Perform truncation on row. CommaList param not used.
 //---------------------------------------------------------------------------
 
 void TruncCommand :: ProcessRow( CSVRow & row, unsigned int ncols,
@@ -91,7 +91,7 @@ void TruncCommand :: ProcessRow( CSVRow & row, unsigned int ncols,
 }
 
 //---------------------------------------------------------------------------
-// Perform padding. Use calues in comma list to pad.
+// Perform padding. Use values in comma list to pad.
 //---------------------------------------------------------------------------
 
 void PadCommand :: ProcessRow( CSVRow & row, unsigned int ncols,
@@ -114,7 +114,7 @@ void PadCommand :: ProcessRow( CSVRow & row, unsigned int ncols,
 }
 
 //---------------------------------------------------------------------------
-// Do truncation or padding depending on comand type.
+// Do truncation or padding depending on command type.
 //---------------------------------------------------------------------------
 
 int TruncPadBase :: Execute( ALib::CommandLine & cmd ) {

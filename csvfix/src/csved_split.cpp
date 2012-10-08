@@ -156,7 +156,7 @@ int SplitFixed :: Execute( ALib::CommandLine & cmd ) {
 }
 
 //---------------------------------------------------------------------------
-// Split based on fixed positions. Needs refactoring.
+// Split based on fixed positions. 
 //---------------------------------------------------------------------------
 
 void SplitFixed :: Split( CSVRow & row ) {

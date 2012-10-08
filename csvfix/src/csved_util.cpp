@@ -19,7 +19,7 @@ using std::vector;
 namespace CSVED {
 
 //---------------------------------------------------------------------------
-// Convert comma list to vecor of ints to be used as col index. We now allow
+// Convert comma list to vector of ints to be used as col index. We now allow
 // ranges in the form n1:n2.
 //---------------------------------------------------------------------------
 
@@ -79,7 +79,7 @@ void CommaListToIndex( const ALib::CommaList & cl,
 
 //---------------------------------------------------------------------------
 // Compare two CSV rows - return as for strcmp. If field list is provided,
-// compare oonly fields in list.
+// compare only fields in list.
 //----------------------------------------------------------------------------
 
 int CmpRow( const CSVRow & a, const CSVRow & b, const FieldList & f ) {
