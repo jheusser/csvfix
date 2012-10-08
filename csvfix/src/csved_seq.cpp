@@ -129,7 +129,7 @@ void SeqCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 				<< " must be integer" );
 	}
 
-	// temp fix for bug in command line parser that can't handle negative
+	// fix for bug in command line parser that can't handle negative
 	// numbers as parameters for switches
 	if ( cmd.HasFlag( FLAG_DECR ) ) {
 		sn = cmd.GetValue( FLAG_DECR );
@@ -159,7 +159,6 @@ void SeqCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 //----------------------------------------------------------------------------
 // Insert sequence number into mask. already checks that the mask contains
 // am insertion marker.
-// ??? Inefficient - should cache insertion point ???
 //----------------------------------------------------------------------------
 
 string SeqCommand :: MaskSeq( const std::string & sn ) const {

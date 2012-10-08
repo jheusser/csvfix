@@ -127,7 +127,7 @@ void TrimCommand :: Chop( CSVRow & row, unsigned int  i ) {
 }
 
 //---------------------------------------------------------------------------
-// Trim fields of row. Alweys perform whitespace removal and only perform
+// Trim fields of row. Always perform whitespace removal and only perform
 // width reductions if widths specified.
 //---------------------------------------------------------------------------
 

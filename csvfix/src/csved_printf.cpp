@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 // csved_printf.cpp
 //
-// printf-formatting
+// printf-formatting for csvfix
 //
 // Copyright (C) 2009 Neil Butterworth
 //---------------------------------------------------------------------------
@@ -55,7 +55,6 @@ int PrintfCommand :: Execute( ALib::CommandLine & cmd ) {
 
 	string fmt = cmd.GetValue( FLAG_FMT );
 	ParseFormat( fmt );
-//	DumpFmt();
 
 	CSVRow row;
 	IOManager io( cmd );
