@@ -32,6 +32,7 @@ const char * const PRINTF_HELP = {
 	"usage: csvfix printf [flags] [files ...]\n"
 	"where flags are:\n"
 	"  -fmt fmt\tspecify fields and printf-style formatters\n"
+	"  -f fields\tfield order to pass to formatter\n"
 	"#SMQ,SEP,IBL,IFN,OFL,SEP"
 };
 
@@ -44,6 +45,7 @@ PrintfCommand :: PrintfCommand( const string & name,
 		: Command( name, desc, PRINTF_HELP ) {
 
 	AddFlag( ALib::CommandLineFlag( FLAG_FMT, true, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_COLS, false, 1 ) );
 
 }
 
@@ -55,6 +57,13 @@ int PrintfCommand :: Execute( ALib::CommandLine & cmd ) {
 
 	string fmt = cmd.GetValue( FLAG_FMT );
 	ParseFormat( fmt );
+	if ( cmd.HasFlag( FLAG_COLS ) ) {
+		ALib::CommaList cl( cmd.GetValue( FLAG_COLS ) );
+		CommaListToIndex( cl, mOrder );
+	}
+	else {
+		mOrder.clear();
+	}
 
 	CSVRow row;
 	IOManager io( cmd );
@@ -64,6 +73,26 @@ int PrintfCommand :: Execute( ALib::CommandLine & cmd ) {
 		io.Out() << line << std::endl;
 	}
 	return 0;
+}
+
+//----------------------------------------------------------------------------
+// Get field indexed by fieldno - this may come directly from the CSV data,
+// or be indirected via the order vector.
+//----------------------------------------------------------------------------
+
+string PrintfCommand :: GetField( const CSVRow & row, unsigned int fieldno ) {
+	if ( mOrder.empty() ) {
+		return fieldno >= row.size() ? "" : row[fieldno];
+	}
+	else {
+		if ( fieldno >= mOrder.size() ) {
+			return "";
+		}
+		else {
+			fieldno = mOrder[fieldno];
+			return fieldno >= row.size() ? "" : row[fieldno];
+		}
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -87,10 +116,7 @@ string PrintfCommand :: FormatRow( const CSVRow & row ) {
 			continue;
 		}
 		else {
-			string field = fieldno >= row.size()
-							? ""
-							: row[fieldno];
-			fieldno++;
+			string field = GetField( row, fieldno++ );
 			char c = ALib::StrLast( mFmtLine[i].mText );
 			if ( fdouble.find( c ) != std::string::npos  ) {
 				double d = ALib::IsNumber( field )
