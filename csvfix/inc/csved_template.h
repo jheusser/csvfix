@@ -28,8 +28,8 @@ class TemplateCommand : public Command {
 	private:
 
 
-		std::string ReplaceColumns( const CSVRow & row );
-		void HandleSpecialChars( char c, unsigned int & pos,
+		std::string ReplaceColumns( const std::string & tplate, const CSVRow & row );
+		void HandleSpecialChars( const std::string & tplate, char c, unsigned int & pos,
 									const CSVRow & row,
 									std::string & out );
 

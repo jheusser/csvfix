@@ -76,7 +76,7 @@ int TemplateCommand :: Execute( ALib::CommandLine & cmd ) {
 
 	while( io.ReadCSV( row ) ) {
 		if ( mFileTemplate.empty() ) {
-			io.Out() << ReplaceColumns( row );
+			io.Out() << ReplaceColumns( mTemplate, row );
 		}
 		else {
 			FileOut( row );
@@ -91,12 +91,12 @@ int TemplateCommand :: Execute( ALib::CommandLine & cmd ) {
 //----------------------------------------------------------------------------
 
 void TemplateCommand :: FileOut( const CSVRow & row  ) {
-	string fname = mFileTemplate.c_str();
+	string fname = ReplaceColumns( mFileTemplate, row );
 	std::ofstream ifs( fname );
 	if ( ! ifs.is_open() ) {
-		CSVTHROW( "Cannot open file " << fname << "for output" );
+		CSVTHROW( "Cannot open file " << fname << " for output" );
 	}
-	ifs << ReplaceColumns( row );
+	ifs << ReplaceColumns( mTemplate, row );
 }
 
 //---------------------------------------------------------------------------
@@ -110,10 +110,11 @@ void TemplateCommand :: FileOut( const CSVRow & row  ) {
 // an expression in the expression language and needs to be evaluated.
 //---------------------------------------------------------------------------
 
-void TemplateCommand :: HandleSpecialChars( char c, unsigned int & pos,
-												const CSVRow & row,
-												string & out ) {
-	char t = mTemplate[ pos++ ];
+void TemplateCommand :: HandleSpecialChars( const string & tplate,
+											char c, unsigned int & pos,
+											const CSVRow & row,
+											string & out ) {
+	char t = tplate[ pos++ ];
 	if ( c == '\\' ) {
 		switch( t ) {
 			case '\n':
@@ -130,7 +131,7 @@ void TemplateCommand :: HandleSpecialChars( char c, unsigned int & pos,
 				CSVTHROW( "Missing closing brace" );
 			}
 			ns += t;
-			t = mTemplate[ pos++ ];
+			t = tplate[ pos++ ];
 		}
 
 		if( ns.size() && ns[0] == EVALCHR ) {    // it's an expression
@@ -172,20 +173,21 @@ string TemplateCommand :: Eval( const CSVRow & row, const string & expr ) {
 // Other characters are copied literaly to output.
 //---------------------------------------------------------------------------
 
-string TemplateCommand :: ReplaceColumns( const CSVRow & row ) {
+string TemplateCommand :: ReplaceColumns( const string & tplate,
+											const CSVRow & row ) {
 
-	if ( ALib::IsEmpty( mTemplate ) ) {
+	if ( ALib::IsEmpty( tplate ) ) {
 		CSVTHROW( "No template contents" );
 	}
 
-	unsigned int pos = 0, len = mTemplate.size();
+	unsigned int pos = 0, len = tplate.size();
 
 	string out;
 
 	while( pos != len ) {
-		char c = mTemplate[pos++];
+		char c = tplate[pos++];
 		if ( c == '\\' || c == PINTRO ) {
-			HandleSpecialChars( c, pos, row, out );
+			HandleSpecialChars( tplate, c, pos, row, out );
 		}
 		else {
 			out += c;
