@@ -33,6 +33,7 @@ class TemplateCommand : public Command {
 									const CSVRow & row,
 									std::string & out );
 
+		std::string Eval( const CSVRow & row, const std::string & expr );
 		void ReadTemplate( const ALib::CommandLine & cmd );
 		std::string mTemplate;
 

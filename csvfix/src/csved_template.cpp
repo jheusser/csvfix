@@ -10,6 +10,7 @@
 #include "csved_template.h"
 #include "csved_strings.h"
 #include "csved_except.h"
+#include "a_expr.h"
 #include <fstream>
 
 using std::string;
@@ -31,6 +32,7 @@ static RegisterCommand <TemplateCommand> rc1_(
 
 const char PINTRO = '{';
 const char POUTRO = '}';
+const char EVALCHR = '@';
 
 //----------------------------------------------------------------------------
 // Help text
@@ -79,6 +81,9 @@ int TemplateCommand :: Execute( ALib::CommandLine & cmd ) {
 // a formatting placeholder. For exanple {2} will be replaced by column
 // two from the input row. Append placeholder value to the 'out'
 // parameter. Also updates the 'pos' param with new position in template.
+//
+// If the string in braces begins with the special EVALCHR character, it is
+// an expression in the expression language and needs to be evaluated.
 //---------------------------------------------------------------------------
 
 void TemplateCommand :: HandleSpecialChars( char c, unsigned int & pos,
@@ -104,6 +109,11 @@ void TemplateCommand :: HandleSpecialChars( char c, unsigned int & pos,
 			t = mTemplate[ pos++ ];
 		}
 
+		if( ns.size() && ns[0] == EVALCHR ) {    // it's an expression
+			out += Eval( row, ns );
+			return;
+		}
+
 		if ( ! ALib::IsInteger( ns ) ) {
 			CSVTHROW( "Invalid placeholder: " << "{" << ns << "}" );
 		}
@@ -117,6 +127,19 @@ void TemplateCommand :: HandleSpecialChars( char c, unsigned int & pos,
 			out += row[ n ];
 		}
 	}
+}
+
+//----------------------------------------------------------------------------
+// Evaluate a string as an expression. The string will start with EVALCHR
+// which needs to be removed.
+//----------------------------------------------------------------------------
+
+string TemplateCommand :: Eval( const CSVRow & row, const string & expr ) {
+	ALib::Expression ex;
+	for( unsigned int i = 0; i < row.size(); i++ ) {
+		ex.AddPosParam( row[i] );
+	}
+	return ex.Evaluate( expr.substr( 1 ) );
 }
 
 //---------------------------------------------------------------------------
