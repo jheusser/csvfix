@@ -35,7 +35,9 @@ class TemplateCommand : public Command {
 
 		std::string Eval( const CSVRow & row, const std::string & expr );
 		void ReadTemplate( const ALib::CommandLine & cmd );
-		std::string mTemplate;
+		void FileOut( const CSVRow & row );
+
+		std::string mTemplate, mFileTemplate;
 
 };
 

@@ -27,7 +27,7 @@ static RegisterCommand <TemplateCommand> rc1_(
 );
 
 //----------------------------------------------------------------------------
-// Parameter intro/outro
+// Parameter intro/outro and expression indicator
 //----------------------------------------------------------------------------
 
 const char PINTRO = '{';
@@ -42,7 +42,8 @@ const char * const TPL_HELP = {
 	"formatted output using template file (output is not CSV)\n"
 	"usage: csvfix template [flags] [files ...]\n"
 	"where flags are:\n"
-	"  -ft  file\tspecify name of template file\n"
+	"  -ft file\tspecify name of template file\n"
+	"  -fn ftpl\tspecify template for generating file names\n"
 	"#IBL,SEP,IFN,OFL"
 };
 
@@ -55,6 +56,7 @@ TemplateCommand ::	TemplateCommand( const string & name,
 		: Command( name, desc, TPL_HELP ) {
 
 	AddFlag( ALib::CommandLineFlag( FLAG_TFILE, true, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_FNAMES, false, 1 ) );
 }
 
 //---------------------------------------------------------------------------
@@ -65,14 +67,36 @@ int TemplateCommand :: Execute( ALib::CommandLine & cmd ) {
 
 	ReadTemplate( cmd );
 
+	if ( cmd.HasFlag( FLAG_FNAMES ) ) {
+		mFileTemplate = cmd.GetValue( FLAG_FNAMES );
+	}
+
 	IOManager io( cmd );
 	CSVRow row;
 
 	while( io.ReadCSV( row ) ) {
-		io.Out() << ReplaceColumns( row );
+		if ( mFileTemplate.empty() ) {
+			io.Out() << ReplaceColumns( row );
+		}
+		else {
+			FileOut( row );
+		}
 	}
 
 	return 0;
+}
+
+//----------------------------------------------------------------------------
+// Output to a file specified by the -fn option, which itself is a template.
+//----------------------------------------------------------------------------
+
+void TemplateCommand :: FileOut( const CSVRow & row  ) {
+	string fname = mFileTemplate.c_str();
+	std::ofstream ifs( fname );
+	if ( ! ifs.is_open() ) {
+		CSVTHROW( "Cannot open file " << fname << "for output" );
+	}
+	ifs << ReplaceColumns( row );
 }
 
 //---------------------------------------------------------------------------
