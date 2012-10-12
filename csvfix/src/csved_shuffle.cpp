@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 // csved_shuffle.cpp
 //
-// randomly shuffle csv rows
+// randomly shuffle csv rows and fields
 //
 // Copyright (C) 2009 Neil Butterworth
 //---------------------------------------------------------------------------
@@ -12,6 +12,7 @@
 #include "csved_shuffle.h"
 #include "csved_strings.h"
 #include <ctime>
+#include <algorithm>
 
 using std::string;
 using std::vector;
@@ -37,6 +38,7 @@ const char * const SHUFFLE_HELP = {
 	"where flags are:\n"
 	"  -n count\tonly output the first 'count' rows after shuffle\n"
 	"  -rs seed\tspecify seed to use for random number generator\n"
+	"  -f fields\tshuffle specified fields instead of rows\n"
 	"#SMQ,SEP,IBL,IFN,OFL"
 };
 
@@ -50,6 +52,7 @@ ShuffleCommand ::ShuffleCommand( const string & name,
 
 	AddFlag( ALib::CommandLineFlag( FLAG_NUM, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_RSEED, false, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_COLS, false, 1 ) );
 }
 
 //----------------------------------------------------------------------------
@@ -63,11 +66,18 @@ int ShuffleCommand :: Execute( ALib::CommandLine & cmd ) {
 	IOManager io( cmd );
 	CSVRow row;
 
-	while( io.ReadCSV( row ) ) {
-		mRows.push_back( row );
+	if ( mFields.size() == 0 ) {
+		while( io.ReadCSV( row ) ) {
+			mRows.push_back( row );
+		}
+		Shuffle( io );
 	}
-
-	Shuffle( io );
+	else {
+		while( io.ReadCSV( row ) ) {
+			ShuffleFields( row );
+			io.WriteRow( row );
+		}
+	}
 	return 0;
 }
 
@@ -93,13 +103,40 @@ void ShuffleCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 	}
 	int n = ALib::ToInteger( sr );
 	mSeed = n < 0 ? std::time(0) : n;
+	if ( cmd.HasFlag( FLAG_COLS ) ) {
+		ALib::CommaList cl( cmd.GetValue( FLAG_COLS ) );
+		CommaListToIndex( cl, mFields );
+	}
+}
+
+//----------------------------------------------------------------------------
+// Shuffle fields specified by the -f option
+//----------------------------------------------------------------------------
+
+void ShuffleCommand ::ShuffleFields( CSVRow & row  ) {
+	std::vector <string> f;
+	for( unsigned int i = 0; i < mFields.size(); i++ ) {
+		unsigned int fi = mFields[i];
+		if ( fi >= row.size() ) {
+			CSVTHROW( "Invalid field index: " << fi + 1 );
+		}
+		else {
+			f.push_back( row[fi] );
+		}
+	}
+	std::random_shuffle( f.begin(), f.end() );
+	unsigned int ri = 0;
+	for( unsigned int i = 0; i < mFields.size(); i++ ) {
+		unsigned int fi = mFields[i];
+		row[fi] = f[ri++];
+	}
 }
 
 //----------------------------------------------------------------------------
 // shuffle rows and output via io manager
 //----------------------------------------------------------------------------
 
-void ShuffleCommand :: ShuffleCommand :: Shuffle( IOManager & io ) {
+void ShuffleCommand :: Shuffle( IOManager & io ) {
 	ALib::RandGen rg( mSeed );
 	int nout = mCount;
 	int last = mRows.size();

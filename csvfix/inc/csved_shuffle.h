@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 // csved_shuffle.h
 //
-// random shuffle CSV rows
+// random shuffle CSV rows and fields
 //
 // Copyright (C) 2009 Neil Butterworth
 //---------------------------------------------------------------------------
@@ -29,10 +29,11 @@ class ShuffleCommand : public Command {
 
 		void ProcessFlags( const ALib::CommandLine & cmd );
 		void Shuffle( IOManager & io );
-
+		void ShuffleFields( CSVRow & row );
 		std::vector <CSVRow> mRows;
 		unsigned int mCount;
 		int mSeed;
+		FieldList mFields;
 };
 
 //------------------------------------------------------------------------
