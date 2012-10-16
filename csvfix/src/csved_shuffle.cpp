@@ -3,7 +3,7 @@
 //
 // randomly shuffle csv rows and fields
 //
-// Copyright (C) 2009 Neil Butterworth
+// Copyright (C) 2012 Neil Butterworth
 //---------------------------------------------------------------------------
 
 #include "a_base.h"
@@ -25,7 +25,7 @@ namespace CSVED {
 
 static RegisterCommand <ShuffleCommand> rc1_(
 	CMD_SHUFFLE,
-	"randomly shuffle rows"
+	"randomly shuffle rows or fields"
 );
 
 //----------------------------------------------------------------------------
