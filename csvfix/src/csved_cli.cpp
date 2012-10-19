@@ -30,7 +30,7 @@ CLIHandler::DictType * CLIHandler::mDict = 0;
 //---------------------------------------------------------------------------
 
 CLIHandler :: CLIHandler( int argc, char * argv[] )
-	: mCmdLine( argc, argv) {
+	: mConfig( this ), mCmdLine( argc, argv) {
 	InitDict();
 }
 
@@ -52,10 +52,43 @@ int CLIHandler :: ExecCommand() {
 		return HelpCmd();
 	}
 	else {
+		string acmd = mConfig.GetCommand( mCmdLine.Argv(1) );
+		if ( acmd != "" ) {
+			RebuildCommandLine( acmd );
+		}
 		Command * cmd = FindCommand();
 		cmd->CheckFlags( mCmdLine );
 		return cmd->Execute( mCmdLine );
 	}
+}
+
+//----------------------------------------------------------------------------
+// Rebuild command line args using values from an aliased command
+//----------------------------------------------------------------------------
+
+void CLIHandler :: RebuildCommandLine( const string & acmd ) {
+	std::vector <string> temp;
+	temp.push_back( mCmdLine.Argv(0) );
+	std::istringstream is( acmd );
+	string arg;
+	while( is >> arg ) {
+		temp.push_back( arg );
+	}
+	for( int i = 2; i < mCmdLine.Argc(); i++ ) {
+		temp.push_back( mCmdLine.Argv(i) );
+	}
+	mCmdLine.Clear();
+	for( unsigned int i = 0; i < temp.size(); i++ ) {
+		mCmdLine.Add( temp[i] );
+	}
+}
+
+//----------------------------------------------------------------------------
+// See if command exists
+//----------------------------------------------------------------------------
+
+bool CLIHandler :: HasCommand( const string & cmd ) const {
+	return mDict->Contains( cmd );
 }
 
 //---------------------------------------------------------------------------

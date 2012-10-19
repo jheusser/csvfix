@@ -156,6 +156,9 @@ class CommandLine {
 		/// Get file using file list (not command line) index
 		std::string File( unsigned int i ) const;
 
+		void Clear();
+		void Add( const std::string & arg );
+
 	private:
 
 		bool HasFlag( const std::string & name, unsigned int start );
