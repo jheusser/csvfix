@@ -13,6 +13,7 @@
 #include "a_dict.h"
 #include "a_env.h"
 #include "csved_command.h"
+#include "csved_config.h"
 
 namespace CSVED {
 
@@ -33,6 +34,9 @@ class CLIHandler {
 
 		static void AddCommand( const std::string & name,
 								Command * cmd );
+
+		bool HasCommand( const std::string & cmd ) const;
+
 	private:
 
 		Command * FindCommand();
@@ -42,9 +46,12 @@ class CLIHandler {
 		int HelpCmd();
 		int Info();
 
+		void RebuildCommandLine( const std::string & acmd );
+
 		static void InitDict();
 		static DictType * mDict;
 
+		Config mConfig;
 		ALib::CommandLine mCmdLine;
 
 };
