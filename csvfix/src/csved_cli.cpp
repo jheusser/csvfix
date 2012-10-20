@@ -66,7 +66,7 @@ int CLIHandler :: ExecCommand() {
 }
 
 //----------------------------------------------------------------------------
-// extract individual tokens from aliased command line, removing quotes
+// Extract individual tokens from aliased command line, removing quotes
 // from quoted strings.
 //----------------------------------------------------------------------------
 
@@ -103,13 +103,10 @@ static string GetNextToken( const string & acmd, unsigned int & i ) {
 	}
 }
 
-
-
-
-
-
 //----------------------------------------------------------------------------
-// Rebuild command line args using values from an aliased command
+// Rebuild command line args using values from an aliased command. The
+// savecmd flag indicates if we use the xisting command name or get the
+// name from an alias.
 //----------------------------------------------------------------------------
 
 void CLIHandler :: RebuildCommandLine( const string & acmd, bool savecmd ) {

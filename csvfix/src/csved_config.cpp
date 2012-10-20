@@ -39,7 +39,7 @@ const string ALIAS_STR = "alias";
 
 
 //----------------------------------------------------------------------------
-// Flags which are allowed as defaults
+// Flags which are allowed as defaults - not currently used.
 //----------------------------------------------------------------------------
 
 struct DefCmdArg {
@@ -112,6 +112,9 @@ static bool Ignore( const string & line ) {
 }
 
 //----------------------------------------------------------------------------
+// Populate the defaults. Use the current working directory config first,
+// and if there isn't one, the user home directory config.
+//----------------------------------------------------------------------------
 
 Config :: Config( CLIHandler * cli ) : mCli( cli ) {
 	if ( ! Populate( GetLocalConfig() ) ) {
@@ -119,6 +122,8 @@ Config :: Config( CLIHandler * cli ) : mCli( cli ) {
 	}
 }
 
+//----------------------------------------------------------------------------
+// Populate from config file
 //----------------------------------------------------------------------------
 
 bool  Config :: Populate( const string cfg ) {
@@ -141,6 +146,11 @@ bool  Config :: Populate( const string cfg ) {
 	return true;
 }
 
+//----------------------------------------------------------------------------
+// Process entry in config file which will be either default options or
+// an alias.
+//----------------------------------------------------------------------------
+
 void Config :: ProcessSetting( const string line ) {
 	std::istringstream is( line );
 	string cmd;
@@ -156,6 +166,11 @@ void Config :: ProcessSetting( const string line ) {
 	}
 }
 
+//----------------------------------------------------------------------------
+// Process an alias in the form:
+//
+//    alias alias-name cmd-name option1 option2 ...
+//----------------------------------------------------------------------------
 
 void Config :: ProcessAlias( std::istringstream & is ) {
 	string alias, cmd;
@@ -178,6 +193,14 @@ void Config :: ProcessAlias( std::istringstream & is ) {
 	mAliases.insert( std::make_pair( alias, cmd + " " + opt ) );
 }
 
+//----------------------------------------------------------------------------
+// Process default options in the form:
+//
+//    defaults option1 option2 ...
+//
+// Should really validate options, but currently do not.
+//----------------------------------------------------------------------------
+
 void Config :: ProcessDefaults( std::istringstream & is ) {
 	if ( mDefaults != "" ) {
 		CSVTHROW( "Can specify defaults once only" );
@@ -185,6 +208,10 @@ void Config :: ProcessDefaults( std::istringstream & is ) {
 	getline( is, mDefaults );
 }
 
+//----------------------------------------------------------------------------
+// See if there is an alias with the given name and return command string
+// if there is one, otherwise return empty string.
+//----------------------------------------------------------------------------
 
 string Config :: GetAliasedCommand( const string & alias ) const {
 	AMapType::const_iterator it = mAliases.find( alias );
@@ -196,10 +223,13 @@ string Config :: GetAliasedCommand( const string & alias ) const {
 	}
 }
 
+//----------------------------------------------------------------------------
+// Return default options - may be empty.
+//----------------------------------------------------------------------------
+
 string Config :: Defaults() const {
 	return mDefaults;
 }
-
 
 
 //---------------------------------------------------------------------------
