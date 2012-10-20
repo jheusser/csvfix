@@ -26,6 +26,7 @@ _OBJS = csved_atable.o \
 		csved_cli.o \
 		csved_check.o \
 		csved_command.o \
+		csved_config.o \
 		csved_date.o \
 		csved_diff.o \
 		csved_dsv.o \
