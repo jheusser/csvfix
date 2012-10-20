@@ -63,20 +63,64 @@ int CLIHandler :: ExecCommand() {
 }
 
 //----------------------------------------------------------------------------
+// extract individual tokens from aliased command line, removing quotes
+// from quoted strings.
+//----------------------------------------------------------------------------
+
+static string GetNextToken( const string & acmd, unsigned int & i ) {
+	string tok;
+	while( std::isspace( ALib::Peek( acmd, i ) ) ) {
+		i++;
+	}
+	if ( acmd[i] == 0 ) {
+		return "";
+	}
+	char quote = acmd[i] == '"' || acmd[i] == '\'' ? acmd[i] : 0;
+	if ( quote ) {
+		i++;
+		while( char c = ALib::Peek( acmd, i ) ) {
+			if ( c == quote ) {
+				i++;
+				return tok;
+			}
+			tok += c;
+			i++;
+		}
+		CSVTHROW( "Mismatched quotes" );
+	}
+	else {
+		while( char c = ALib::Peek( acmd, i ) ) {
+			if ( c <= ' ' ) {
+				return tok;
+			}
+			tok += c;
+			i++;
+		}
+		return tok;
+	}
+}
+
+//----------------------------------------------------------------------------
 // Rebuild command line args using values from an aliased command
 //----------------------------------------------------------------------------
 
 void CLIHandler :: RebuildCommandLine( const string & acmd ) {
+
 	std::vector <string> temp;
 	temp.push_back( mCmdLine.Argv(0) );
-	std::istringstream is( acmd );
-	string arg;
-	while( is >> arg ) {
-		temp.push_back( arg );
+
+	unsigned int i = 0;
+	while( i < acmd.size() ) {
+		string elem = GetNextToken( acmd, i );
+		if ( ! elem.empty() ) {
+			temp.push_back( elem );
+		}
 	}
-	for( int i = 2; i < mCmdLine.Argc(); i++ ) {
+
+	for( i = 2; i < mCmdLine.Argc(); i++ ) {
 		temp.push_back( mCmdLine.Argv(i) );
 	}
+
 	mCmdLine.Clear();
 	for( unsigned int i = 0; i < temp.size(); i++ ) {
 		mCmdLine.Add( temp[i] );
