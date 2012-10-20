@@ -29,7 +29,8 @@ class Config {
 	public:
 
 		Config( CLIHandler * cli );
-		std::string GetCommand( const std::string & alias ) const;
+		std::string GetAliasedCommand( const std::string & alias ) const;
+		std::string Defaults() const;
 
 	private:
 

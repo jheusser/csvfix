@@ -37,6 +37,27 @@ const string HOME_VAR = "HOME";
 const string DEF_STR = "defaults";
 const string ALIAS_STR = "alias";
 
+
+//----------------------------------------------------------------------------
+// Flags which are allowed as defaults
+//----------------------------------------------------------------------------
+
+struct DefCmdArg {
+	string cmd;
+	int argc;
+};
+
+DefCmdArg defargs[] = {
+	{ FLAG_IGNBL, 0 },
+	{ FLAG_SMARTQ, 0 },
+	{ FLAG_ICNAMES, 0 },
+	{ FLAG_CSVSEP, 1 },
+	{ FLAG_CSVSEPR, 1 },
+	{ FLAG_OUTSEP, 1 },
+	{ FLAG_QLIST, 1 },
+	{ "", -1 }
+};
+
 //----------------------------------------------------------------------------
 // Get configuration  from specified  directory
 //----------------------------------------------------------------------------
@@ -158,10 +179,14 @@ void Config :: ProcessAlias( std::istringstream & is ) {
 }
 
 void Config :: ProcessDefaults( std::istringstream & is ) {
+	if ( mDefaults != "" ) {
+		CSVTHROW( "Can specify defaults once only" );
+	}
+	getline( is, mDefaults );
 }
 
 
-string Config :: GetCommand( const string & alias ) const {
+string Config :: GetAliasedCommand( const string & alias ) const {
 	AMapType::const_iterator it = mAliases.find( alias );
 	if ( it == mAliases.end() ) {
 		return "";
@@ -169,6 +194,10 @@ string Config :: GetCommand( const string & alias ) const {
 	else {
 		return it->second;
 	}
+}
+
+string Config :: Defaults() const {
+	return mDefaults;
 }
 
 

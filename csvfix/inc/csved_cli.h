@@ -46,7 +46,8 @@ class CLIHandler {
 		int HelpCmd();
 		int Info();
 
-		void RebuildCommandLine( const std::string & acmd );
+		void RebuildCommandLine( const std::string & acmd, bool savecmd );
+		void AddDefaults( const std::string & acmd  );
 
 		static void InitDict();
 		static DictType * mDict;
