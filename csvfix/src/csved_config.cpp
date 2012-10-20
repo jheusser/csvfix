@@ -150,11 +150,11 @@ void Config :: ProcessAlias( std::istringstream & is ) {
 	if ( ! mCli->HasCommand( cmd ) ) {
 		CSVTHROW( "No such command as " << cmd << " for alias " << alias );
 	}
+
 	string opt;
-	while( is >> opt ) {
-		cmd += (" " + opt);
-	}
-	mAliases.insert( std::make_pair( alias, cmd ) );
+	getline( is, opt );
+
+	mAliases.insert( std::make_pair( alias, cmd + " " + opt ) );
 }
 
 void Config :: ProcessDefaults( std::istringstream & is ) {
