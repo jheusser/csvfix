@@ -52,9 +52,12 @@ int CLIHandler :: ExecCommand() {
 		return HelpCmd();
 	}
 	else {
-		string acmd = mConfig.GetCommand( mCmdLine.Argv(1) );
+		string acmd = mConfig.GetAliasedCommand( mCmdLine.Argv(1) );
 		if ( acmd != "" ) {
-			RebuildCommandLine( acmd );
+			RebuildCommandLine( acmd, false );
+		}
+		else {
+			RebuildCommandLine( mConfig.Defaults(), true );
 		}
 		Command * cmd = FindCommand();
 		cmd->CheckFlags( mCmdLine );
@@ -100,14 +103,23 @@ static string GetNextToken( const string & acmd, unsigned int & i ) {
 	}
 }
 
+
+
+
+
+
 //----------------------------------------------------------------------------
 // Rebuild command line args using values from an aliased command
 //----------------------------------------------------------------------------
 
-void CLIHandler :: RebuildCommandLine( const string & acmd ) {
+void CLIHandler :: RebuildCommandLine( const string & acmd, bool savecmd ) {
 
 	std::vector <string> temp;
 	temp.push_back( mCmdLine.Argv(0) );
+
+	if ( savecmd ) {
+		temp.push_back( mCmdLine.Argv(1) );
+	}
 
 	unsigned int i = 0;
 	while( i < acmd.size() ) {
@@ -117,7 +129,7 @@ void CLIHandler :: RebuildCommandLine( const string & acmd ) {
 		}
 	}
 
-	for( i = 2; i < mCmdLine.Argc(); i++ ) {
+	for( int i = 2; i < mCmdLine.Argc(); i++ ) {
 		temp.push_back( mCmdLine.Argv(i) );
 	}
 
