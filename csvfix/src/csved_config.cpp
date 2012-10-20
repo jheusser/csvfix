@@ -26,7 +26,7 @@ namespace CSVED {
 
 #ifdef _WIN32
 #include <direct.h>
-const string CONFIG_FILE = "csvfix.ini";
+const string CONFIG_FILE = "csvfix.cfg";
 const string HOME_VAR = "USERPROFILE";
 #else
 #include <direct.h>
