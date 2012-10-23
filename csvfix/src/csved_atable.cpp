@@ -37,7 +37,8 @@ const char * const ATABLE_HELP = {
 	"where flags are:\n"
 	"  -h head\tcomma-separated list of table headers\n"
 	"\t\tuse '-h @' to interpret first input line as the header\n"
-	"  -ra fields	list of field indexes to right-align\n"
+	"  -ra fields\tlist of field indexes to right-align\n"
+	"  -s\t\tinsert separator afyer every line of data\n"
 	"#IBL,IFN,OFL"
 
 };
@@ -55,10 +56,11 @@ const string FILE_HEADER = "@";
 
 AsciiTableCommand :: AsciiTableCommand( const string & name,
 								const string & desc )
-		: Command( name, desc, ATABLE_HELP ) {
+		: Command( name, desc, ATABLE_HELP ), mUseLineSep( false ) {
 
 	AddFlag( ALib::CommandLineFlag( FLAG_HEADER, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_RALIGN, false, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_SEP, false, 0 ) );
 }
 
 //----------------------------------------------------------------------------
@@ -125,9 +127,14 @@ void AsciiTableCommand :: OutputTable( std::ostream & os ) {
 		}
 		else {
 			OutputRow( os, mRows[i] );
+			if ( mUseLineSep ) {
+				os << sep << "\n";
+			}
 		}
 	}
-	os << sep <<"\n";
+	if ( ! mUseLineSep ) {
+		os << sep <<"\n";
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -174,6 +181,7 @@ void AsciiTableCommand :: AddRow( const CSVRow & row ) {
 //----------------------------------------------------------------------------
 
 void AsciiTableCommand :: ProcessFlags( ALib::CommandLine & cmd ) {
+	mUseLineSep = cmd.HasFlag( FLAG_SEP );
 	mHeadings = ALib::CommaList( cmd.GetValue( FLAG_HEADER, "" ) );
 	ALib::CommaList ra = ALib::CommaList( cmd.GetValue( FLAG_RALIGN, "" ) );
 	CommaListToIndex( ra, mRightAlign );

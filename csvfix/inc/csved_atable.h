@@ -38,6 +38,7 @@ class AsciiTableCommand : public Command {
 		std::vector <unsigned int> mWidths;
 		ALib::CommaList mHeadings;
 		FieldList mRightAlign;
+		bool mUseLineSep;
 };
 
 //----------------------------------------------------------------------------
