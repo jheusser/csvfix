@@ -123,6 +123,14 @@ Config :: Config( CLIHandler * cli ) : mCli( cli ) {
 }
 
 //----------------------------------------------------------------------------
+// Get name of current config file, or empty string if none.
+//----------------------------------------------------------------------------
+
+string Config :: ConfigFile() const {
+	return mConfigFile;
+}
+
+//----------------------------------------------------------------------------
 // Populate from config file
 //----------------------------------------------------------------------------
 
@@ -131,6 +139,7 @@ bool  Config :: Populate( const string cfg ) {
 	if ( ! f.is_open() ) {
 		return false;
 	}
+	mConfigFile = cfg;
 	string line;
 	while( getline( f, line ) ) {
 		if ( Ignore( line ) ) {

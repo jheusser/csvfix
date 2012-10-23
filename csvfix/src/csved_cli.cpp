@@ -195,6 +195,10 @@ int CLIHandler :: Info() {
 	cout << "\n" << CSVED_NAME << " " << CSVED_VERS << " (" << CSVED_VDATE << ")\n";
 	cout << CSVED_CPYR << "\n" << CSVED_NOWAR;
 	cout << "\n\n";
+	cout << "Configuration file: " 
+				<< (mConfig.ConfigFile().empty() 
+					? "none" 
+					: mConfig.ConfigFile() ) << "\n\n";
 	cout << "csvfix is a CSV stream editor\n";
 	cout << "use 'csvfix help' to see a list of commands\n";
 	cout << "use 'csvfix help command' to see help on a specific command\n";

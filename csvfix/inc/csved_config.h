@@ -31,6 +31,7 @@ class Config {
 		Config( CLIHandler * cli );
 		std::string GetAliasedCommand( const std::string & alias ) const;
 		std::string Defaults() const;
+		std::string ConfigFile() const;
 
 	private:
 
@@ -40,7 +41,7 @@ class Config {
 		void ProcessDefaults( std::istringstream & is );
 
 		CLIHandler * mCli;
-		std::string mDefaults;
+		std::string mDefaults, mConfigFile;
 		typedef std::map <std::string, std::string> AMapType;
 		AMapType mAliases;
 
