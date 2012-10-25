@@ -32,15 +32,7 @@ DEFTEST( RedirectionTest1 ) {
 	FAILNE( line, "line 1" );
 }
 
-DEFTEST( SSToVecTest ) {
-	ostringstream os;
-	os << "one" << endl;
-	os << "two" << "\n";
-	vector <string> v;
-	StreamToVec( os, v );
-	FAILNE( v.size(), 2 );
-	FAILNE( v[0], "one" );
-}
+
 
 #endif
 
