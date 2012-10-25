@@ -68,12 +68,6 @@ class InputRedirector : public Redirector  <std::istream,std::ifstream> {
 // Convert stringstream to something that supports push_back
 //----------------------------------------------------------------------------
 
-template <typename SSTYPE, typename VTYPE>
-void StreamToVec( SSTYPE & ss, VTYPE & vt  ) {
-	std::string lines = ss.str();
-	StrToVec( lines, vt  );
-}
-
 
 //----------------------------------------------------------------------------
 

@@ -311,6 +311,29 @@ static string FuncGetenv( const deque <string> & params ) {
 	return val == NULL ? "" : val;
 }
 
+// min and max
+static string FuncMin( const deque <string> & params ) {
+	if ( IsNumber( params[0] ) && IsNumber( params[1] )) {
+		double n1 = GetDParam( params, 0 );
+		double n2 = GetDParam( params, 1 );
+		return n1 < n2 ? params[0] : params[1];
+	}
+	else {
+		return params[0] < params[1] ? params[0] : params[1];
+	}
+}
+
+static string FuncMax( const deque <string> & params ) {
+	if ( IsNumber( params[0] ) && IsNumber( params[1] ))  {
+		double n1 = GetDParam( params, 0 );
+		double n2 = GetDParam( params, 1 );
+		return n1 > n2 ? params[0] : params[1];
+	}
+	else {
+		return params[0] > params[1] ? params[0] : params[1];
+	}
+}
+
 //----------------------------------------------------------------------------
 // Add all the functions to the function dictionary
 //----------------------------------------------------------------------------
@@ -335,6 +358,8 @@ ADD_FUNC( "lower", 		FuncLower, 		1 );
 ADD_FUNC( "len", 		FuncLen, 		1 );
 ADD_FUNC( "streq", 		FuncStrEq, 		2 );
 ADD_FUNC( "match", 		FuncMatch, 		2 );
+ADD_FUNC( "min", 		FuncMin, 		2 );
+ADD_FUNC( "max", 		FuncMax, 		2 );
 
 
 //----------------------------------------------------------------------------
@@ -1374,6 +1399,8 @@ static ExprTest ETests[] = {
 	{"len('foo')", "3" },
 	{"streq('foo','FOO')", "1" },
 	{"streq('foox','FOO')", "0" },
+	{"min('3','6')", "3" },
+	{"max('3','6')", "6" },
 	{NULL,NULL}
 };
 
