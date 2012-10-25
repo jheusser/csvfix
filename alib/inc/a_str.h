@@ -282,6 +282,7 @@ class CommaList {
 		const CommaList & Append ( const CommaList & cl );
 		const CommaList & Append ( const std::string & s );
 		bool Contains( const std::string & s ) const;
+		int Index( const std::string & s ) const;
 
 	private:
 

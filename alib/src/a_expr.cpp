@@ -334,17 +334,84 @@ static string FuncMax( const deque <string> & params ) {
 	}
 }
 
+// date validation and element access
+static string FuncIsDate( const deque <string> & params ) {
+	try {
+		Date d( params[0] );
+	}
+	catch( ... ) {
+		return "0";
+	}
+	return "1";
+}
+
+static string FuncDay( const deque <string> & params ) {
+	try {
+		Date d( params[0] );
+		return Str( d.Day() );
+	}
+	catch( ... ) {
+		return "";
+	}
+}
+
+static string FuncMonth( const deque <string> & params ) {
+	try {
+		Date d( params[0] );
+		return Str( d.Month() );
+	}
+	catch( ... ) {
+		return "";
+	}
+}
+
+static string FuncYear( const deque <string> & params ) {
+	try {
+		Date d( params[0] );
+		return Str( d.Year() );
+	}
+	catch( ... ) {
+		return "";
+	}
+}
+
+// get 1-based index of first param in comma-list
+static string FuncIndex( const deque <string> & params ) {
+	CommaList cl( params[1] );
+	int idx = cl.Index( params[0] );
+	return Str( idx + 1 );
+}
+
+// pick 1-based value from comma list
+static string FuncPick( const deque <string> & params ) {
+	if ( ! IsInteger( params[0] )) {
+		ATHROW( "First parameter of pick() must be integer" );
+	}
+	int n = ToInteger( params[0] );
+	CommaList cl( params[1] );
+	if ( n < 1 || n > (int) cl.Size() ) {
+		return "";
+	}
+	else {
+		return cl.At( n - 1 );
+	}
+}
+
 //----------------------------------------------------------------------------
 // Add all the functions to the function dictionary
 //----------------------------------------------------------------------------
 
 ADD_FUNC( "abs", 		FuncAbs, 		1 );
 ADD_FUNC( "bool", 		FuncBool, 		1 );
+ADD_FUNC( "day", 		FuncDay, 		1 );
 ADD_FUNC( "env", 		FuncGetenv, 	1 );
 ADD_FUNC( "if", 		FuncIf, 		3 );
+ADD_FUNC( "index", 		FuncIndex, 		2 );
 ADD_FUNC( "int", 		FuncInt, 		1 );
+ADD_FUNC( "isdate", 	FuncIsDate, 	1 );
 ADD_FUNC( "isempty", 	FuncIsEmpty,	1 );
 ADD_FUNC( "isnum", 		FuncIsNum, 		1 );
+ADD_FUNC( "month", 		FuncMonth, 		1 );
 ADD_FUNC( "not", 		FuncNot, 		1 );
 ADD_FUNC( "pos",		FuncPos, 		2 );
 ADD_FUNC( "random", 	FuncRandom, 	0 );
@@ -358,8 +425,10 @@ ADD_FUNC( "lower", 		FuncLower, 		1 );
 ADD_FUNC( "len", 		FuncLen, 		1 );
 ADD_FUNC( "streq", 		FuncStrEq, 		2 );
 ADD_FUNC( "match", 		FuncMatch, 		2 );
-ADD_FUNC( "min", 		FuncMin, 		2 );
 ADD_FUNC( "max", 		FuncMax, 		2 );
+ADD_FUNC( "min", 		FuncMin, 		2 );
+ADD_FUNC( "pick", 		FuncPick, 		2 );
+ADD_FUNC( "year", 		FuncYear, 		1 );
 
 
 //----------------------------------------------------------------------------
@@ -1401,6 +1470,13 @@ static ExprTest ETests[] = {
 	{"streq('foox','FOO')", "0" },
 	{"min('3','6')", "3" },
 	{"max('3','6')", "6" },
+	{"day('1980-10-7')", "7" },
+	{"month('1980-10-7')", "10" },
+	{"year('1980-10-7')", "1980" },
+	{"isdate('1980-10-7')", "1" },
+	{"isdate('1980-13-7')", "0" },
+	{"index('two', 'one,two,three' )", "2" },
+	{"pick('2', 'one,two,three' )", "two" },
 	{NULL,NULL}
 };
 
