@@ -872,6 +872,14 @@ bool CommaList :: Contains( const string & s ) const {
 	return ALib::Contains( mItems, s );
 }
 
+int CommaList :: Index( const string & s ) const {
+	for( unsigned int i = 0; i < mItems.size(); i++ ) {
+		if ( s == mItems[i] ) {
+			return i;
+		}
+	}
+	return -1;
+}
 
 
 //---------------------------------------------------------------------------
