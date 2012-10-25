@@ -13,7 +13,6 @@
 #include "csved_strings.h"
 #include "csved_version.h"
 #include "csved_cli.h"
-
 #include <fstream>
 
 using namespace std;
@@ -21,22 +20,29 @@ using namespace std;
 namespace CSVED {
 
 //----------------------------------------------------------------------------
-// Config file name and location is OS dependent
+// Config file name and location via env variable is OS dependent, as is the 
+// include file containing declaration of getcwd() & the file path separator.
 //----------------------------------------------------------------------------
 
 #ifdef _WIN32
 #include <direct.h>
 const string CONFIG_FILE = "csvfix.cfg";
 const string HOME_VAR = "USERPROFILE";
+const string PATH_SEP = "\\";
 #else
-#include <direct.h>
+#include <unistd.h>
 const string CONFIG_FILE = ".csvfix";
 const string HOME_VAR = "HOME";
+const string PATH_SEP = "/";
 #endif
+
+//----------------------------------------------------------------------------
+// Names of config file commands and the comment prefix character
+//----------------------------------------------------------------------------
 
 const string DEF_STR = "defaults";
 const string ALIAS_STR = "alias";
-
+const char COMMENT_CHAR = '#';
 
 //----------------------------------------------------------------------------
 // Flags which are allowed as defaults - not currently used.
@@ -59,29 +65,29 @@ DefCmdArg defargs[] = {
 };
 
 //----------------------------------------------------------------------------
-// Get configuration  from specified  directory
+// Get configuration from specified directory, which cannot be empty string.
 //----------------------------------------------------------------------------
 
 static string GetConfigNameFromDir( const string & dir ) {
-	string sep;
 	char last  = dir[dir.size() - 1];
-	if ( last != '\\' && last != '/' ) {
-		sep = "/";
-	}
+	string sep = (last != '\\' && last != '/') ? PATH_SEP : "";
 	return dir + sep + CONFIG_FILE;
 }
 
 
 //----------------------------------------------------------------------------
-// Get the full path to the user config file.
+// Get the full path to the user config file. If the env variable pointing
+// to the home directory is not set, don't try to use the user config file.
 //----------------------------------------------------------------------------
 
 static string GetUserConfig() {
 	string dir = ALib::GetEnv( HOME_VAR );
-	if ( dir == "" ) {
-		CSVTHROW( "Environment variable " << HOME_VAR << " not set" );
+	if ( dir.empty() ) {
+		return "";
 	}
-	return GetConfigNameFromDir( dir );
+	else {
+		return GetConfigNameFromDir( dir );
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -89,19 +95,19 @@ static string GetUserConfig() {
 //----------------------------------------------------------------------------
 
 static string GetLocalConfig() {
-	const int BUFFSIZE = 1024;
+	const int BUFFSIZE = 1024;     // big enough?
 	char dir[ BUFFSIZE ];
 	getcwd( dir, BUFFSIZE );
 	return GetConfigNameFromDir( dir );
 }
 
 //----------------------------------------------------------------------------
-// See if  a line should be ignored - empty or comment
+// See if a line should be ignored - i.e. it is empty or comment
 //----------------------------------------------------------------------------
 
 static bool Ignore( const string & line ) {
 	for( unsigned int i = 0; i < line.size(); i++ ) {
-		if ( line[i] == '#' ) {
+		if ( line[i] == COMMENT_CHAR ) {
 			return true;
 		}
 		else if ( ! std::isspace( line[i] ) ) {
@@ -112,7 +118,7 @@ static bool Ignore( const string & line ) {
 }
 
 //----------------------------------------------------------------------------
-// Populate the defaults. Use the current working directory config first,
+// Populate the configuration. Use the current working directory config first,
 // and if there isn't one, the user home directory config.
 //----------------------------------------------------------------------------
 

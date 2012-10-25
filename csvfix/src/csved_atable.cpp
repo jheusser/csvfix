@@ -38,7 +38,7 @@ const char * const ATABLE_HELP = {
 	"  -h head\tcomma-separated list of table headers\n"
 	"\t\tuse '-h @' to interpret first input line as the header\n"
 	"  -ra fields\tlist of field indexes to right-align\n"
-	"  -s\t\tinsert separator afyer every line of data\n"
+	"  -s\t\tinsert separator after every line of data\n"
 	"#IBL,IFN,OFL"
 
 };
