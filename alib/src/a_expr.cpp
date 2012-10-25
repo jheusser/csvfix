@@ -566,7 +566,7 @@ char ExprTokeniser :: Next() {
 }
 
 //----------------------------------------------------------------------------
-// one character lookahead into tokeniser input
+// One character lookahead into tokeniser input
 //----------------------------------------------------------------------------
 
 char ExprTokeniser :: Peek() const {
@@ -900,8 +900,8 @@ void ExprCompiler :: DumpRP( std::ostream & os, const Expression::RPNRep & rp ) 
 }
 
 //----------------------------------------------------------------------------
-// Expressionuses compiler to compile string rep of expression into Reverse
-// Polish form and then executes it. Alternativel, these stabes can be
+// Expression uses compiler to compile string rep of expression into Reverse
+// Polish form and then executes it. Alternatively, these stages can be
 // performed separately.
 //----------------------------------------------------------------------------
 
@@ -1099,7 +1099,7 @@ void Expression :: DoCompare( const string & op ) {
 		if ( op == "==" ) {
 			PushBool( dl == dr );
 		}
-		else if ( op == "<>" || op == "!="  ) {
+		else if ( op == "<>" || op == "!="  ) {		// we allow either
 			PushBool( dl != dr );
 		}
 		else if ( op == "<" ) {
@@ -1152,7 +1152,8 @@ bool Expression :: ToBool( const std::string & s )  {
 }
 
 //----------------------------------------------------------------------------
-// Handle the && and || operators, performing short-circuited evaluation
+// Handle the && and || operators. Currently we don't do short-circuited
+// evaluation, but we certainly ought to.
 //----------------------------------------------------------------------------
 
 void Expression :: DoAndOr( const std::string & op ) {
@@ -1192,7 +1193,7 @@ string Expression :: GetVar( const string & var ) const {
 			return "";
 		}
 		else {
-			return mPosParams[ n ];
+			return mPosParams[n];
 		}
 	}
 	else {
@@ -1258,7 +1259,7 @@ void Expression :: ExecOp( const ExprToken & tok ) {
 	else if ( op == "*" ) {
 		mStack.push( Str( PopNum() * PopNum() ) );
 	}
-	else if ( In( op, IgnoreCase, "==", "<>", "<", ">", "<=", ">=", NULL ) ) {
+	else if ( In( op, IgnoreCase, "==", "<>", "!=", "<", ">", "<=", ">=", NULL ) ) {
 		DoCompare( op );
 	}
 	else if ( op == "&&" || op == "||" ) {
@@ -1400,6 +1401,8 @@ DEFTEST( BoolTest ) {
 	string s = e.Evaluate( "1 == 2;" );
 	FAILNE( s, "0" );
 	s = e.Evaluate( "1 <> 2;" );
+	FAILNE( s, "1" );
+	s = e.Evaluate( "1 != 2;" );
 	FAILNE( s, "1" );
 	s = e.Evaluate( "1 && 2;" );
 	FAILNE( s, "1" );
