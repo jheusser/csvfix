@@ -43,6 +43,25 @@ void Expression :: SetIVNReplace( double d ) {
 	mIVNReplace = d;
 }
 
+//----------------------------------------------------------------------------// Hack for user seeding of rng
+//----------------------------------------------------------------------------
+bool Expression :: mUseRNGSeed = false;
+int Expression :: mRNGSeed = 0;
+
+void Expression :: SetRNGSeed( int n ) {
+	mUseRNGSeed = true;
+	mRNGSeed = n;
+}
+
+int Expression :: GetRNGSeed() {
+	if ( mUseRNGSeed ) {
+		return mRNGSeed;
+	}
+	else {
+		return std::time(0);
+	}
+}
+
 //----------------------------------------------------------------------------
 // Separator used between expressions
 //----------------------------------------------------------------------------
@@ -167,7 +186,7 @@ static double GetDParam( const deque <string> & params, int i ) {
 //----------------------------------------------------------------------------
 
 // if first param is true, return second param else return third
-static string FuncIf( const deque <string> & params ) {
+static string FuncIf( const deque <string> & params, Expression * ) {
 	if ( Expression::ToBool( params[0] ) ) {
 		return params[1];
 	}
@@ -177,7 +196,7 @@ static string FuncIf( const deque <string> & params ) {
 }
 
 // Invert truth of param . We don't currently support '!' operator.
-static string FuncNot( const deque <string> & params ) {
+static string FuncNot( const deque <string> & params, Expression *  ) {
 	if ( Expression::ToBool( params[0] ) ) {
 		return "0";
 	}
@@ -187,19 +206,19 @@ static string FuncNot( const deque <string> & params ) {
 }
 
 // Transform double param into an integer
-static string FuncInt( const deque <string> & params ) {
+static string FuncInt( const deque <string> & params, Expression *  ) {
 	double n = GetDParam( params, 0 );
 	return Str( (int)n );
 }
 
 // Get absolute value of param
-static string FuncAbs( const deque <string> & params ) {
+static string FuncAbs( const deque <string> & params, Expression *  ) {
 	double n = GetDParam( params, 0 );
 	return Str( std::fabs( n ) );
 }
 
 // Get sign of param
-static string FuncSign( const deque <string> & params ) {
+static string FuncSign( const deque <string> & params, Expression *  ) {
 	double n = GetDParam( params, 0 );
 	if ( n == 0 ) {
 		return "0";
@@ -213,27 +232,27 @@ static string FuncSign( const deque <string> & params ) {
 }
 
 // Trim leading & trailing whitespace from param
-static string FuncTrim( const deque <string> & params ) {
+static string FuncTrim( const deque <string> & params, Expression *  ) {
 	return Str( Trim( params[0] ) );
 }
 
 // Return string converted to uppercase
-static string FuncUpper( const deque <string> & params ) {
+static string FuncUpper( const deque <string> & params, Expression *  ) {
 	return Str( Upper( params[0] ) );
 }
 
 // Return string converted to lowercase
-static string FuncLower( const deque <string> & params ) {
+static string FuncLower( const deque <string> & params, Expression *  ) {
 	return Str( Lower( params[0] ) );
 }
 
 // Return length of param treaded as string
-static string FuncLen( const deque <string> & params ) {
+static string FuncLen( const deque <string> & params, Expression *  ) {
 	return Str( params[0].size() );
 }
 
 // Return substring of first param specified by start and length
-static string FuncSubstr( const deque <string> & params ) {
+static string FuncSubstr( const deque <string> & params, Expression *  ) {
 	int pos = int( GetDParam( params, 1 ) ) - 1;
 	if ( pos < 0 ) {
 		ATHROW( "Invalid position in substr()" );
@@ -248,7 +267,7 @@ static string FuncSubstr( const deque <string> & params ) {
 
 // Get position of second param in first. Returns zero on fail else
 // one-based index of start of second param in first.
-static string FuncPos( const deque <string> & params ) {
+static string FuncPos( const deque <string> & params, Expression *  ) {
 	string haystack = params[0];
 	string needle = params[1];
 	STRPOS pos = haystack.find( needle );
@@ -256,12 +275,12 @@ static string FuncPos( const deque <string> & params ) {
 }
 
 // Is param a number (real or integer)
-static string FuncIsNum( const deque <string> & params ) {
+static string FuncIsNum( const deque <string> & params, Expression *  ) {
 	return IsNumber( params[0] ) ? "1" : "0";
 }
 
 // Normalise param into boolean 1 (true) or 0 (false)
-static string FuncBool( const deque <string> & params ) {
+static string FuncBool( const deque <string> & params, Expression *  ) {
 	if ( Expression::ToBool( params[0] ) ) {
 		return "1";
 	}
@@ -271,48 +290,48 @@ static string FuncBool( const deque <string> & params ) {
 }
 
 // Does param consist of only whitespace characters
-static string FuncIsEmpty( const deque <string> & params ) {
+static string FuncIsEmpty( const deque <string> & params, Expression *  ) {
 	return params[0].find_first_not_of( " \t"  ) == STRNPOS ? "1" : "0";
 }
 
 // return random number
-static string FuncRandom( const deque <string> & params ) {
-	static RandGen rg( std::time(0) );
+static string FuncRandom( const deque <string> & params, Expression *  ) {
+	static RandGen rg( Expression::GetRNGSeed() );
 	return Str( rg.NextReal() );
 }
 
 // get current date in ISO format
-static string FuncToday( const deque <string> & params ) {
+static string FuncToday( const deque <string> & params, Expression *  ) {
 	Date d = Date::Today();
 	return d.Str();
 }
 
 // get current time in hh:mm:ss format
-static string FuncNow( const deque <string> & params ) {
+static string FuncNow( const deque <string> & params, Expression *  ) {
 	Time t = Time::Now();
 	return t.Str();
 }
 
 // compare params as strings ignoring case
-static string FuncStrEq( const deque <string> & params ) {
+static string FuncStrEq( const deque <string> & params, Expression *  ) {
 	return Str( Equal( params[0], params[1]) );
 }
 
 // see if regex matches string
-static string FuncMatch( const deque <string> & params ) {
+static string FuncMatch( const deque <string> & params, Expression *  ) {
 	RegEx re( params[1] );
 	RegEx::Pos pos = re.FindIn( params[0] );
 	return pos.Found() ? "1" : "0";
 }
 
 // get environment variable, or empty string
-static string FuncGetenv( const deque <string> & params ) {
+static string FuncGetenv( const deque <string> & params, Expression *  ) {
 	const char * val = std::getenv( params[0].c_str() );
 	return val == NULL ? "" : val;
 }
 
 // min and max
-static string FuncMin( const deque <string> & params ) {
+static string FuncMin( const deque <string> & params, Expression *  ) {
 	if ( IsNumber( params[0] ) && IsNumber( params[1] )) {
 		double n1 = GetDParam( params, 0 );
 		double n2 = GetDParam( params, 1 );
@@ -323,7 +342,7 @@ static string FuncMin( const deque <string> & params ) {
 	}
 }
 
-static string FuncMax( const deque <string> & params ) {
+static string FuncMax( const deque <string> & params, Expression *  ) {
 	if ( IsNumber( params[0] ) && IsNumber( params[1] ))  {
 		double n1 = GetDParam( params, 0 );
 		double n2 = GetDParam( params, 1 );
@@ -335,7 +354,7 @@ static string FuncMax( const deque <string> & params ) {
 }
 
 // date validation and element access
-static string FuncIsDate( const deque <string> & params ) {
+static string FuncIsDate( const deque <string> & params, Expression *  ) {
 	try {
 		Date d( params[0] );
 	}
@@ -345,7 +364,7 @@ static string FuncIsDate( const deque <string> & params ) {
 	return "1";
 }
 
-static string FuncDay( const deque <string> & params ) {
+static string FuncDay( const deque <string> & params, Expression *  ) {
 	try {
 		Date d( params[0] );
 		return Str( d.Day() );
@@ -355,7 +374,7 @@ static string FuncDay( const deque <string> & params ) {
 	}
 }
 
-static string FuncMonth( const deque <string> & params ) {
+static string FuncMonth( const deque <string> & params, Expression *  ) {
 	try {
 		Date d( params[0] );
 		return Str( d.Month() );
@@ -365,7 +384,7 @@ static string FuncMonth( const deque <string> & params ) {
 	}
 }
 
-static string FuncYear( const deque <string> & params ) {
+static string FuncYear( const deque <string> & params, Expression *  ) {
 	try {
 		Date d( params[0] );
 		return Str( d.Year() );
@@ -376,14 +395,14 @@ static string FuncYear( const deque <string> & params ) {
 }
 
 // get 1-based index of first param in comma-list
-static string FuncIndex( const deque <string> & params ) {
+static string FuncIndex( const deque <string> & params, Expression *  ) {
 	CommaList cl( params[1] );
 	int idx = cl.Index( params[0] );
 	return Str( idx + 1 );
 }
 
 // pick 1-based value from comma list
-static string FuncPick( const deque <string> & params ) {
+static string FuncPick( const deque <string> & params, Expression *  ) {
 	if ( ! IsInteger( params[0] )) {
 		ATHROW( "First parameter of pick() must be integer" );
 	}
@@ -397,6 +416,20 @@ static string FuncPick( const deque <string> & params ) {
 	}
 }
 
+// get field from current record - index is 1-based
+static string FuncField( const deque <string> & params, Expression * e ) {
+	if ( ! IsInteger( params[0] )) {
+		ATHROW( "Parameter of field() must be integer" );
+	}
+	int i =  ToInteger( params[0] ) - 1;
+	if ( i < 0 || i >= (int) e->PosParamCount() ) {
+		return "";
+	}
+	else {
+		return e->PosParam( i );
+	}
+}
+
 //----------------------------------------------------------------------------
 // Add all the functions to the function dictionary
 //----------------------------------------------------------------------------
@@ -405,6 +438,7 @@ ADD_FUNC( "abs", 		FuncAbs, 		1 );
 ADD_FUNC( "bool", 		FuncBool, 		1 );
 ADD_FUNC( "day", 		FuncDay, 		1 );
 ADD_FUNC( "env", 		FuncGetenv, 	1 );
+ADD_FUNC( "field", 		FuncField, 		1 );
 ADD_FUNC( "if", 		FuncIf, 		3 );
 ADD_FUNC( "index", 		FuncIndex, 		2 );
 ADD_FUNC( "int", 		FuncInt, 		1 );
@@ -984,7 +1018,17 @@ string Expression :: CallFunction( const string & name ) {
 		ATHROW( "Function " << name << "() given the wrong number of parameters."
 					<< " It takes "<< af->mParamCount << "." );
 	}
-	return af->mFunc( params );
+	return af->mFunc( params, this );
+}
+
+//----------------------------------------------------------------------------// Get positional parameter values
+//----------------------------------------------------------------------------
+unsigned int Expression :: PosParamCount() const {
+	return mPosParams.size();
+}
+
+string Expression :: PosParam( unsigned int i ) const {
+	return mPosParams.at( i );
 }
 
 //----------------------------------------------------------------------------
@@ -1388,6 +1432,8 @@ DEFTEST( VarTest ) {
 	e.AddVar( "beast", "666" );
 	s = e.Evaluate( "$beast;" );
 	FAILNE( s, "666" );
+	s = e.Evaluate( "field(1)" );
+	FAILNE( s, "3" );
 }
 
 DEFTEST( ParenTest ) {

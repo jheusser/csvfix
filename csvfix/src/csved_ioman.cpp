@@ -62,6 +62,16 @@ IOManager :: IOManager( const ALib::CommandLine & cmdline,
 		CommaListToIndex( cl, mQuoteFields );
 	}
 
+	// random number seeding for expressions
+	if ( cmdline.HasFlag( FLAG_RFSEED ) ) {
+		string s= cmdline.GetValue( FLAG_RFSEED );
+		if ( ! ALib::IsInteger( s ) ) {
+			CSVTHROW( "Seed specified by " << FLAG_RFSEED << " must be integer" );
+		}
+		int n = ALib::ToInteger( s );
+		ALib::Expression::SetRNGSeed( n );
+	}
+
 	// invalid number replacement hack for expressions
 	if ( cmdline.HasFlag( FLAG_REPINV ) ) {
 		string rin = cmdline.GetValue( FLAG_REPINV);

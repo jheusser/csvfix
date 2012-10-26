@@ -22,6 +22,7 @@ namespace CSVED {
 // This is the help for the generic flags
 //----------------------------------------------------------------------------
 
+const char * const GEN_SEED = "  -seed n\tseed to be used by random() function\n";
 const char * const GEN_SEP = "  -sep s\tspecify CSV field separator character\n";
 const char * const GEN_RIN = "  -rin n\treplace invalid numbers by n in expressions\n";
 const char * const GEN_RSEP = "  -rsep s\tas for -sep but retain separator on output\n";
@@ -119,6 +120,7 @@ string Command :: Help() const {
 		}
 		if ( tmp[1].find( "RIN" ) != string::npos ) {
 			tmp[0] += GEN_RIN;
+			tmp[0] += GEN_SEED;
 		}
 	}
 	return tmp[0];
@@ -146,6 +148,7 @@ void Command :: CheckFlags( ALib::CommandLine & cmd ) {
 	cmd.AddFlag( ALib::CommandLineFlag( FLAG_OUTSEP, false, 1 ) );
 	cmd.AddFlag( ALib::CommandLineFlag( FLAG_QLIST, false, 1 ) );
 	cmd.AddFlag( ALib::CommandLineFlag( FLAG_REPINV, false, 1 ) );
+	cmd.AddFlag( ALib::CommandLineFlag( FLAG_RFSEED, false, 1 ) );
 	cmd.CheckFlags( 2 );		// don't check the command name
 
 }

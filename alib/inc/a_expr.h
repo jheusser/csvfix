@@ -71,7 +71,8 @@ class Expression {
 		typedef std::vector <ExprToken> RPNRep;
 
 		// type for functions within expression
-		typedef std::string (*FuncImpl)( const std::deque <std::string> & );
+		typedef std::string (*FuncImpl)( const std::deque <std::string> &,
+											Expression * );
 
 		Expression();
 		~Expression();
@@ -84,6 +85,10 @@ class Expression {
 
 		void ClearPosParams();
 		void AddPosParam( const std::string & s );
+
+		unsigned int PosParamCount() const;
+		std::string PosParam( unsigned int i ) const;
+
 		void ClearVars();
 		void AddVar( const std::string & name, const std::string & val );
 
@@ -101,6 +106,8 @@ class Expression {
 		static bool ToBool( const std::string & s );
 
 		static void SetIVNReplace( double d );
+		static void SetRNGSeed( int n );
+		static int GetRNGSeed();
 
 	private:
 
@@ -126,6 +133,8 @@ class Expression {
 		static bool mUseIVNHack;
 		static double mIVNReplace;
 
+		static bool mUseRNGSeed;
+		static int mRNGSeed;
 
 };
 
