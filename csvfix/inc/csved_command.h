@@ -25,13 +25,16 @@ class Command {
 
 	public:
 
-
-		Command( const std::string & name,
-				  const std::string & desc );
+		enum class SkipType { None, Skip, Pass };
 
 		Command( const std::string & name,
 				  const std::string & desc,
-				  const std::string & help );
+				  SkipType s = SkipType::None );
+
+		Command( const std::string & name,
+				  const std::string & desc,
+				  const std::string & help,
+				  SkipType s = SkipType::None );
 
 		virtual ~Command();
 
@@ -48,11 +51,15 @@ class Command {
 
 		void AddFlag( const ALib::CommandLineFlag & f );
 
+		bool Skip( const CSVRow & r ) const;
+		bool Pass( const CSVRow & r ) const;
+
 	private:
 
 		std::string mName, mDesc;
 		std::vector <ALib::CommandLineFlag> mFlags;
 		std::string mHelp;
+		SkipType mSkipType;
 };
 
 //------------------------------------------------------------------------

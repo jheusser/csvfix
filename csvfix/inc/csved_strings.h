@@ -221,6 +221,11 @@ const char * const FLAG_XMLIPATH	= "-ip";
 const char * const FLAG_XMLMLSEP	= "-ml";
 const char * const FLAG_XMLEXCL		= "-ex";
 
+//----------------------------------------------------------------------------// Skip and pass options
+//----------------------------------------------------------------------------
+const char * const FLAG_SKIP		= "-skip";
+const char * const FLAG_PASS		= "-pass";
+
 //---------------------------------------------------------------------------
 // Other stuff
 //---------------------------------------------------------------------------

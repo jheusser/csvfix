@@ -34,6 +34,10 @@ const char * const GEN_SQF = "  -sqf fields\tspecify fields that must be quoted\
 const char * const GEN_OFL	= "  -o file\twrite output to file "
 									"rather than standard output\n";
 
+const char * const GEN_SKIP = " -skip t\tif test t is true, do not process or output record\n";
+const char * const GEN_PASS = " -pass t\tif test t is true, output CSV record as is\n";
+
+
 
 //------------------------------------------------------------------------
 // Construct from command name, short description and list of flags
@@ -41,13 +45,16 @@ const char * const GEN_OFL	= "  -o file\twrite output to file "
 //---------------------------------------------------------------------------
 
 Command :: Command( const string & name,
-						const string & desc )
-	: mName( name ), mDesc( desc )   {
+						const string & desc,
+						SkipType s )
+	: mName( name ), mDesc( desc ), mSkipType( s )   {
 }
 
 Command :: Command( const string & name,
-						const string & desc, const string & help )
-	: mName( name ), mDesc( desc ), mHelp( help )  {
+						const string & desc,
+						const string & help,
+						SkipType s  )
+	: mName( name ), mDesc( desc ), mHelp( help ), mSkipType( s )  {
 }
 
 //---------------------------------------------------------------------------
@@ -74,6 +81,16 @@ string Command :: Desc() const {
 void Command :: AddHelp( const string & help ) {
 	mHelp = help;
 }
+
+
+bool Command :: Skip( const CSVRow & r  ) const {
+	return mSkipType == SkipType::Skip;
+}
+
+bool Command :: Pass( const CSVRow & r ) const {
+	return mSkipType == SkipType::Pass;
+}
+
 
 //----------------------------------------------------------------------------
 // Process help text. May contain a terminal section preceded by a # char
@@ -122,6 +139,10 @@ string Command :: Help() const {
 			tmp[0] += GEN_RIN;
 			tmp[0] += GEN_SEED;
 		}
+		if ( tmp[1].find( "SKIP" ) != string::npos ) {
+			tmp[0] += GEN_SKIP;
+			tmp[0] += GEN_PASS;
+		}
 	}
 	return tmp[0];
 }
@@ -149,6 +170,8 @@ void Command :: CheckFlags( ALib::CommandLine & cmd ) {
 	cmd.AddFlag( ALib::CommandLineFlag( FLAG_QLIST, false, 1 ) );
 	cmd.AddFlag( ALib::CommandLineFlag( FLAG_REPINV, false, 1 ) );
 	cmd.AddFlag( ALib::CommandLineFlag( FLAG_RFSEED, false, 1 ) );
+	cmd.AddFlag( ALib::CommandLineFlag( FLAG_SKIP, false, 1 ) );
+	cmd.AddFlag( ALib::CommandLineFlag( FLAG_PASS, false, 1 ) );
 	cmd.CheckFlags( 2 );		// don't check the command name
 
 }
@@ -170,6 +193,8 @@ int Command :: CountNonGeneric( const ALib::CommandLine & cmd ) const  {
 				&& arg != FLAG_CSVSEP
 				&& arg != FLAG_OUTSEP
 				&& arg != FLAG_REPINV
+				&& arg != FLAG_SKIP
+				&& arg != FLAG_PASS
 				&& arg != FLAG_ICNAMES ) {
 					n++;
 			}
