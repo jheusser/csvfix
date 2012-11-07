@@ -41,7 +41,7 @@ const char * const ORDER_HELP = {
 	"  -rf fields\tas for -f, but specify fields from end of record\n"
 	"  -fn names\tspecify fields using list of field names\n"
 	"\t\tthis reguires that the input contains field name header\n"
-	"#SMQ,SEP,IBL,IFN,OFL"
+	"#SMQ,SEP,IBL,IFN,OFL,SKIP,PASS"
 
 };
 
@@ -86,6 +86,7 @@ void OrderCommand :: OnNewCSVStream( const string &,
 
 int OrderCommand :: Execute( ALib::CommandLine & cmd ) {
 
+	GetSkipOptions( cmd );
 	ProcessFlags( cmd );
 
 	IOManager io( cmd, mOrderNames.Size() != 0 );
@@ -93,11 +94,17 @@ int OrderCommand :: Execute( ALib::CommandLine & cmd ) {
 	CSVRow row;
 
 	while( io.ReadCSV( row ) ) {
-		if ( mExclude ) {
-			ExcludeFields( row );
+		if ( Skip( row ) ) {
+			continue;
 		}
-		else {
-			Reorder( row );
+
+		if ( ! Pass( row ) ) {
+			if ( mExclude ) {
+				ExcludeFields( row );
+			}
+			else {
+				Reorder( row );
+			}
 		}
 		io.WriteRow( row );
 	}

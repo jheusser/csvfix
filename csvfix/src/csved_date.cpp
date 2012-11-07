@@ -47,7 +47,7 @@ const char * const DREAD_HELP = {
 	"  -mn names\tspecifies month names - default is English months\n"
 	"  -bxl\t\tlist only records containing invalid dates\n"
 	"  -bdx\t\tsliently exclude records containing invalid dates\n"
-	"#SMQ,SEP,IBL,IFN,OFL"
+	"#SMQ,SEP,IBL,IFN,OFL,SKIP,PASS"
 };
 
 const char * const DFMT_HELP = {
@@ -56,7 +56,7 @@ const char * const DFMT_HELP = {
 	"where flags are:\n"
 	"  -f fields\tspecify fields using numeric field indexes\n"
 	"  -fmt fmt\tformat to to ue for output\n"
-	"#SMQ,SEP,IBL,IFN,OFL"
+	"#SMQ,SEP,IBL,IFN,OFL,SKIP,PASS"
 };
 
 //---------------------------------------------------------------------------
@@ -104,12 +104,22 @@ DateReadCommand :: ~DateReadCommand() {
 
 int DateReadCommand :: Execute( ALib::CommandLine & cmd ) {
 
+	GetSkipOptions( cmd );
 	ProcessFlags( cmd );
 
 	IOManager io( cmd );
 	CSVRow row;
 
 	while( io.ReadCSV( row ) ) {
+
+		if ( Skip( row ) ) {
+			continue;
+		}
+		if( Pass( row ) ) {
+			io.WriteRow( row );
+			continue;
+		}
+
 		if ( ConvertDates( row ) ) {
 			io.WriteRow( row );
 		}

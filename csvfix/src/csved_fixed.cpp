@@ -42,7 +42,7 @@ const char * const RFIX_HELP = {
 	"where flags are:\n"
 	"  -f fields\tspecify fields to extract from fixed-format\n"
 	"  -k\t\tretain trailing spaces on output\n"
-	"#AIBL,SMQ.OFL"
+	"#AIBL,SMQ,OFL"
 };
 
 const char * const WFIX_HELP = {
@@ -50,7 +50,7 @@ const char * const WFIX_HELP = {
 	"usage: csvfix read_fixed  [flags] [file ...]\n"
 	"where flags are:\n"
 	"  -f fields\tspecify fields and widths to to output as fixed-format\n"
-	"#AIBL.IFN,OFL,SEP"
+	"#AIBL.IFN,OFL,SEP,SKIP"
 };
 
 //
@@ -185,6 +185,7 @@ static string Ruler() {
 
 int WriteFixedCommand :: Execute( ALib::CommandLine & cmd ) {
 
+	GetSkipOptions( cmd );
 	BuildFields( cmd );
 
 	IOManager io( cmd );
@@ -195,6 +196,9 @@ int WriteFixedCommand :: Execute( ALib::CommandLine & cmd ) {
 
 	CSVRow row;
 	while( io.ReadCSV( row ) ) {
+		if ( Skip( row ) ) {
+			continue;
+		}
 		string line = MakeFixedOutput( row );
 		io.Out() << line << "\n";
 	}

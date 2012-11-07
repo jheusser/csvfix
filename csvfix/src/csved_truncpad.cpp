@@ -39,7 +39,7 @@ const char * const TRUNC_HELP = {
 	"usage: csvfix truncate [flags] [file ...]\n"
 	"where flags are:\n"
 	"  -n count\tnumber of fields to truncate to\n"
-	"#ALL"
+	"#ALL,SKIP,PASS"
 };
 
 const char * const PAD_HELP = {
@@ -48,7 +48,7 @@ const char * const PAD_HELP = {
 	"where flags are:\n"
 	"  -n count\tnumber of fields to pad to\n"
 	"  -p vals\tvalues  to use for paddding (default is empty string)\n"
-	"#ALL"
+	"#ALL,SKIP,PASS"
 };
 
 //----------------------------------------------------------------------------
@@ -119,6 +119,7 @@ void PadCommand :: ProcessRow( CSVRow & row, unsigned int ncols,
 
 int TruncPadBase :: Execute( ALib::CommandLine & cmd ) {
 
+	GetSkipOptions( cmd );
 	string ps = cmd.GetValue( FLAG_PAD );
 	ALib::CommaList padding( ps );
 	unsigned int ncols = padding.Size();
@@ -141,8 +142,16 @@ int TruncPadBase :: Execute( ALib::CommandLine & cmd ) {
 	CSVRow row;
 
 	while( io.ReadCSV( row ) ) {
-		unsigned int nc = ncolspec ? ncols : row.size() + padding.Size();
-		ProcessRow( row, nc, padding );
+
+		if ( Skip( row ) ) {
+			continue;
+		}
+
+		if ( ! Pass( row ) ) {
+			unsigned int nc = ncolspec ? ncols : row.size() + padding.Size();
+			ProcessRow( row, nc, padding );
+		}
+
 		io.WriteRow( row );
 	}
 

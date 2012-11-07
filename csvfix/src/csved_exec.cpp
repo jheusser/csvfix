@@ -36,7 +36,7 @@ const char * const EXEC_HELP = {
 	"where flags are:\n"
 	"  -c cmd\tcommand line to execute\n"
 	"  -r\t\treplace CSV input with command output\n"
-	"#ALL"
+	"#ALL,SKIP,PASS"
 };
 
 //------------------------------------------------------------------------
@@ -58,6 +58,7 @@ ExecCommand ::ExecCommand( const string & name,
 
 int ExecCommand :: Execute( ALib::CommandLine & cmd ) {
 
+	GetSkipOptions( cmd );
 	mCmdLine = cmd.GetValue( FLAG_CMD, "" );
 	if ( ALib::IsEmpty( mCmdLine ) ) {
 		CSVTHROW( "Empty command" );
@@ -69,7 +70,9 @@ int ExecCommand :: Execute( ALib::CommandLine & cmd ) {
 	ALib::Executor ex;
 
 	while( io.ReadCSV( row ) ) {
-
+		if ( Skip( row ) ) {
+			continue;
+		}
 		string cmd = MakeCmd( row );
 		std::istream & is = ex.Exec( cmd );
 		if ( ! is ) {
@@ -81,10 +84,12 @@ int ExecCommand :: Execute( ALib::CommandLine & cmd ) {
 
 		while( std::getline( is, line ) ) {
 			if ( csv ) {
-				CSVRow tmp(row ), cmdout;
-				clp.Parse( line, cmdout );
-				ALib::operator+=( tmp, cmdout );
-				io.WriteRow( tmp );
+				CSVRow tmp( row ), cmdout;
+				if ( ! Pass( tmp ) ) {
+					clp.Parse( line, cmdout );
+					ALib::operator+=( tmp, cmdout );
+					io.WriteRow( tmp );
+				}
 			}
 			else {
 				io.Out() << line << "\n";

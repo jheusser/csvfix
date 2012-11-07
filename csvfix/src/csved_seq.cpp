@@ -45,7 +45,7 @@ const char * const SEQ_HELP = {
 	"  -p pad\tprovide width (with left zero padding) of sequence numbers\n"
 	"  -f pos\tspecify index of field to place sequence numberr at\n"
 	"  -m mask\tspecify mask to apply to sequence number\n"
-	"#SMQ,SEP,IBL,IFN,OFL"
+	"#SMQ,SEP,IBL,IFN,OFL,SKIP,PASS"
 };
 
 //------------------------------------------------------------------------
@@ -72,13 +72,19 @@ SeqCommand ::SeqCommand( const string & name,
 
 int SeqCommand :: Execute( ALib::CommandLine & cmd ) {
 
+	GetSkipOptions( cmd );
 	ProcessFlags( cmd );
 
 	IOManager io( cmd );
 	CSVRow row;
 
 	while( io.ReadCSV( row ) ) {
-		AddSeq( row );
+		if( Skip( row ) ) {
+			continue;
+		}
+		if ( ! Pass( row ) ) {
+			AddSeq( row );
+		}
 		io.WriteRow( row );
 	}
 

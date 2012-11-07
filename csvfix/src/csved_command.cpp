@@ -34,8 +34,8 @@ const char * const GEN_SQF = "  -sqf fields\tspecify fields that must be quoted\
 const char * const GEN_OFL	= "  -o file\twrite output to file "
 									"rather than standard output\n";
 
-const char * const GEN_SKIP = " -skip t\tif test t is true, do not process or output record\n";
-const char * const GEN_PASS = " -pass t\tif test t is true, output CSV record as is\n";
+const char * const GEN_SKIP = "  -skip t\tif test t is true, do not process or output record\n";
+const char * const GEN_PASS = "  -pass t\tif test t is true, output CSV record as is\n";
 
 
 
@@ -80,6 +80,9 @@ void Command :: AddHelp( const string & help ) {
 	mHelp = help;
 }
 
+//----------------------------------------------------------------------------// Expressions to test whether an input row should be skipped or passed
+// through as is.
+//----------------------------------------------------------------------------
 
 void Command :: GetSkipOptions( const ALib::CommandLine & cl ) {
 
@@ -171,6 +174,8 @@ string Command :: Help() const {
 		}
 		if ( tmp[1].find( "SKIP" ) != string::npos ) {
 			tmp[0] += GEN_SKIP;
+		}
+		if ( tmp[1].find( "PASS" ) != string::npos ) {
 			tmp[0] += GEN_PASS;
 		}
 	}
@@ -200,8 +205,14 @@ void Command :: CheckFlags( ALib::CommandLine & cmd ) {
 	cmd.AddFlag( ALib::CommandLineFlag( FLAG_QLIST, false, 1 ) );
 	cmd.AddFlag( ALib::CommandLineFlag( FLAG_REPINV, false, 1 ) );
 	cmd.AddFlag( ALib::CommandLineFlag( FLAG_RFSEED, false, 1 ) );
-	cmd.AddFlag( ALib::CommandLineFlag( FLAG_SKIP, false, 1 ) );
-	cmd.AddFlag( ALib::CommandLineFlag( FLAG_PASS, false, 1 ) );
+
+	vector <string> tmp;
+	ALib::Split( mHelp, GFL_DELIM, tmp );
+	if ( tmp.size() > 1 && tmp[1].find( "SKIP" ) != string::npos ) {
+		cmd.AddFlag( ALib::CommandLineFlag( FLAG_SKIP, false, 1 ) );
+		cmd.AddFlag( ALib::CommandLineFlag( FLAG_PASS, false, 1 ) );
+	}
+
 	cmd.CheckFlags( 2 );		// don't check the command name
 
 }
@@ -223,7 +234,6 @@ int Command :: CountNonGeneric( const ALib::CommandLine & cmd ) const  {
 				&& arg != FLAG_CSVSEP
 				&& arg != FLAG_OUTSEP
 				&& arg != FLAG_REPINV
-				&& arg != FLAG_SKIP
 				&& arg != FLAG_PASS
 				&& arg != FLAG_ICNAMES ) {
 					n++;

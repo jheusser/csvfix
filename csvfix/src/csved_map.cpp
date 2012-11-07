@@ -38,7 +38,7 @@ const char * const MAP_HELP = {
 	"  -fv vals\tcomma-separated list of values to map from\n"
 	"  -tv vals\tpossibly empty list oof values to map to\n"
 	"  -ic\t\tignore case when mapping (default is to respect case)\n"
-	"#ALL"
+	"#ALL,SKIP,PASS"
 };
 
 //---------------------------------------------------------------------------
@@ -61,12 +61,18 @@ MapCommand ::	MapCommand( const string & name,
 
 int MapCommand :: Execute( ALib::CommandLine & cmd ) {
 
+	GetSkipOptions( cmd );
 	ProcessFlags( cmd );
 
 	IOManager io( cmd );
 
 	while( io.ReadCSV( mRow ) ) {
-		DoMapping();
+		if ( Skip( mRow ) ) {
+			continue;
+		}
+		if ( ! Pass( mRow ) ) {
+			DoMapping();
+		}
 		io.WriteRow( mRow );
 	}
 

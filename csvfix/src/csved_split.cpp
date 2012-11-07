@@ -51,7 +51,7 @@ const char * const FSPLIT_HELP = {
 	"  -f field\tindex of the field to be split\n"
 	"  -p plist\tlist of positions to split, in start:len format\n"
 	"  -k\t\tretain field being split in output (default is discard it)\n"
-	"#ALL"
+	"#ALL,SKIP,PASS"
 };
 
 const char * const CSPLIT_HELP = {
@@ -63,7 +63,7 @@ const char * const CSPLIT_HELP = {
 	"  -tcn\tsplit at first transition from character to number\n"
 	"  -tnc\tsplit at first transition from number to character\n"
 	"  -k\t\tretain field being split in output (default is discard it)\n"
-	"#ALL"
+	"#ALL,SKIP,PASS"
 };
 
 //---------------------------------------------------------------------------
@@ -134,20 +134,26 @@ SplitFixed :: SplitFixed( const string & name,
 
 int SplitFixed :: Execute( ALib::CommandLine & cmd ) {
 
+	GetSkipOptions( cmd );
 	GetCommonFlags( cmd );
 	string pos = cmd.GetValue( FLAG_POS );
 
 	if ( ALib::IsEmpty( pos ) ) {
 		CSVTHROW( "Need list of position pairs specified by " << FLAG_POS );
 	}
-	CreatePositions( pos );
 
+	CreatePositions( pos );
 
 	IOManager io( cmd );
 	CSVRow row;
 
 	while( io.ReadCSV( row ) ) {
-		Split( row );
+		if ( Skip( row ) ) {
+			continue;
+		}
+		if( ! Pass( row ) ) {
+			Split( row );
+		}
 		io.WriteRow( row );
 	}
 
@@ -156,7 +162,7 @@ int SplitFixed :: Execute( ALib::CommandLine & cmd ) {
 }
 
 //---------------------------------------------------------------------------
-// Split based on fixed positions. 
+// Split based on fixed positions.
 //---------------------------------------------------------------------------
 
 void SplitFixed :: Split( CSVRow & row ) {
@@ -230,6 +236,7 @@ SplitChar :: SplitChar( const string & name, const string & desc )
 
 int SplitChar :: Execute( ALib::CommandLine & cmd ) {
 
+	GetSkipOptions( cmd );
 	GetCommonFlags( cmd );
 
 	if ( cmd.HasFlag( FLAG_TRANA2N ) || cmd.HasFlag( FLAG_TRANN2A ) ) {
@@ -254,11 +261,17 @@ int SplitChar :: Execute( ALib::CommandLine & cmd ) {
 	CSVRow row;
 
 	while( io.ReadCSV( row ) ) {
-		if ( mTrans == stNone ) {
-			Split( row );
+		if ( Skip( row ) ) {
+			continue;
 		}
-		else {
-			TransSplit( row );
+
+		if ( ! Pass( row ) ) {
+			if ( mTrans == stNone ) {
+				Split( row );
+			}
+			else {
+				TransSplit( row );
+			}
 		}
 		io.WriteRow( row );
 	}

@@ -35,7 +35,7 @@ const char * const INFO_HELP = {
 	"where flags are:\n"
 	"  -b\t\tremove path from filename\n"
 	"  -tc\t\toutput file name and line number as two separate CSV fields\n"
-	"#ALL"
+	"#ALL,SKIP,PASS"
 };
 
 //---------------------------------------------------------------------------
@@ -57,6 +57,7 @@ FileInfoCommand :: FileInfoCommand( const string & name,
 
 int FileInfoCommand :: Execute( ALib::CommandLine & cmd ) {
 
+	GetSkipOptions( cmd );
 	mTwoCols = cmd.HasFlag( FLAG_TWOC );
 	mBasename = cmd.HasFlag( FLAG_BASEN );
 
@@ -64,6 +65,13 @@ int FileInfoCommand :: Execute( ALib::CommandLine & cmd ) {
 
 	CSVRow row;
 	while( io.ReadCSV( row ) ) {
+		if ( Skip( row ) ) {
+			continue;
+		}
+		if ( Pass( row ) ) {
+			io.WriteRow( row );
+			continue;
+		}
 
 		string fname = mBasename
 						? ALib::Filename( io.CurrentFileName() ).Base()

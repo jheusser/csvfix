@@ -51,7 +51,7 @@ const char * const INS_HELP = {
 	"  -s sep\tspecifies statement separator (default ';')\n"
 	"  -nq fields\tspecifies fields not to quote on output\n"
 	"  -qn\t\tforce quoting of NULL values\n"
-	"#IBN,SEP,OFL,IFN"
+	"#IBN,SEP,OFL,IFN,SKIP"
 };
 
 const char * const UPD_HELP = {
@@ -64,7 +64,7 @@ const char * const UPD_HELP = {
 	"  -s sep\tspecifies statement separator (default ';')\n"
 	"  -nq fields\tspecifies fields not to quote on output\n"
 	"  -qn\t\tforce quoting of NULL values\n"
-	"#IBN,SEP,OFL,IFN"
+	"#IBN,SEP,OFL,IFN,SKIP"
 };
 
 const char * const DEL_HELP = {
@@ -76,7 +76,7 @@ const char * const DEL_HELP = {
 	"  -s sep\tspecifies statement separator (default ';')\n"
 	"  -nq fields\tspecifies fields not to quote on output\n"
 	"  -qn\t\tforce quoting of NULL values\n"
-	"#IBN,SEP,OFL,IFN"
+	"#IBN,SEP,OFL,IFN,SKIP"
 };
 
 //---------------------------------------------------------------------------
@@ -100,6 +100,8 @@ SQLCommand :: SQLCommand( const string & name,
 //---------------------------------------------------------------------------
 
 void SQLCommand :: GetCommonValues( ALib::CommandLine & cmd ) {
+
+	GetSkipOptions( cmd );
 	mTable = cmd.GetValue( FLAG_TABLE );
 	if ( mTable == "" ) {
 		CSVTHROW( "Need table name specified by " << FLAG_TABLE << " flag" );
@@ -304,8 +306,10 @@ int SQLInsertCommand ::	Execute( ALib::CommandLine & cmd ) {
 	CSVRow row;
 
 	while( io.ReadCSV( row ) ) {
-		io.Out() << CreateInsertSQL( TableName(), row );
-		io.Out() << Separator();
+		if ( ! Skip( row ) ) {
+			io.Out() << CreateInsertSQL( TableName(), row );
+			io.Out() << Separator();
+		}
 	}
 
 	return 0;
@@ -419,8 +423,10 @@ int SQLUpdateCommand ::	Execute( ALib::CommandLine & cmd ) {
 	CSVRow row;
 
 	while( io.ReadCSV( row ) ) {
-		io.Out() << CreateUpdateSQL( TableName(), row );
-		io.Out() << Separator();
+		if ( ! Skip( row ) ) {
+			io.Out() << CreateUpdateSQL( TableName(), row );
+			io.Out() << Separator();
+		}
 	}
 
 	return 0;
@@ -502,8 +508,10 @@ int SQLDeleteCommand :: Execute( ALib::CommandLine & cmd ) {
 	CSVRow row;
 
 	while( io.ReadCSV( row ) ) {
-		io.Out() << CreateDeleteSQL( TableName(), row );
-		io.Out() << Separator();
+		if ( ! Skip( row ) ) {
+			io.Out() << CreateDeleteSQL( TableName(), row );
+			io.Out() << Separator();
+		}
 	}
 
 	return 0;

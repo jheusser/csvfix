@@ -229,7 +229,7 @@ const char * const TOXML_HELP = {
 	"  -xf file \tXML specification file - produce XHTML table if omitted\n"
 	"  -in ind \tindentation to use - 'tabs' means indent using tabs\n"
 	"  -et \t\talways outoput explicit end-tags\n"
-	"#IBL,IFN,OFL"
+	"#IBL,IFN,OFL,SKIP"
 };
 
 
@@ -256,6 +256,7 @@ ToXMLCommand :: ~ToXMLCommand() {
 
 int ToXMLCommand :: Execute( ALib::CommandLine & cmd ) {
 
+	GetSkipOptions( cmd );
 	ProcessFlags( cmd );
 	IOManager io( cmd );
 	CSVRow row;
@@ -267,7 +268,9 @@ int ToXMLCommand :: Execute( ALib::CommandLine & cmd ) {
 		std::unique_ptr <XMLSpecTag> root( ReadSpec( mXMLSpec ) );
 		vector <CSVRow> input;
 		while( io.ReadCSV( row ) ) {
-			input.push_back( row );
+			if ( ! Skip( row ) ) {
+				input.push_back( row );
+			}
 		}
 		InSlice all( input );
 		MakeXML( io, root.get(), all, 0 );

@@ -38,7 +38,7 @@ const char * const MERGE_HELP = {
 	"  -s sep\tcharacter(s) to use as separator\n"
 	"  -p pos\tposition to insert merged field in output\n"
 	"  -k\t\tretain original merged fields in output\n"
-	"#SMQ,SEP,IBL,IFN,OFL"
+	"#SMQ,SEP,IBL,IFN,OFL,SKIP,PASS"
 };
 
 //---------------------------------------------------------------------------
@@ -61,13 +61,19 @@ MergeCommand ::	MergeCommand( const string & name,
 
 int MergeCommand :: Execute( ALib::CommandLine & cmd ) {
 
+	GetSkipOptions( cmd );
 	ProcessFlags( cmd );
 
 	IOManager io( cmd );
 	CSVRow row;
 
 	while( io.ReadCSV( row ) ) {
-		DoMerge( row );
+		if ( Skip( row ) ) {
+			continue;
+		}
+		if ( ! Pass( row ) ) {
+			DoMerge( row );
+		}
 		io.WriteRow( row );
 	}
 

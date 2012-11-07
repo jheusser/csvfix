@@ -37,7 +37,7 @@ const char * const RMNEW_HELP = {
 	"  -s sep\tseparator text to replace newline\n"
 	"  -x\t\texclude data after first newline in field\n"
 	"  -f fields\tfields to apply command to (default is all)\n"
-	"#SMQ,SEP,IBL,IFN,OFL"
+	"#SMQ,SEP,IBL,IFN,OFL,SKIP,PASS"
 };
 
 
@@ -61,13 +61,19 @@ RemoveNewlineCommand :: RemoveNewlineCommand( const string & name,
 
 int RemoveNewlineCommand :: Execute( ALib::CommandLine & cmd ) {
 
+	GetSkipOptions( cmd );
 	ProcessFlags( cmd );
 
 	IOManager io( cmd );
 	CSVRow row;
 
 	while( io.ReadCSV( row ) ) {
-		RemoveNewlines( row );
+		if ( Skip( row ) ) {
+			continue;
+		}
+		if ( ! Pass( row ) ) {
+			RemoveNewlines( row );
+		}
 		io.WriteRow( row );
 	}
 

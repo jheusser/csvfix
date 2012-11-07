@@ -44,7 +44,7 @@ const char * const TPL_HELP = {
 	"where flags are:\n"
 	"  -ft file\tspecify name of template file\n"
 	"  -fn ftpl\tspecify template for generating file names\n"
-	"#IBL,SEP,IFN,OFL"
+	"#IBL,SEP,IFN,OFL,SKIP"
 };
 
 //---------------------------------------------------------------------------
@@ -65,6 +65,7 @@ TemplateCommand ::	TemplateCommand( const string & name,
 
 int TemplateCommand :: Execute( ALib::CommandLine & cmd ) {
 
+	GetSkipOptions( cmd );
 	ReadTemplate( cmd );
 
 	if ( cmd.HasFlag( FLAG_FNAMES ) ) {
@@ -75,6 +76,10 @@ int TemplateCommand :: Execute( ALib::CommandLine & cmd ) {
 	CSVRow row;
 
 	while( io.ReadCSV( row ) ) {
+		if ( Skip( row ) ) {
+			continue;
+		}
+
 		if ( mFileTemplate.empty() ) {
 			io.Out() << ReplaceColumns( mTemplate, row );
 		}

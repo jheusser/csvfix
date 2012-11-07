@@ -33,7 +33,7 @@ const char * const PRINTF_HELP = {
 	"where flags are:\n"
 	"  -fmt fmt\tspecify fields and printf-style formatters\n"
 	"  -f fields\tfield order to pass to formatter\n"
-	"#SMQ,SEP,IBL,IFN,OFL,SEP"
+	"#SMQ,SEP,IBL,IFN,OFL,SEP,SKIP,PASS"
 };
 
 //----------------------------------------------------------------------------
@@ -55,6 +55,7 @@ PrintfCommand :: PrintfCommand( const string & name,
 
 int PrintfCommand :: Execute( ALib::CommandLine & cmd ) {
 
+	GetSkipOptions( cmd );
 	string fmt = cmd.GetValue( FLAG_FMT );
 	ParseFormat( fmt );
 	if ( cmd.HasFlag( FLAG_COLS ) ) {
@@ -69,8 +70,16 @@ int PrintfCommand :: Execute( ALib::CommandLine & cmd ) {
 	IOManager io( cmd );
 
 	while( io.ReadCSV( row ) ) {
-		string line = FormatRow( row );
-		io.Out() << line << std::endl;
+		if ( Skip( row ) ) {
+			continue;
+		}
+		if ( Pass( row ) ) {
+			io.WriteRow( row );
+		}
+		else {
+			string line = FormatRow( row );
+			io.Out() << line << std::endl;
+		}
 	}
 	return 0;
 }

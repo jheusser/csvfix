@@ -59,7 +59,7 @@ const char * const DSVW_HELP = {
 	"where flags are:\n"
 	"  -f fields\tspecify list of fields to convert (default is all)\n"
 	"  -s sep\tspecify DSV separator character (default is pipe symbol)\n"
-	"#IFN,IBL,OFL,SEP"
+	"#IFN,IBL,OFL,SEP,SKIP"
 };
 
 //---------------------------------------------------------------------------
@@ -259,12 +259,15 @@ DSVWriteCommand	:: DSVWriteCommand( const string & name,
 
 int DSVWriteCommand :: Execute( ALib::CommandLine & cmd ) {
 
+	GetSkipOptions( cmd );
 	ReadFlags( cmd );
 	IOManager io( cmd );
 	CSVRow row;
 
 	while( io.ReadCSV( row ) ) {
-		io.Out() << MakeDSV( row ) << "\n";
+		if ( ! Skip( row ) ) {
+			io.Out() << MakeDSV( row ) << "\n";
+		}
 	}
 
 	return 0;

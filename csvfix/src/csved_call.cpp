@@ -50,7 +50,7 @@ const char * const CALL_HELP = {
 	"  -dll name\tfilename of DLL containing function\n"
 	"  -f fields\tindexes of fields to pass to the function\n"
 	"  -bs size\tsize in Kbytes of buffer used to communicate with DLL (default 4K)\n "
-	"#ALL"
+	"#ALL,SKIP,PASS"
 };
 
 //----------------------------------------------------------------------------
@@ -77,6 +77,7 @@ CallCommand :: CallCommand( const string & name, const string & desc )
 
 int CallCommand :: Execute( ALib::CommandLine & cmd ) {
 
+	GetSkipOptions( cmd );
 	ProcessFlags( cmd );
 	std::vector <char> outbuf( mOutBufSize );
 
@@ -93,6 +94,15 @@ int CallCommand :: Execute( ALib::CommandLine & cmd ) {
 	CSVRow row;
 
 	while( io.ReadCSV( row ) ) {
+
+		if ( ! Skip( row ) ) {
+			continue;
+		}
+		if ( Pass( row ) ) {
+			io.WriteRow( row );
+			continue;
+		}
+
 		int rv = CallOnFields( row, &outbuf[0] );
 		if ( rv == 0 ) {
 			io.WriteRow( row );
