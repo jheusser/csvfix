@@ -181,7 +181,7 @@ unsigned int CommandLine :: GetValues( const string & name,
 string CommandLine :: MustGetValue( const string & name ) const {
 	int i = FindFlag( name );
 	if ( i < 0 || i == Argc() - 1 ) {
-		ATHROW( "Required value for flag " << name << " not found" );
+		ATHROW( "Required value for option " << name << " not found" );
 	}
 	return Argv( i + 1 );
 }
@@ -193,7 +193,7 @@ string CommandLine :: MustGetValue( const string & name ) const {
 
 void CommandLine :: AddFlag( const CommandLineFlag & f ) {
 	if  ( mFlagDict.Contains( f.Name() ) ) {
-		ATHROW( "Duplicate flag: " << f.Name() );
+		ATHROW( "Duplicate option: " << f.Name() );
 	}
 	mFlagDict.Add( f.Name(), f );
 }
@@ -220,15 +220,15 @@ void CommandLine :: CheckFlags( unsigned int start ) {
 			else {
 				const CommandLineFlag * f = mFlagDict.GetPtr( a );
 				if ( f == 0 ) {
-					ATHROW( "Unknown flag: " << a );
+					ATHROW( "Invalid option: " << a );
 				}
 				else if ( f->ParamCount() ) {
 					if ( pos + 1 == Argc() ) {
-						ATHROW( "Flag has no value: " << a );
+						ATHROW( "Option has no value: " << a );
 					}
 					string param = Argv( ++pos  );
 					if ( param.size() && param[0] == '-' ) {
-						ATHROW( "Flag has no value: " << a << " " << param );
+						ATHROW( "Option has no value: " << a << " " << param );
 					}
 				}
 			}
@@ -273,7 +273,7 @@ void CommandLine :: CheckMultiFlags( unsigned int start ) {
 		if ( it->second > 1 ) {
 			const CommandLineFlag * f = mFlagDict.GetPtr( it->first );
 			if ( f && ! f->MultipleOK() ) {
-				ATHROW( "Multiple " << f->Name() << " flags not allowed" );
+				ATHROW( "Multiple " << f->Name() << " options not allowed" );
 			}
 		}
 		++it;
@@ -290,7 +290,7 @@ void CommandLine :: CheckRequiredFlags( unsigned int start ) {
 	for ( unsigned int i = 0; i < names.size(); i++ ) {
 		const CommandLineFlag * f = mFlagDict.GetPtr( names[i] );
 		if ( f->Required() && ! HasFlag( names[i], start ) ) {
-			ATHROW( "Required flag " << names[i] << " missing" ;)
+			ATHROW( "Required option " << names[i] << " missing" ;)
 		}
 	}
 }
