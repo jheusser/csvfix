@@ -45,16 +45,14 @@ const char * const GEN_PASS = " -pass t\tif test t is true, output CSV record as
 //---------------------------------------------------------------------------
 
 Command :: Command( const string & name,
-						const string & desc,
-						SkipType s )
-	: mName( name ), mDesc( desc ), mSkipType( s )   {
+						const string & desc)
+	: mName( name ), mDesc( desc ) {
 }
 
 Command :: Command( const string & name,
 						const string & desc,
-						const string & help,
-						SkipType s  )
-	: mName( name ), mDesc( desc ), mHelp( help ), mSkipType( s )  {
+						const string & help )
+	: mName( name ), mDesc( desc ), mHelp( help ){
 }
 
 //---------------------------------------------------------------------------
@@ -83,14 +81,46 @@ void Command :: AddHelp( const string & help ) {
 }
 
 
-bool Command :: Skip( const CSVRow & r  ) const {
-	return mSkipType == SkipType::Skip;
+void Command :: GetSkipOptions( const ALib::CommandLine & cl ) {
+
+	mSkipExpr = ALib::Expression();
+	mPassExpr = ALib::Expression();
+
+	if ( cl.HasFlag( FLAG_SKIP ) ) {
+		string expr = cl.GetValue( FLAG_SKIP );
+		mSkipExpr.Compile( expr );
+	}
+	if ( cl.HasFlag( FLAG_PASS ) ) {
+		string expr = cl.GetValue( FLAG_PASS );
+		mPassExpr.Compile( expr );
+	}
 }
 
-bool Command :: Pass( const CSVRow & r ) const {
-	return mSkipType == SkipType::Pass;
+static void SetPosParams( ALib::Expression & e, const CSVRow & r ) {
+	e.ClearPosParams();
+	for( unsigned int i = 0; i < r.size(); i++ ) {
+		e.AddPosParam( r[i] );
+	}
 }
 
+static bool EvalSkipPass( ALib::Expression & e, const CSVRow & r ) {
+	if ( e.IsCompiled() ) {
+		SetPosParams( e, r );
+		string ev = e.Evaluate();
+		return ev == "0" ? false : true;
+	}
+	else {
+		return false;
+	}
+}
+
+bool Command :: Skip( const CSVRow & r  )  {
+	return EvalSkipPass( mSkipExpr, r );
+}
+
+bool Command :: Pass( const CSVRow & r )  {
+	return EvalSkipPass( mPassExpr, r );
+}
 
 //----------------------------------------------------------------------------
 // Process help text. May contain a terminal section preceded by a # char
