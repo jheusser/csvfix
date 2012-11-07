@@ -39,7 +39,7 @@ const char * const ATABLE_HELP = {
 	"\t\tuse '-h @' to interpret first input line as the header\n"
 	"  -ra fields\tlist of field indexes to right-align\n"
 	"  -s\t\tinsert separator after every line of data\n"
-	"#IBL,IFN,OFL"
+	"#IBL,IFN,OFL,SKIP"
 
 };
 
@@ -70,11 +70,14 @@ AsciiTableCommand :: AsciiTableCommand( const string & name,
 
 int AsciiTableCommand :: Execute( ALib::CommandLine & cmd ) {
 
+	GetSkipOptions( cmd );
 	ProcessFlags( cmd );
 	IOManager io( cmd );
 	CSVRow row;
 	while( io.ReadCSV( row ) ) {
-		AddRow( row );
+		if ( ! Skip( row ) ) {
+			AddRow( row );
+		}
 	}
 	OutputTable( io.Out() );
 	return 0;

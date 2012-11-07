@@ -42,7 +42,7 @@ const char * const TSTAMP_HELP = {
 	"  -t \t\tdisplay only time part of timestamp\n"
 	"  -n \t\tdisplay timestamp as numeric value with no separators\n"
 	"  -rt \t\tupdate stamp in real time as records are written\n"
-	"#ALL"
+	"#ALL,SKIP"
 };
 
 //----------------------------------------------------------------------------
@@ -102,6 +102,7 @@ string TimestampCommand :: FormatStamp( std::time_t t ) const {
 
 int TimestampCommand :: Execute( ALib::CommandLine & cmd ) {
 
+	GetSkipOptions( cmd );
 	ProcessFlags( cmd );
 
 	IOManager io( cmd );
@@ -110,6 +111,11 @@ int TimestampCommand :: Execute( ALib::CommandLine & cmd ) {
 	string stamp = FormatStamp( std::time(0) );
 
 	while( io.ReadCSV( row ) ) {
+
+		if ( Skip( row ) ) {
+			continue;
+		}
+
 		if ( mRealTime ) {
 			stamp = FormatStamp( std::time(0) );
 		}

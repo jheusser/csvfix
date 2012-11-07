@@ -39,7 +39,7 @@ const char * const EDIT_HELP = {
 	"where flags are:\n"
 	"  -f fields\tfields to apply edits to (default is all fields)\n"
 	"  -e cmd\tspecify edit command - currently only s(ubstitute) implemented\n"
-	"#ALL"
+	"#ALL,SKIP,PASS"
 };
 
 //------------------------------------------------------------------------
@@ -60,6 +60,7 @@ EditCommand ::EditCommand( const string & name,
 
 int EditCommand :: Execute( ALib::CommandLine & cmd ) {
 
+	GetSkipOptions( cmd );
 	for ( int i = 2; i < cmd.Argc(); i++ ) {
 		if ( cmd.Argv( i ) == FLAG_EDIT ) {
 			AddSubCmd( cmd.Argv( i + 1 ) );
@@ -74,7 +75,12 @@ int EditCommand :: Execute( ALib::CommandLine & cmd ) {
 	CSVRow row;
 
 	while( io.ReadCSV( row ) ) {
-		EditRow( row );
+		if ( Skip( row ) ) {
+			continue;
+		}
+		if ( ! Pass( row ) ) {
+			EditRow( row );
+		}
 		io.WriteRow( row );
 	}
 

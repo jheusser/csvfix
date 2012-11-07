@@ -39,7 +39,7 @@ const char * const VALID_HELP = {
 	"where flags are:\n"
 	"  -vf file\tspecify file containing validation rules\n"
 	"  -om mode\toutput mode (pass,fail,report)\n"
-	"#IFN,SEP,OFL,IBL"
+	"#IFN,SEP,OFL,IBL,SKIP"
 };
 
 //------------------------------------------------------------------------
@@ -78,6 +78,7 @@ void ValidateCommand :: Clear() {
 
 int ValidateCommand :: Execute( ALib::CommandLine & cmd ) {
 
+	GetSkipOptions( cmd );
 	GetOutputMode( cmd );
 
 	ReadValidationFile( cmd );
@@ -86,6 +87,9 @@ int ValidateCommand :: Execute( ALib::CommandLine & cmd ) {
 	CSVRow row;
 
 	while( io.ReadCSV( row ) ) {
+		if ( Skip( row ) ) {
+			continue;
+		}
 		int errcount = 0;
 		for ( unsigned int i = 0; i < mRules.size(); i++ ) {
 			ValidationRule::Results res = mRules[i]->Apply( row );

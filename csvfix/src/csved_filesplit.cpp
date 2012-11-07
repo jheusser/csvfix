@@ -47,7 +47,7 @@ const char * const SPLIT_HELP = {
 	"  -fp pre\tprefix to use to generate filenames(default is file_)\n"
 	"  -fx ext\textension to use to generate filenames(default is csv)\n"
 	"  -ufn\t\tuse field content to generate filenames\n"
-	"#IBL,SEP,IFN,SMQ"
+	"#IBL,SEP,IFN,SMQ,SKIP,PASS"
 };
 
 //---------------------------------------------------------------------------
@@ -73,13 +73,22 @@ FileSplitCommand :: FileSplitCommand( const string & name,
 
 int FileSplitCommand :: Execute( ALib::CommandLine & cmd ) {
 
+	GetSkipOptions( cmd );
 	ProcessFlags( cmd );
 
 	IOManager io( cmd );
 	CSVRow row;
 
 	while( io.ReadCSV( row ) ) {
-		WriteRow( io, row );
+		if ( Skip( row ) ) {
+			continue;
+		}
+		if ( Pass( row ) ) {
+			io.WriteRow( row  );
+		}
+		else {
+			WriteRow( io, row );
+		}
 	}
 
 	mOutFile.flush();

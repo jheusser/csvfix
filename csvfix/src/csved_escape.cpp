@@ -45,7 +45,7 @@ const char * const ESC_HELP = {
 	"  -s chars\tlist of characters to be escaped\n"
 	"  -e esc\tstring to use for escaping (default is backslash)\n"
 	"  -sql\t\tperform SQL single quote escaping\n"
-	"#ALL"
+	"#ALL,SKIP,PASS"
 };
 
 //---------------------------------------------------------------------------
@@ -73,6 +73,7 @@ EscCommand :: EscCommand( const string & name,
 
 int EscCommand ::	Execute( ALib::CommandLine & cmd ) {
 
+	GetSkipOptions( cmd );
 	mSqlMode = cmd.HasFlag( FLAG_SQLQ );
 	if ( mSqlMode ) {
 		if ( cmd.HasFlag( FLAG_CHARS ) || cmd.HasFlag( FLAG_ESC ) ) {
@@ -99,7 +100,12 @@ int EscCommand ::	Execute( ALib::CommandLine & cmd ) {
 	CSVRow row;
 
 	while( io.ReadCSV( row ) ) {
-		EscapeRow( row );
+		if ( Skip( row ) ) {
+			continue;
+		}
+		if( ! Pass( row ) ) {
+			EscapeRow( row );
+		}
 		io.WriteRow( row );
 	}
 

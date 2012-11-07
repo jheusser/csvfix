@@ -37,7 +37,7 @@ const char * const TRIM_HELP = {
 	"  -l\t\ttrim leading whitespace\n"
 	"  -t\t\ttrim trailing whitespace\n"
 	"  -w widths\tspecifies widths to truncate fields to\n"
-	"#ALL"
+	"#ALL,SKIP,PASS"
 };
 
 //---------------------------------------------------------------------------
@@ -76,6 +76,7 @@ void TrimCommand ::	GetWidths( const std::string & ws ) {
 
 int TrimCommand ::	Execute( ALib::CommandLine & cmd ) {
 
+	GetSkipOptions( cmd );
 	if ( cmd.HasFlag( FLAG_TRLEAD ) || cmd.HasFlag( FLAG_TRTRAIL ) ) {
 		mTrimLead = cmd.HasFlag( FLAG_TRLEAD );
 		mTrimTrail = cmd.HasFlag( FLAG_TRTRAIL );
@@ -95,7 +96,13 @@ int TrimCommand ::	Execute( ALib::CommandLine & cmd ) {
 	CSVRow row;
 
 	while( io.ReadCSV( row ) ) {
-		Trim( row );
+		if ( Skip( row ) ) {
+			continue;
+		}
+
+		if ( ! Pass( row ) ) {
+			Trim( row );
+		}
 		io.WriteRow( row );
 	}
 

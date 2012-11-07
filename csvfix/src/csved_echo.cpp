@@ -33,7 +33,7 @@ const char * const ECHO_HELP = {
 	"echo input CSV data to output\n"
 	"usage: csvfix echo [flags] [file ...]\n"
 	"where flags are:\n"
-	"#ALL"
+	"#ALL,SKIP"
 };
 
 //---------------------------------------------------------------------------
@@ -51,11 +51,14 @@ EchoCommand :: EchoCommand( const string & name,
 
 int EchoCommand :: Execute( ALib::CommandLine & cmd ) {
 
+	GetSkipOptions( cmd );
 	IOManager io( cmd );
 	CSVRow row;
 
 	while( io.ReadCSV( row ) ) {
-		io.WriteRow( row );
+		if ( ! Skip( row ) ) {
+			io.WriteRow( row );
+		}
 	}
 
 	return 0;

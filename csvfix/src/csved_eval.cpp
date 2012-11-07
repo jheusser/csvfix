@@ -37,7 +37,7 @@ const char * const EVAL_HELP = {
 	"  -e expr\texpression to evaluate\n"
 	"  -r f,expr\treplace field f with result of evaluating expr\n"
 	"  -d\t\tdiscard input and only write result of -e evaluations\n"
-	"#ALL"
+	"#ALL,SKIP,PASS"
 };
 
 //----------------------------------------------------------------------------
@@ -58,6 +58,7 @@ EvalCommand ::	EvalCommand( const string & name,
 
 int EvalCommand ::	Execute( ALib::CommandLine & cmd ) {
 
+	GetSkipOptions( cmd );
 	IOManager io( cmd );
 	CSVRow row;
 
@@ -65,13 +66,19 @@ int EvalCommand ::	Execute( ALib::CommandLine & cmd ) {
 	GetExpressions( cmd );
 
 	while( io.ReadCSV( row ) ) {
-		SetParams( row, io );
-		if ( mDiscardInput ) {
-			row = EvaluateAndDiscard();
+		if ( Skip( row ) ) {
+			continue;
 		}
-		else {
-			Evaluate( row );
+		if ( ! Pass( row ) ) {
+			SetParams( row, io );
+			if ( mDiscardInput ) {
+				row = EvaluateAndDiscard();
+			}
+			else {
+				Evaluate( row );
+			}
 		}
+
 		io.WriteRow( row );
 	}
 

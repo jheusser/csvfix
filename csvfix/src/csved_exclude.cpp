@@ -39,7 +39,7 @@ const char * const EXCL_HELP = {
 	"  -f fields\tlist of fields to exclude\n"
 	"  -rf fields\tlist of fields to exclude, starting from end of record\n"
 	"  -if expr\texclude fields specified by -f if expr evaluates to true\n"
-	"#ALL"
+	"#ALL,SKIP,PASS"
 };
 
 //----------------------------------------------------------------------------
@@ -62,14 +62,20 @@ ExcludeCommand ::ExcludeCommand( const string & name,
 
 int ExcludeCommand :: Execute( ALib::CommandLine & cmd ) {
 
+	GetSkipOptions( cmd );
 	ProcessFlags( cmd );
 
 	IOManager io( cmd );
 	CSVRow row;
 
 	while( io.ReadCSV( row ) ) {
-		if ( EvalExprOnRow( io, row ) ) {
-			Exclude( row );
+		if ( Skip( row ) ) {
+			continue;
+		}
+		if ( ! Pass( row ) ) {
+			if ( EvalExprOnRow( io, row ) ) {
+				Exclude( row );
+			}
 		}
 		io.WriteRow( row );
 	}

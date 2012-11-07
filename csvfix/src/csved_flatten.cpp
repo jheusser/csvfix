@@ -44,7 +44,7 @@ const char * const FLAT_HELP = {
 	"  -k key\tspecify list of key fields (default is first field)\n"
 	"  -r \t\tremove key in output (default is retain)\n"
 	"  -f data\tspecify list of data fields (default is all but first)\n"
-	"#SMQ,SEP,IBL,IFN,OFL"
+	"#SMQ,SEP,IBL,IFN,OFL,SKIP"
 };
 
 const char * const UNFLAT_HELP = {
@@ -53,7 +53,7 @@ const char * const UNFLAT_HELP = {
 	"where flags are:\n"
 	"  -k key\tspecify list of key fields (default is first field)\n"
 	"  -n data\tnumberr of data fields perr output row (default is 1)\n"
-	"#SMQ,SEP,IBL,IFN,OFL"
+	"#SMQ,SEP,IBL,IFN,OFL,SKIP"
 };
 
 //------------------------------------------------------------------------
@@ -76,6 +76,7 @@ FlattenCommand :: FlattenCommand( const string & name,
 
 int FlattenCommand :: Execute( ALib::CommandLine & cmd ) {
 
+	GetSkipOptions( cmd );
 	ProcessFlags( cmd );
 
 	IOManager io( cmd );
@@ -86,6 +87,9 @@ int FlattenCommand :: Execute( ALib::CommandLine & cmd ) {
 	int read = 0;
 
 	while( io.ReadCSV( row ) ) {
+		if ( Skip( row ) ) {
+			continue;
+		}
 		string key = MakeKey( row );
 		if ( read++ == 0 ) {
 			NewKey( row );

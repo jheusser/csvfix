@@ -48,7 +48,7 @@ const char * const MONEY_HELP = {
 	"  -cn\t\ttreat the amount being formatted as if it were cents, not dollars\n"
 	"  -r\t\treplace fields with new format - default is to append fields to output\n"
 	"  -w width\tspecify width of output, which will be right-aligned\n"
-	"#ALL"
+	"#ALL,SKIP,PASS"
 };
 
 //---------------------------------------------------------------------------
@@ -78,11 +78,21 @@ MoneyCommand :: MoneyCommand( const string & name,
 
 int MoneyCommand :: Execute( ALib::CommandLine & cmd ) {
 
+	GetSkipOptions( cmd );
 	ProcessFlags( cmd );
 	IOManager io( cmd );
 	CSVRow row;
 
 	while( io.ReadCSV( row ) ) {
+
+		if ( Skip( row ) ) {
+			continue;
+		}
+		if ( Pass( row ) ) {
+			io.WriteRow( row );
+			continue;
+		}
+
 		CSVRow out( row );
 		for ( unsigned int i = 0; i < row.size(); i++ ) {
 			if ( mFields.empty() || ALib::Contains( mFields, i ) ) {
