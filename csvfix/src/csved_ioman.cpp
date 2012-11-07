@@ -72,15 +72,6 @@ IOManager :: IOManager( const ALib::CommandLine & cmdline,
 		ALib::Expression::SetRNGSeed( n );
 	}
 
-	// invalid number replacement hack for expressions
-	if ( cmdline.HasFlag( FLAG_REPINV ) ) {
-		string rin = cmdline.GetValue( FLAG_REPINV);
-		if ( rin.empty() || ! ALib::IsNumber( rin ) ) {
-			CSVTHROW( "Value for " << FLAG_REPINV << " must be numeric" );
-		}
-		double d = ALib::ToReal( rin );
-		ALib::Expression::SetIVNReplace( d );
-	}
 }
 
 //----------------------------------------------------------------------------

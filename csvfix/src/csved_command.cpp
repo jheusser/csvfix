@@ -24,7 +24,6 @@ namespace CSVED {
 
 const char * const GEN_SEED = "  -seed n\tseed to be used by random() function\n";
 const char * const GEN_SEP = "  -sep s\tspecify CSV field separator character\n";
-const char * const GEN_RIN = "  -rin n\treplace invalid numbers by n in expressions\n";
 const char * const GEN_RSEP = "  -rsep s\tas for -sep but retain separator on output\n";
 const char * const GEN_OSEP = "  -osep s\tspecifies output separator\n";
 const char * const GEN_IBL = "  -ibl\t\tignore blank input lines\n";
@@ -96,7 +95,7 @@ string Command :: Help() const {
 	if ( tmp.size() > 1 ) {
 		tmp[0] += "\n";
 		if ( tmp[1] == "ALL" ) {
-			tmp[1] ="IBL,IFN,SMQ,OFL,SEP,RIN";
+			tmp[1] ="IBL,IFN,SMQ,OFL,SEP";
 		}
 		if ( tmp[1].find( "IBL" ) != string::npos ) {
 			tmp[0] += GEN_IBL;
@@ -117,10 +116,6 @@ string Command :: Help() const {
 		}
 		if ( tmp[1].find( "OFL" ) != string::npos ) {
 			tmp[0] += GEN_OFL;
-		}
-		if ( tmp[1].find( "RIN" ) != string::npos ) {
-			tmp[0] += GEN_RIN;
-			tmp[0] += GEN_SEED;
 		}
 	}
 	return tmp[0];
@@ -147,7 +142,6 @@ void Command :: CheckFlags( ALib::CommandLine & cmd ) {
 	cmd.AddFlag( ALib::CommandLineFlag( FLAG_CSVSEPR, false, 1 ) );
 	cmd.AddFlag( ALib::CommandLineFlag( FLAG_OUTSEP, false, 1 ) );
 	cmd.AddFlag( ALib::CommandLineFlag( FLAG_QLIST, false, 1 ) );
-	cmd.AddFlag( ALib::CommandLineFlag( FLAG_REPINV, false, 1 ) );
 	cmd.AddFlag( ALib::CommandLineFlag( FLAG_RFSEED, false, 1 ) );
 	cmd.CheckFlags( 2 );		// don't check the command name
 
@@ -169,7 +163,6 @@ int Command :: CountNonGeneric( const ALib::CommandLine & cmd ) const  {
 				&& arg != FLAG_SMARTQ
 				&& arg != FLAG_CSVSEP
 				&& arg != FLAG_OUTSEP
-				&& arg != FLAG_REPINV
 				&& arg != FLAG_ICNAMES ) {
 					n++;
 			}
