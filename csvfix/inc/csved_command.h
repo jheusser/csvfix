@@ -11,6 +11,7 @@
 
 #include "a_base.h"
 #include "a_env.h"
+#include "a_expr.h"
 
 #include "csved_ioman.h"
 #include "csved_types.h"
@@ -25,16 +26,12 @@ class Command {
 
 	public:
 
-		enum class SkipType { None, Skip, Pass };
+		Command( const std::string & name,
+				  const std::string & desc );
 
 		Command( const std::string & name,
 				  const std::string & desc,
-				  SkipType s = SkipType::None );
-
-		Command( const std::string & name,
-				  const std::string & desc,
-				  const std::string & help,
-				  SkipType s = SkipType::None );
+				  const std::string & help );
 
 		virtual ~Command();
 
@@ -51,15 +48,16 @@ class Command {
 
 		void AddFlag( const ALib::CommandLineFlag & f );
 
-		bool Skip( const CSVRow & r ) const;
-		bool Pass( const CSVRow & r ) const;
+		void GetSkipOptions( const ALib::CommandLine & cl );
+		bool Skip( const CSVRow & r );
+		bool Pass( const CSVRow & r );
 
 	private:
 
 		std::string mName, mDesc;
 		std::vector <ALib::CommandLineFlag> mFlags;
 		std::string mHelp;
-		SkipType mSkipType;
+		ALib::Expression mSkipExpr, mPassExpr;
 };
 
 //------------------------------------------------------------------------
