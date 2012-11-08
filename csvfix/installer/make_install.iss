@@ -2,7 +2,7 @@
 
 [Setup]
 AppName=CSVfix
-AppVerName=CSVfix 1.4
+AppVerName=CSVfix 1.5
 AppPublisher=Neil Butterworth
 AppPublisherURL=http://code.google.com/p/csvfix/
 AppSupportURL=http://code.google.com/p/csvfix/

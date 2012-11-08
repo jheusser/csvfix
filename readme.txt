@@ -9,7 +9,7 @@ For further information, please see the CSVfix website
 at http://code.google.com/p/csvfix.
 
 Neil Butterworth
-6-Sep-2012
+8-Nov-2012
 
 
 
