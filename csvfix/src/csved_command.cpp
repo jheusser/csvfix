@@ -145,8 +145,8 @@ string Command :: Help() const {
 	ALib::Split( mHelp, GFL_DELIM, tmp );
 	if ( tmp.size() > 1 ) {
 		tmp[0] += "\n";
-		if ( tmp[1] == "ALL" ) {
-			tmp[1] ="IBL,IFN,SMQ,OFL,SEP";
+		if ( tmp[1].find( "ALL" ) != string::npos ) {
+			tmp[1] +="IBL,IFN,SMQ,OFL,SEP";
 		}
 		if ( tmp[1].find( "IBL" ) != string::npos ) {
 			tmp[0] += GEN_IBL;
