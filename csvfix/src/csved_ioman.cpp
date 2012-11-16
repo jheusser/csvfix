@@ -44,7 +44,10 @@ IOManager :: IOManager( const ALib::CommandLine & cmdline,
 			mMakeColMap( colmap ),
 			mCSVSep( ',' ), mRetainSep( false ), mOutputSep(0),
 			mPreOpen( preopen ) {
+
+	GetGenOpts( cmdline );
 	OpenStreams();
+
 	mIgnoreBlankLines = mCmdLine.HasFlag( FLAG_IGNBL );
 	mSmartQuotes = mCmdLine.HasFlag( FLAG_SMARTQ );
 	mSkipColNames = mCmdLine.HasFlag( FLAG_ICNAMES );
@@ -54,8 +57,6 @@ IOManager :: IOManager( const ALib::CommandLine & cmdline,
 					<< " and " << FLAG_SMARTQ << " flags");
 
 	}
-
-	GetCSVSep( cmdline );
 
 	if( cmdline.HasFlag( FLAG_QLIST )) {
 		ALib::CommaList cl(cmdline.GetValue( FLAG_QLIST ) );
@@ -75,10 +76,10 @@ IOManager :: IOManager( const ALib::CommandLine & cmdline,
 }
 
 //----------------------------------------------------------------------------
-// Handle user defined CSV separator
+// Handle generic options
 //----------------------------------------------------------------------------
 
-void IOManager :: GetCSVSep( const ALib::CommandLine & cmd ) {
+void IOManager :: GetGenOpts( const ALib::CommandLine & cmd ) {
 
 	NotBoth( cmd, FLAG_CSVSEP, FLAG_CSVSEPR );
 
@@ -98,6 +99,8 @@ void IOManager :: GetCSVSep( const ALib::CommandLine & cmd ) {
 		mCSVSep = s[0];
 		mRetainSep = cmd.HasFlag( FLAG_CSVSEPR );
 	}
+
+	mHeader = cmd.GetValue( FLAG_HDRREC, "xxxxx" );
 
 	if ( cmd.HasFlag( FLAG_OUTSEP )) {
 		string s = cmd.GetValue( FLAG_OUTSEP );
@@ -222,6 +225,9 @@ void IOManager :: OpenOutputFile( const string & fname ) {
 			CSVTHROW( "Could not open " << fname << " for output" );
 		}
 		mOutput = ofs;
+	}
+	if ( ! mHeader.empty() ) {
+		(*mOutput) << mHeader << "\n";
 	}
 }
 

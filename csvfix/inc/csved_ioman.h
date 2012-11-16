@@ -71,7 +71,7 @@ class IOManager {
 		void OpenInputFile( const std::string & fname );
 		void OpenOutputFile( const std::string & fname );
 		void ClearStreams();
-		void GetCSVSep( const ALib::CommandLine & cl );
+		void GetGenOpts( const ALib::CommandLine & cl );
 
 		struct Input {
 			std::string mFileName;
@@ -97,6 +97,7 @@ class IOManager {
 		bool mRetainSep;
 		char mOutputSep;
 		bool mPreOpen;
+		std::string mHeader;
 };
 
 
