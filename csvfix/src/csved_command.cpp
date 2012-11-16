@@ -36,7 +36,7 @@ const char * const GEN_OFL	= "  -o file\twrite output to file "
 const char * const GEN_SKIP = "  -skip t\tif test t is true, do not process or output record\n";
 const char * const GEN_PASS = "  -pass t\tif test t is true, output CSV record as is\n";
 
-
+const char * const GEN_HDR ="  -hdr s\twrite the string s out as a header record\n";
 
 //------------------------------------------------------------------------
 // Construct from command name, short description and list of flags
@@ -156,6 +156,7 @@ string Command :: Help() const {
 			tmp[0] += GEN_SEP;
 			tmp[0] += GEN_RSEP;
 			tmp[0] += GEN_OSEP;
+			tmp[0] += GEN_HDR;
 		}
 		if ( tmp[1].find( "IFN" ) != string::npos ) {
 			tmp[0] += GEN_IFN;
@@ -200,6 +201,7 @@ void Command :: CheckFlags( ALib::CommandLine & cmd ) {
 	cmd.AddFlag( ALib::CommandLineFlag( FLAG_OUTSEP, false, 1 ) );
 	cmd.AddFlag( ALib::CommandLineFlag( FLAG_QLIST, false, 1 ) );
 	cmd.AddFlag( ALib::CommandLineFlag( FLAG_RFSEED, false, 1 ) );
+	cmd.AddFlag( ALib::CommandLineFlag( FLAG_HDRREC, false, 1 ) );
 
 	vector <string> tmp;
 	ALib::Split( mHelp, GFL_DELIM, tmp );
