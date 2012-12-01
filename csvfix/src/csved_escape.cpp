@@ -19,7 +19,7 @@ using std::vector;
 namespace CSVED {
 
 //---------------------------------------------------------------------------
-// Register find command
+// Register escape command
 //---------------------------------------------------------------------------
 
 static RegisterCommand <EscCommand> rc1_(
@@ -139,7 +139,7 @@ void EscCommand :: EscapeRow( CSVRow & row ) {
 }
 
 //---------------------------------------------------------------------------
-// Quote specified row value
+// Escape specified row value
 //---------------------------------------------------------------------------
 
 void EscCommand :: EscapeValue( CSVRow & row, unsigned int i ) {

@@ -140,7 +140,7 @@ string Config :: ConfigFile() const {
 // Populate from config file
 //----------------------------------------------------------------------------
 
-bool  Config :: Populate( const string cfg ) {
+bool  Config :: Populate( const string & cfg ) {
 	std::ifstream f( cfg.c_str() );
 	if ( ! f.is_open() ) {
 		return false;

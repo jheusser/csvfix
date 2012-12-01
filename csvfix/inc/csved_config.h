@@ -35,7 +35,7 @@ class Config {
 
 	private:
 
-		bool Populate( const std::string cfg );
+		bool Populate( const std::string & cfg );
 		void ProcessSetting( const std::string line );
 		void ProcessAlias( std::istringstream & is );
 		void ProcessDefaults( std::istringstream & is );
