@@ -100,7 +100,7 @@ void IOManager :: GetGenOpts( const ALib::CommandLine & cmd ) {
 		mRetainSep = cmd.HasFlag( FLAG_CSVSEPR );
 	}
 
-	mHeader = cmd.GetValue( FLAG_HDRREC, "xxxxx" );
+	mHeader = cmd.GetValue( FLAG_HDRREC, "" );
 
 	if ( cmd.HasFlag( FLAG_OUTSEP )) {
 		string s = cmd.GetValue( FLAG_OUTSEP );
