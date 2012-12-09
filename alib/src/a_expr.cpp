@@ -43,8 +43,10 @@ void Expression :: SetIVNReplace( double d ) {
 	mIVNReplace = d;
 }
 
-//----------------------------------------------------------------------------// Hack for user seeding of rng
-//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+// Hack for user seeding of rng
+//----------------------------------------------------------------------------
+
 bool Expression :: mUseRNGSeed = false;
 int Expression :: mRNGSeed = 0;
 
@@ -430,6 +432,11 @@ static string FuncField( const deque <string> & params, Expression * e ) {
 	}
 }
 
+// check if number is an integer
+static string FuncIsInt( const deque <string> & params, Expression * e ) {
+	return IsInteger( params[0] ) ? "1" : "0";
+}
+
 //----------------------------------------------------------------------------
 // Add all the functions to the function dictionary
 //----------------------------------------------------------------------------
@@ -444,6 +451,7 @@ ADD_FUNC( "index", 		FuncIndex, 		2 );
 ADD_FUNC( "int", 		FuncInt, 		1 );
 ADD_FUNC( "isdate", 	FuncIsDate, 	1 );
 ADD_FUNC( "isempty", 	FuncIsEmpty,	1 );
+ADD_FUNC( "isint", 		FuncIsInt, 		1 );
 ADD_FUNC( "isnum", 		FuncIsNum, 		1 );
 ADD_FUNC( "month", 		FuncMonth, 		1 );
 ADD_FUNC( "not", 		FuncNot, 		1 );
@@ -1021,8 +1029,10 @@ string Expression :: CallFunction( const string & name ) {
 	return af->mFunc( params, this );
 }
 
-//----------------------------------------------------------------------------// Get positional parameter values
-//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+// Get positional parameter values
+//----------------------------------------------------------------------------
+
 unsigned int Expression :: PosParamCount() const {
 	return mPosParams.size();
 }
@@ -1412,6 +1422,14 @@ DEFTEST( ExpressionTest ) {
 	FAILNE( s, "2" );
 	s = e.Evaluate( "3-1" );
 	FAILNE( s, "2" );
+}
+
+DEFTEST( NumTest ) {
+	Expression e;
+	string s = e.Evaluate( "isint('42');" );
+	FAILNE( s, "1" );
+	s = e.Evaluate( "isint('42.0');" );
+	FAILNE( s, "0" );
 }
 
 DEFTEST( UnaryMinusTest ) {
