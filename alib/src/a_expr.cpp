@@ -30,20 +30,6 @@ using std::deque;
 namespace ALib {
 
 //----------------------------------------------------------------------------
-// Hack for invalid number problem with CSVfix - if using the hack, all
-// calls to PopNum() will succeed, returning mIVNReplace if popping a
-// string which would be an invalid number
-//----------------------------------------------------------------------------
-
-bool Expression :: mUseIVNHack = false;
-double Expression :: mIVNReplace = 0.0;
-
-void Expression :: SetIVNReplace( double d ) {
-	mUseIVNHack = true;
-	mIVNReplace = d;
-}
-
-//----------------------------------------------------------------------------
 // Hack for user seeding of rng
 //----------------------------------------------------------------------------
 
@@ -1137,9 +1123,6 @@ string Expression :: PopStr() {
 double 	Expression ::  PopNum() {
 	string s = PopStr();
 	if ( ! IsNumber( s ) ) {
-		if ( mUseIVNHack ) {
-			return mIVNReplace;
-		}
 		ATHROW( "Invalid numeric value " << s );
 	}
 	return ToReal( s );
