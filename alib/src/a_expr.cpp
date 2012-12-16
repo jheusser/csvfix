@@ -437,6 +437,20 @@ static string FuncIsInt( const deque <string> & params, Expression * e ) {
 	return IsInteger( params[0] ) ? "1" : "0";
 }
 
+// try to match regex agains all  positional parameters
+// returns 1-based index of matching parameter, or 0 on no match
+static string FuncFind( const deque <string> & params, Expression * e ) {
+	RegEx re( params[0] );
+	for ( unsigned int i = 0; i < e->PosParamCount(); i++ ) {
+		RegEx::Pos pos = re.FindIn( e->PosParam( i ) );
+		if ( pos.Found() ) {
+			return Str( i + 1 );
+		}
+	}
+	return "0";
+}
+
+
 //----------------------------------------------------------------------------
 // Add all the functions to the function dictionary
 //----------------------------------------------------------------------------
@@ -446,6 +460,7 @@ ADD_FUNC( "bool", 		FuncBool, 		1 );
 ADD_FUNC( "day", 		FuncDay, 		1 );
 ADD_FUNC( "env", 		FuncGetenv, 	1 );
 ADD_FUNC( "field", 		FuncField, 		1 );
+ADD_FUNC( "find", 		FuncFind, 		1 );
 ADD_FUNC( "if", 		FuncIf, 		3 );
 ADD_FUNC( "index", 		FuncIndex, 		2 );
 ADD_FUNC( "int", 		FuncInt, 		1 );
@@ -1409,6 +1424,21 @@ DEFTEST( CompilerTest ) {
 
 }
 
+DEFTEST( PosParamTest ) {
+	Expression e;
+	e.AddPosParam( "foo" );
+	e.AddPosParam( "bar" );
+	FAILNE( e.PosParamCount(), 2 );
+	FAILNE( e.PosParam(0), "foo" );
+	FAILNE( e.PosParam(1), "bar" );
+
+	// these use pos params
+	string s = e.Evaluate( "find('bar')" );
+	FAILNE( s, "2" );
+	s = e.Evaluate( "find('zod')" );
+	FAILNE( s, "0" );
+
+}
 
 DEFTEST( ExpressionTest ) {
 	Expression e;
