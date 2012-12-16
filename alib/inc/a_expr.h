@@ -105,7 +105,6 @@ class Expression {
 		static void AddFunction( const std::string & name, const AddFunc & f );
 		static bool ToBool( const std::string & s );
 
-		static void SetIVNReplace( double d );
 		static void SetRNGSeed( int n );
 		static int GetRNGSeed();
 
@@ -128,10 +127,6 @@ class Expression {
 		RPNRep mRPN;
 
 		static Dictionary <AddFunc> mFuncs;
-
-		// invalid number hack
-		static bool mUseIVNHack;
-		static double mIVNReplace;
 
 		static bool mUseRNGSeed;
 		static int mRNGSeed;
