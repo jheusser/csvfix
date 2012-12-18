@@ -78,7 +78,7 @@ string TimestampCommand :: FormatStamp( std::time_t t ) const {
 	if ( mShowDate ) {
 		os << tm.tm_year + 1900 << ysep
 			<< std::setw(2) << std::setfill( '0' ) <<  tm.tm_mon + 1 << ysep
-			<< std::setw(2) << std::setfill( '0' ) <<  tm.tm_mday + 1;
+			<< std::setw(2) << std::setfill( '0' ) <<  tm.tm_mday;
 	}
 
 	if ( mShowDate && mShowTime  && ! mNumericStamp ) {

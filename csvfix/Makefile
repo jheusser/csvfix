@@ -68,6 +68,7 @@ _OBJS = csved_atable.o \
 		csved_stat.o \
 		csved_sum.o \
 		csved_template.o \
+		csved_timestamp.o \
 		csved_toxml.o \
 		csved_trim.o \
 		csved_truncpad.o \
