@@ -74,7 +74,7 @@ class ODBCBuffer {
 		char * Buffer() const;
 		const string & Name() const;
 		int Width() const;
-		SQLINTEGER & ReadWidth();
+		SQLLEN & ReadWidth();
 		SQLSMALLINT Type() const;
 
 	private:
@@ -83,7 +83,7 @@ class ODBCBuffer {
 		SQLSMALLINT mType;
 		int mWidth;
 		char * mBuffer;
-		SQLINTEGER mReadWidth;
+		SQLLEN mReadWidth;
 
 };
 
@@ -295,7 +295,7 @@ int ODBCBuffer :: Width() const {
 // must return reference as is used in buffer binding
 //----------------------------------------------------------------------------
 
-SQLINTEGER & ODBCBuffer :: ReadWidth() {
+SQLLEN & ODBCBuffer :: ReadWidth() {
 	return mReadWidth;
 }
 
@@ -389,8 +389,8 @@ SQLHANDLE  DBCImpl :: GetEnv() {
 						!= SQL_SUCCESS ) {
 		ATHROW( "Cannot allocate ODBC environment handle" );
 	}
-	int ver = SQL_OV_ODBC2;
-	if ( SQLSetEnvAttr( mEnv, SQL_ATTR_ODBC_VERSION, (void *)ver , 0 )
+	long long ver = SQL_OV_ODBC2;
+	if ( SQLSetEnvAttr( mEnv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)ver , 0 )
 							!= SQL_SUCCESS ) {
 		ATHROW( "Cannot set ODBC version" );
 	}
@@ -534,7 +534,7 @@ bool DBSImpl :: CreateBuffers() {
 	const int NAMEBUFSIZE = 256;
 	SQLCHAR name[NAMEBUFSIZE];
 	SQLSMALLINT namelen, digits, nulls, coltype;
-	SQLUINTEGER colwidth;
+	SQLULEN colwidth;
 
 	for ( unsigned int col = 0; col < mColCount; col++ ) {
 
