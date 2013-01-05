@@ -17,8 +17,6 @@
 
 using namespace std;
 
-namespace CSVED {
-
 //----------------------------------------------------------------------------
 // Config file name and location via env variable is OS dependent, as is the 
 // include file containing declaration of getcwd() & the file path separator.
@@ -35,6 +33,12 @@ const string CONFIG_FILE = ".csvfix";
 const string HOME_VAR = "HOME";
 const string PATH_SEP = "/";
 #endif
+
+//----------------------------------------------------------------------------
+// Namespace can't inc direct.h without causing errors, so do not move this!
+//----------------------------------------------------------------------------
+
+namespace CSVED {
 
 //----------------------------------------------------------------------------
 // Names of config file commands and the comment prefix character
