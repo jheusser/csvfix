@@ -10,11 +10,15 @@
 WINOUT = bin/csvfix.exe
 LINOUT = bin/csvfix
 
-CC = g++ -std=c++0x
+CCTYPE = gcc
 IDIR = inc
 ODIR = obj
 SDIR = src
 INC = -Iinc -I../alib/inc
+
+cc.gcc = g++ -std=c++0x
+cc.clang = clang++ -std=c++11 -stdlib=libc++ 
+CC = ${cc.${CCTYPE}}
 
 ALIB = ../alib/lib/alib.a
 WINLIBS = ../alib/lib/alib.a -lodbc32 
