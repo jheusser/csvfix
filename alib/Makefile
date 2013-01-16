@@ -2,12 +2,16 @@
 # Copyright (C) 2009 Neil Butterworth
 
 OUT = lib/alib.a
-CC = g++
+CCTYPE = gcc
 IDIR = inc
 ODIR = obj
 XDIR = expat
 SDIR = src
 INC = -Iinc -Iexpat
+
+cc.gcc = g++
+cc.clang = clang++ -std=c++11 -stdlib=libc++  
+CC = ${cc.${CCTYPE}}
 
 _OBJS = a_chsrc.o a_csv.o a_enc.o a_env.o a_except.o \
 		a_expr.o a_myth.o a_inifile.o  a_exec.o \
@@ -15,6 +19,7 @@ _OBJS = a_chsrc.o a_csv.o a_enc.o a_env.o a_except.o \
 		a_regex.o a_shstr.o a_slice.o a_sort.o a_str.o a_table.o \
 		a_xmlevents.o a_xmlparser.o a_xmltree.o \
 		a_date.o a_range.o 
+
 
 OBJS = $(patsubst %,$(ODIR)/%,$(_OBJS))
 
