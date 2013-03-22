@@ -12,6 +12,7 @@
 #include "csved_cli.h"
 #include "csved_flatten.h"
 #include "csved_strings.h"
+#include "csved_evalvars.h"
 
 using std::string;
 using std::vector;
@@ -44,6 +45,7 @@ const char * const FLAT_HELP = {
 	"  -k key\tspecify list of key fields (default is first field)\n"
 	"  -r \t\tremove key in output (default is retain)\n"
 	"  -f data\tspecify list of data fields (default is all but first)\n"
+	"  -me expr\tspecify master record expression\n"
 	"#SMQ,SEP,IBL,IFN,OFL,SKIP"
 };
 
@@ -67,7 +69,41 @@ FlattenCommand :: FlattenCommand( const string & name,
 	AddFlag( ALib::CommandLineFlag( FLAG_COLS, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_KEY, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_REMOVE, false, 0 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_HEADEXP, false, 1 ) );
 
+}
+
+//----------------------------------------------------------------------------
+// Flatten master/detail records, using mHeadEx to identify the master
+// master records.
+//----------------------------------------------------------------------------
+
+int FlattenCommand :: MDFlatten( ALib::CommandLine & cmd ) {
+
+	IOManager io( cmd );
+	CSVRow row, master;
+
+	ALib::Expression e;
+	e.Compile( mMasterExpr );
+
+	while( io.ReadCSV( row ) ) {
+		if ( Skip( row ) ) {
+			continue;
+		}
+		AddVars( e, io, row );
+		if ( ALib::Expression::ToBool( e.Evaluate() ) ) { // it's a master
+			master = row;
+		}
+		else {											  // it's a detail
+			if ( master.size() == 0 ) {
+				CSVTHROW( "No master record identified" );
+			}
+			CSVRow output( master );
+			output.insert( output.end(), row.begin(), row.end() );
+			io.WriteRow( output );
+		}
+	}
+	return 0;
 }
 
 //---------------------------------------------------------------------------
@@ -78,6 +114,10 @@ int FlattenCommand :: Execute( ALib::CommandLine & cmd ) {
 
 	GetSkipOptions( cmd );
 	ProcessFlags( cmd );
+
+	if ( mMasterExpr != "" ) {
+		return MDFlatten( cmd );
+	}
 
 	IOManager io( cmd );
 	CSVRow row;
@@ -169,11 +209,23 @@ void FlattenCommand :: AddData( const CSVRow & row ) {
 
 void FlattenCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 
-	ALib::CommaList dl( cmd.GetValue( FLAG_COLS, "" ));
-	CommaListToIndex( dl, mDataFields );
-	ALib::CommaList kl( cmd.GetValue( FLAG_KEY, "1" ));
-	CommaListToIndex( kl, mKeyFields );
-	mKeepKey = ! cmd.HasFlag( FLAG_REMOVE );
+	if ( cmd.HasFlag( FLAG_HEADEXP ) ) {
+		if ( cmd.HasFlag( FLAG_COLS ) || cmd.HasFlag( FLAG_KEY )
+				|| cmd.HasFlag( FLAG_REMOVE ) ) {
+			CSVTHROW( "Cannot use " << FLAG_HEADEXP << " with other options" );
+		}
+		mMasterExpr = cmd.GetValue( FLAG_HEADEXP, "" );
+		if ( mMasterExpr.empty() ) {
+			CSVTHROW( "Empty expression for option " << FLAG_HEADEXP );
+		}
+	}
+	else {
+		ALib::CommaList dl( cmd.GetValue( FLAG_COLS, "" ));
+		CommaListToIndex( dl, mDataFields );
+		ALib::CommaList kl( cmd.GetValue( FLAG_KEY, "1" ));
+		CommaListToIndex( kl, mKeyFields );
+		mKeepKey = ! cmd.HasFlag( FLAG_REMOVE );
+	}
 }
 
 //------------------------------------------------------------------------

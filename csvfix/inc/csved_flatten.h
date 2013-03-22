@@ -10,6 +10,7 @@
 #define INC_CSVED_FLATTEN_H
 
 #include "a_base.h"
+#include "a_expr.h"
 #include "csved_command.h"
 
 namespace CSVED {
@@ -31,11 +32,13 @@ class FlattenCommand : public Command {
 		std::string MakeKey( const CSVRow & row ) const;
 		void NewKey( const CSVRow & row );
 		void AddData( const CSVRow & row );
+		int MDFlatten( ALib::CommandLine & cmd );
 
 		std::string mKey;
 		FieldList mKeyFields, mDataFields;
 		CSVRow mData;
 		bool mKeepKey;
+		std::string mMasterExpr;
 
 };
 
