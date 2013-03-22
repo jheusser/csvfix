@@ -138,6 +138,7 @@ const char * const FLAG_FUNC	= "-fnc";
 const char * const FLAG_EXPRIC	= "-ei";
 const char * const FLAG_FROMV	= "-fv";
 const char * const FLAG_HEADER	= "-h";
+const char * const FLAG_HEADEXP	= "-me";
 const char * const FLAG_HDRREC	= "-hdr";
 const char * const FLAG_ICASE	= "-ic";
 const char * const FLAG_IF		= "-if";
@@ -223,8 +224,10 @@ const char * const FLAG_XMLIPATH	= "-ip";
 const char * const FLAG_XMLMLSEP	= "-ml";
 const char * const FLAG_XMLEXCL		= "-ex";
 
-//----------------------------------------------------------------------------// Skip and pass options
-//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+// Skip and pass options
+//----------------------------------------------------------------------------
+
 const char * const FLAG_SKIP		= "-skip";
 const char * const FLAG_PASS		= "-pass";
 
