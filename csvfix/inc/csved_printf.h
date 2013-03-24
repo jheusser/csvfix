@@ -47,6 +47,7 @@ class PrintfCommand : public Command {
 
 		std::vector <Format> mFmtLine;
 		FieldList mOrder;
+		bool mCSVQuote;
 
 };
 
