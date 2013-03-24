@@ -33,6 +33,7 @@ const char * const PRINTF_HELP = {
 	"where flags are:\n"
 	"  -fmt fmt\tspecify fields and printf-style formatters\n"
 	"  -f fields\tfield order to pass to formatter\n"
+	"  -q\t\tapply CSV quoting to each printf conversion\n"
 	"#SMQ,SEP,IBL,IFN,OFL,SEP,SKIP,PASS"
 };
 
@@ -42,10 +43,11 @@ const char * const PRINTF_HELP = {
 
 PrintfCommand :: PrintfCommand( const string & name,
 								const string & desc )
-		: Command( name, desc, PRINTF_HELP ) {
+		: Command( name, desc, PRINTF_HELP ), mCSVQuote( false ) {
 
 	AddFlag( ALib::CommandLineFlag( FLAG_FMT, true, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_COLS, false, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_QUOTE, false, 0 ) );
 
 }
 
@@ -57,6 +59,8 @@ int PrintfCommand :: Execute( ALib::CommandLine & cmd ) {
 
 	GetSkipOptions( cmd );
 	string fmt = cmd.GetValue( FLAG_FMT );
+	mCSVQuote = cmd.HasFlag( FLAG_QUOTE );
+
 	ParseFormat( fmt );
 	if ( cmd.HasFlag( FLAG_COLS ) ) {
 		ALib::CommaList cl( cmd.GetValue( FLAG_COLS ) );
@@ -105,6 +109,22 @@ string PrintfCommand :: GetField( const CSVRow & row, unsigned int fieldno ) {
 }
 
 //----------------------------------------------------------------------------
+// Helper to do CSV quoting of internal double quotes in string
+//----------------------------------------------------------------------------
+
+static string CSVQuote( const string & s ) {
+	string out;
+	for( unsigned int i = 0; i < s.size(); i++ ) {
+		if ( s[i] == '"' ) {
+			out += '"';
+		}
+		out += s[i];
+	}
+	return out;
+}
+
+
+//----------------------------------------------------------------------------
 // format single row - if fields are missing, treat them as being empty
 //----------------------------------------------------------------------------
 
@@ -140,7 +160,8 @@ string PrintfCommand :: FormatRow( const CSVRow & row ) {
 				s += ALib::Format( mFmtLine[i].mText.c_str(), n );
 			}
 			else {
-				s += ALib::Format( mFmtLine[i].mText.c_str(), field.c_str() );
+				string out = ALib::Format( mFmtLine[i].mText.c_str(), field.c_str() );
+				s += mCSVQuote ? CSVQuote( out ) : out;
 			}
 		}
 	}

@@ -178,6 +178,7 @@ const char * const FLAG_POS		= "-p";
 const char * const FLAG_QLIST	= "-sqf";
 const char * const FLAG_QNULLS	= "-qn";
 const char * const FLAG_QUIET	= "-q";
+const char * const FLAG_QUOTE	= "-q";
 const char * const FLAG_REPLACE	= "-r";
 const char * const FLAG_RHEAD	= "-rh";
 const char * const FLAG_RANGE	= "-r";
