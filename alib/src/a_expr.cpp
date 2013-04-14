@@ -20,6 +20,8 @@
 #include <cmath>
 #include <cstring>
 #include <ctime>
+#include <sstream>
+#include <iomanip>
 
 using std::string;
 using std::vector;
@@ -436,6 +438,20 @@ static string FuncFind( const deque <string> & params, Expression * e ) {
 	return "0";
 }
 
+// round number n to d decimal places
+static string FuncRound( const deque <string> & params, Expression * e ) {
+	if ( ! IsInteger( params[1] )) {
+		ATHROW( "Second parameter of round() must be integer" );
+	}
+	double n = IsNumber( params[0] ) ? ToReal( params[0] ) : 0.0 ;
+	int d = ToInteger( params[1] );
+	if ( d < 0 ) {
+		ATHROW( "Second parameter of round() must be non-negative" );
+	}
+	std::ostringstream os;
+	os << std::fixed << std::setprecision( d ) << n;
+	return os.str();
+}
 
 //----------------------------------------------------------------------------
 // Add all the functions to the function dictionary
@@ -472,6 +488,7 @@ ADD_FUNC( "max", 		FuncMax, 		2 );
 ADD_FUNC( "min", 		FuncMin, 		2 );
 ADD_FUNC( "pick", 		FuncPick, 		2 );
 ADD_FUNC( "year", 		FuncYear, 		1 );
+ADD_FUNC( "round", 		FuncRound, 		2 );
 
 
 //----------------------------------------------------------------------------
