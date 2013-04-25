@@ -227,9 +227,6 @@ void CommandLine :: CheckFlags( unsigned int start ) {
 						ATHROW( "Option has no value: " << a );
 					}
 					string param = Argv( ++pos  );
-					if ( param.size() && param[0] == '-' ) {
-						ATHROW( "Option has no value: " << a << " " << param );
-					}
 				}
 			}
 		}
