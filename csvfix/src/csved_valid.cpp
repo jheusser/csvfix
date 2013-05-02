@@ -48,11 +48,10 @@ const char * const VALID_HELP = {
 
 ValidateCommand ::	ValidateCommand( const string & name,
 										const string & desc )
-	: Command( name, desc, VALID_HELP ), mOutMode( Reports ) {
-
-
+		: Command( name, desc, VALID_HELP ), mOutMode( Reports ) {
 	AddFlag( ALib::CommandLineFlag( FLAG_VFILE, true, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_OMODE, false, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_ERRCODE, false, 0 ) );
 }
 
 //---------------------------------------------------------------------------
@@ -80,11 +79,14 @@ int ValidateCommand :: Execute( ALib::CommandLine & cmd ) {
 
 	GetSkipOptions( cmd );
 	GetOutputMode( cmd );
-
 	ReadValidationFile( cmd );
 
 	IOManager io( cmd );
 	CSVRow row;
+
+	// we optionally return an error code to the shell if validation failed
+	int errtotal = 0;
+	bool errcode = cmd.HasFlag( FLAG_ERRCODE );
 
 	while( io.ReadCSV( row ) ) {
 		if ( Skip( row ) ) {
@@ -97,6 +99,7 @@ int ValidateCommand :: Execute( ALib::CommandLine & cmd ) {
 			if ( res.size() && mOutMode == Reports ) {
 				Report( io, res, errcount );
 				errcount++;
+				errtotal += errcount;
 				continue;
 			}
 
@@ -111,9 +114,11 @@ int ValidateCommand :: Execute( ALib::CommandLine & cmd ) {
 		if ( mOutMode == Passes && errcount == 0 ) {
 			io.WriteRow( row );
 		}
+		errtotal += errcount;
 	}
 
-	return 0;
+    // exit code of 2 indicates program detected invalid data
+	return errtotal && errcode ? 2 : 0;
 }
 
 //---------------------------------------------------------------------------
