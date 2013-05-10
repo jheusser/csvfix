@@ -74,11 +74,9 @@ int EvalCommand ::	Execute( ALib::CommandLine & cmd ) {
 		if ( ! Pass( row ) ) {
 			SetParams( row, io );
 			if ( mDiscardInput ) {
-				row = EvaluateAndDiscard();
+				row.clear();
 			}
-			else {
-				Evaluate( row );
-			}
+			Evaluate( row );
 		}
 
 		io.WriteRow( row );
@@ -86,22 +84,6 @@ int EvalCommand ::	Execute( ALib::CommandLine & cmd ) {
 
 	return 0;
 }
-
-
-//----------------------------------------------------------------------------
-// Evaluate -e expressions (not -r) and produce a new row which contains
-// only the result of these evaluations - input data is discarded.
-//----------------------------------------------------------------------------
-
-CSVRow EvalCommand :: EvaluateAndDiscard() {
-	CSVRow newrow;
-	for ( unsigned int i = 0; i < mFieldExprs.size() ; i++ ) {
-		string r = mFieldExprs[i].mExpr.Evaluate();
-		newrow.push_back( r );
-	}
-	return newrow;
-}
-
 
 //----------------------------------------------------------------------------
 // Evaluate expressions. If the field index associated with the expression
@@ -177,8 +159,8 @@ void EvalCommand ::	GetExpressions( ALib::CommandLine & cmd ) {
 	int i = 2;	// skip exe name and command name
 
 	while( i < cmd.Argc() ) {
-		mIsIf.push_back( cmd.Argv( i ) == FLAG_IF );
-		if ( cmd.Argv( i ) == FLAG_EXPR  || mIsIf[mIsIf.size()-1] ) {
+		if ( cmd.Argv( i ) == FLAG_EXPR || cmd.Argv( i ) == FLAG_IF ) {
+			mIsIf.push_back( cmd.Argv( i ) == FLAG_IF );
 			if ( i + 1 >= cmd.Argc() ) {
 				CSVTHROW( "Missing expression" );
 			}
@@ -192,6 +174,7 @@ void EvalCommand ::	GetExpressions( ALib::CommandLine & cmd ) {
 			mFieldExprs.push_back( FieldEx( -1, ex ) );
 		}
 		else if ( cmd.Argv( i ) == FLAG_REMOVE ) {
+			mIsIf.push_back( false );
 			if ( mDiscardInput ) {
 				CSVTHROW( "Cannot specify both " << FLAG_REMOVE
 							<< " and " << FLAG_DISCARD );
