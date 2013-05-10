@@ -37,7 +37,6 @@ class EvalCommand : public Command {
 
 		void SetParams( const CSVRow & row, class IOManager & iom );
 		void Evaluate( CSVRow & row );
-		CSVRow EvaluateAndDiscard();
 
 		void GetExpressions( ALib::CommandLine & cmd );
 		std::vector <FieldEx> mFieldExprs;
