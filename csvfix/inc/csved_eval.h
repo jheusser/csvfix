@@ -41,6 +41,7 @@ class EvalCommand : public Command {
 
 		void GetExpressions( ALib::CommandLine & cmd );
 		std::vector <FieldEx> mFieldExprs;
+		std::vector <bool> mIsIf;
 		bool mDiscardInput;
 
 };

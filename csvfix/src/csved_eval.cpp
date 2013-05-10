@@ -35,6 +35,7 @@ const char * const EVAL_HELP = {
 	"usage: csvfix eval [flags] [file ...]\n"
 	"where flags are:\n"
 	"  -e expr\texpression to evaluate\n"
+	"  -if expr\tallows conditional expression evaluation\n"
 	"  -r f,expr\treplace field f with result of evaluating expr\n"
 	"  -d\t\tdiscard input and only write result of -e evaluations\n"
 	"#ALL,SKIP,PASS"
@@ -50,6 +51,7 @@ EvalCommand ::	EvalCommand( const string & name,
 		AddFlag( ALib::CommandLineFlag( FLAG_EXPR, false, 1, true ) );
 		AddFlag( ALib::CommandLineFlag( FLAG_REMOVE, false, 1, true ) );
 		AddFlag( ALib::CommandLineFlag( FLAG_DISCARD, false, 0, true) );
+		AddFlag( ALib::CommandLineFlag( FLAG_IF, false, 1, true) );
 }
 
 //----------------------------------------------------------------------------
@@ -105,16 +107,44 @@ CSVRow EvalCommand :: EvaluateAndDiscard() {
 // Evaluate expressions. If the field index associated with the expression
 // is negative, append to row, otherwise replace field specified by the
 // index if possible.
+//
+// Now need to process -if expressions. If one of these evalates to true, the
+// following -e expression is evaluated, and the one following that is
+// skipped - vice versa if it returned false.
 //----------------------------------------------------------------------------
 
 void EvalCommand ::	Evaluate( CSVRow & row ) {
+
+	bool skipelse = false;
+
 	for ( unsigned int i = 0; i < mFieldExprs.size() ; i++ ) {
+		if ( mIsIf[i] ) {
+			if ( i < mFieldExprs.size() - 1  && mIsIf[i+2] ) {
+				CSVTHROW( "Cannot have consecutive -if options" );
+			}
+			if ( i >= mFieldExprs.size() - 2 ) {
+				CSVTHROW( "Need two -e options after -if" );
+			}
+			string r = mFieldExprs[i].mExpr.Evaluate();
+			if ( ALib::Expression::ToBool( r ) ) {
+				skipelse = true;
+			} else {
+				i++;
+			}
+			continue;
+		}
+
 		string r = mFieldExprs[i].mExpr.Evaluate();
 		if ( mFieldExprs[i].mField < 0 || mFieldExprs[i].mField >= (int) row.size() ) {
 			row.push_back( r );
 		}
 		else {
 			row[ mFieldExprs[i].mField ] = r;
+		}
+
+		if ( skipelse ) {
+			i++;
+			skipelse = false;
 		}
 	}
 }
@@ -138,13 +168,17 @@ void EvalCommand ::	SetParams( const CSVRow & row, IOManager & iom ) {
 //     -r field,expr
 //
 // In the first case, create a dummy field index with negative value.
+//
+// Now need to test for -if option which is treated as for -e, except we
+// record the fact that it was -f for later use by evaluate.
 //----------------------------------------------------------------------------
 
 void EvalCommand ::	GetExpressions( ALib::CommandLine & cmd ) {
 	int i = 2;	// skip exe name and command name
 
 	while( i < cmd.Argc() ) {
-		if ( cmd.Argv( i ) == FLAG_EXPR ) {
+		mIsIf.push_back( cmd.Argv( i ) == FLAG_IF );
+		if ( cmd.Argv( i ) == FLAG_EXPR  || mIsIf[mIsIf.size()-1] ) {
 			if ( i + 1 >= cmd.Argc() ) {
 				CSVTHROW( "Missing expression" );
 			}
