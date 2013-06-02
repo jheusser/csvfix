@@ -58,9 +58,19 @@ IOManager :: IOManager( const ALib::CommandLine & cmdline,
 
 	}
 
+	// a rather horrid hack for -sqf flag (which specifies fields that must be quoted)
+	// if the QLIST option is zero, set to a really high value to prevent
+	// quoting of all fields, which may result in invalid CSV output.
 	if( cmdline.HasFlag( FLAG_QLIST )) {
-		ALib::CommaList cl(cmdline.GetValue( FLAG_QLIST ) );
-		CommaListToIndex( cl, mQuoteFields );
+		string ql = cmdline.GetValue( FLAG_QLIST );
+		if ( ql == "0" || ql == "none" ) {
+			ALib::CommaList cl( "999999"  );   // a big number
+			CommaListToIndex( cl, mQuoteFields );
+		}
+		else {
+			ALib::CommaList cl(cmdline.GetValue( FLAG_QLIST ) );
+			CommaListToIndex( cl, mQuoteFields );
+		}
 	}
 
 	// random number seeding for expressions
