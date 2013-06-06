@@ -45,6 +45,7 @@ const char * const ESC_HELP = {
 	"  -s chars\tlist of characters to be escaped\n"
 	"  -e esc\tstring to use for escaping (default is backslash)\n"
 	"  -sql\t\tperform SQL single quote escaping\n"
+	"  -noc\t\tturns off CSV interenal escaping\n"
 	"#ALL,SKIP,PASS"
 };
 
@@ -60,6 +61,8 @@ EscCommand :: EscCommand( const string & name,
 	AddFlag( ALib::CommandLineFlag( FLAG_CHARS, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_ESC, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_COLS, false, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_ESCOFF, false, 0 ) );
+
 }
 
 //---------------------------------------------------------------------------
@@ -106,7 +109,7 @@ int EscCommand ::	Execute( ALib::CommandLine & cmd ) {
 		if( ! Pass( row ) ) {
 			EscapeRow( row );
 		}
-		io.WriteRow( row );
+		io.WriteRow( row, cmd.HasFlag( FLAG_ESCOFF) );
 	}
 
 	return 0;

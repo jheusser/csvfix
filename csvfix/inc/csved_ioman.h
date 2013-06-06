@@ -59,7 +59,7 @@ class IOManager {
 
 		bool ReadLine( std::string & line );
 		bool ReadCSV( CSVRow & row );
-		void WriteRow( const CSVRow & row );
+		void WriteRow( const CSVRow & row, bool ignoredq = false );
 
 		std::ostream & Out() const;
 
