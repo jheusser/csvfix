@@ -124,6 +124,7 @@ const char * const FLAG_ENDTAG	= "-et";
 const char * const FLAG_EEXPR	= "-ee";
 const char * const FLAG_ERRCODE = "-ec";
 const char * const FLAG_ESC		= "-e";
+const char * const FLAG_ESCOFF	= "-noc";
 const char * const FLAG_EXPR	= "-e";
 const char * const FLAG_EXCLF	= "-xf";
 const char * const FLAG_EXCLNL	= "-x";

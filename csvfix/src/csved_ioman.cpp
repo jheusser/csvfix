@@ -243,12 +243,14 @@ void IOManager :: OpenOutputFile( const string & fname ) {
 
 
 //---------------------------------------------------------------------------
-// Write row of CSV data to ouput, doing quoting..If smart quoting is on
+// Write row of CSV data to ouput, doing quoting. If smart quoting is on
 // then only enclose in quotes if field contains special characters. If the
-// user specifdied the -sqf flag, always quote those fields..
+// user specified the -sqf flag, always quote those fields.
+//
+// Added quick hack to turn CSV escaping off for use by escape command.
 //---------------------------------------------------------------------------
 
-void IOManager :: WriteRow( const CSVRow & row ) {
+void IOManager :: WriteRow( const CSVRow & row, bool noescape  ) {
 
 	string SPECIAL;					// chars that need quoting
 	if ( mRetainSep ) {				// this repaces comma
@@ -275,6 +277,9 @@ void IOManager :: WriteRow( const CSVRow & row ) {
 			else {
 				Out() << row[i];
 			}
+		}
+		else if ( noescape ) {
+			Out() << '"' << row[i] << '"';
 		}
 		else {
 			Out() << ALib::CSVQuote( row[i] );
