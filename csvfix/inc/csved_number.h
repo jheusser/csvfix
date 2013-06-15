@@ -30,7 +30,7 @@ class NumberCommand : public Command {
 
 		void ProcessFlags( const ALib::CommandLine & cmd );
 		void Convert( CSVRow & row );
-		std::string ConvertField( const std::string & val );
+		std::string ConvertField( const std::string & val, char ts, char dp );
 
 		std::vector <unsigned int> mFields;
 		std::string mFormat, mErrStr;
