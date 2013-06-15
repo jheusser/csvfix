@@ -49,7 +49,8 @@ const char * const NUMBER_HELP = {
 //----------------------------------------------------------------------------
 
 NumberCommand :: NumberCommand( const string & name, const string & desc )
-				: Command( name, desc, NUMBER_HELP )  {
+				: Command( name, desc, NUMBER_HELP ),
+					mErrExit( false ), mHasErrStr( false ) {
 
 	AddFlag( ALib::CommandLineFlag( FLAG_COLS, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_FMT, false, 1 ) );
@@ -57,16 +58,82 @@ NumberCommand :: NumberCommand( const string & name, const string & desc )
 	AddFlag( ALib::CommandLineFlag( FLAG_ERRCODE, false, 0 ) );
 }
 
+//----------------------------------------------------------------------------
+// Two supported formats:
+//
+//    1,234.00	---> EN
+//    1.234,00	---> EU
+//----------------------------------------------------------------------------
+
+const string EN_FMT	= "EN";
+const string EU_FMT	= "EU";
 
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
 
-int NumberCommand :: Execute( ALib::CommandLine & cmd ) {
+int NumberCommand :: Execute( ALib::CommandLine & cmd )  {
 
 	ProcessFlags( cmd );
+
 	IOManager io( cmd );
 	CSVRow row;
+
+	while( io.ReadCSV( row ) ) {
+		Convert( row );
+		io.WriteRow( row );
+	}
+
 	return 0;
+}
+
+
+//----------------------------------------------------------------------------
+// Convert specified value using language format.
+//----------------------------------------------------------------------------
+
+string NumberCommand :: ConvertField( const string & field ) {
+
+	string s;
+
+	for( unsigned int i = 0; i < field.size(); i++ ) {
+		char c = field[i];
+		if ( mFormat == EN_FMT && c != ',' ) {
+			s += c;
+		}
+		else if ( mFormat == EU_FMT && c == ',' ) {
+			s += '.';
+		}
+		else if ( mFormat == EU_FMT && c != '.' ) {
+			s += c;
+		}
+	}
+
+	if ( ! ALib::IsNumber( s ) ) {
+		if ( mErrExit ) {
+			CSVTHROW( "Invalid number: " << field );
+		}
+		else if ( mHasErrStr ) {
+			return mErrStr;
+		}
+		else {
+			return field;
+		}
+	}
+
+	return s;
+}
+
+
+//----------------------------------------------------------------------------
+// Convert specified fields
+//----------------------------------------------------------------------------
+
+void NumberCommand :: Convert( CSVRow & row ) {
+	for( unsigned int i = 0; i < row.size(); i++ ) {
+		if ( mFields.size() == 0 || ALib::Contains( mFields, i ) ) {
+			row[i] = ConvertField( row[i] );
+		}
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -74,6 +141,22 @@ int NumberCommand :: Execute( ALib::CommandLine & cmd ) {
 //----------------------------------------------------------------------------
 
 void NumberCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
+
+	string cs = cmd.GetValue( FLAG_COLS );
+	if ( ! ALib::IsEmpty( cs ) ) {
+		ALib::CommaList cl( cs );
+		CommaListToIndex( cl, mFields );
+	}
+	mFormat = cmd.GetValue( FLAG_FMT, EN_FMT);
+	if ( mFormat != EN_FMT && mFormat != EU_FMT ) {
+		CSVTHROW( FLAG_FMT << " must be " << EN_FMT << " or " << EU_FMT );
+	}
+	mErrExit = cmd.HasFlag( FLAG_ERRCODE );
+	mErrStr = cmd.GetValue( FLAG_ERRSTR );
+	mHasErrStr = cmd.HasFlag( FLAG_ERRSTR );
+	if ( mErrExit && mHasErrStr ) {
+		CSVTHROW( "Cannot specify both " << FLAG_ERRCODE << " and " << FLAG_ERRSTR );
+	}
 }
 
 

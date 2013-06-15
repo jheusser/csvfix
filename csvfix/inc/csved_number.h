@@ -29,6 +29,12 @@ class NumberCommand : public Command {
 	private:
 
 		void ProcessFlags( const ALib::CommandLine & cmd );
+		void Convert( CSVRow & row );
+		std::string ConvertField( const std::string & val );
+
+		std::vector <unsigned int> mFields;
+		std::string mFormat, mErrStr;
+		bool mErrExit, mHasErrStr;
 
 };
 
