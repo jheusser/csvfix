@@ -69,6 +69,7 @@ const string EN_FMT	= "EN";
 const string EU_FMT	= "EU";
 
 //----------------------------------------------------------------------------
+// Convert input rows, with Skip/Pass filtering.
 //----------------------------------------------------------------------------
 
 int NumberCommand :: Execute( ALib::CommandLine & cmd )  {
@@ -79,7 +80,14 @@ int NumberCommand :: Execute( ALib::CommandLine & cmd )  {
 	CSVRow row;
 
 	while( io.ReadCSV( row ) ) {
-		Convert( row );
+
+		if ( Skip( row ) ) {
+			continue;
+		}
+		if( ! Pass( row ) ) {
+			Convert( row );
+		}
+
 		io.WriteRow( row );
 	}
 
@@ -88,24 +96,26 @@ int NumberCommand :: Execute( ALib::CommandLine & cmd )  {
 
 
 //----------------------------------------------------------------------------
-// Convert specified value using language format.
+// Convert specified value using language-specific thousands separator and
+// decimal point.
 //----------------------------------------------------------------------------
 
-string NumberCommand :: ConvertField( const string & field ) {
+string NumberCommand :: ConvertField( const string & field, char ts, char dp ) {
 
 	string s;
-
+	bool havedp = false;
 	for( unsigned int i = 0; i < field.size(); i++ ) {
 		char c = field[i];
-		if ( mFormat == EN_FMT && c != ',' ) {
-			s += c;
+		if ( c == dp ) {
+			havedp = true;
+			if ( dp != '.' ) {
+				c = '.';
+			}
 		}
-		else if ( mFormat == EU_FMT && c == ',' ) {
-			s += '.';
+		else if ( c == ts && ! havedp ) {
+			continue;
 		}
-		else if ( mFormat == EU_FMT && c != '.' ) {
-			s += c;
-		}
+		s += c;
 	}
 
 	if ( ! ALib::IsNumber( s ) ) {
@@ -131,7 +141,9 @@ string NumberCommand :: ConvertField( const string & field ) {
 void NumberCommand :: Convert( CSVRow & row ) {
 	for( unsigned int i = 0; i < row.size(); i++ ) {
 		if ( mFields.size() == 0 || ALib::Contains( mFields, i ) ) {
-			row[i] = ConvertField( row[i] );
+			char ts = mFormat == EN_FMT ? ',' : '.';
+			char dp = mFormat == EN_FMT ? '.' : ',';
+			row[i] = ConvertField( row[i], ts, dp );
 		}
 	}
 }
