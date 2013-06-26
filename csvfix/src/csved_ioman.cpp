@@ -253,17 +253,19 @@ void IOManager :: OpenOutputFile( const string & fname ) {
 void IOManager :: WriteRow( const CSVRow & row, bool noescape  ) {
 
 	string SPECIAL;					// chars that need quoting
-	if ( mRetainSep ) {				// this repaces comma
-		SPECIAL = "\"'";
+
+	if ( mRetainSep ) {	
+		SPECIAL = "\"";
 		SPECIAL += mCSVSep;
 	}
+	else if ( mOutputSep ) {
+		SPECIAL += mOutputSep;
+		SPECIAL += '"';
+	}
 	else {
-		SPECIAL = "\",'";
+		SPECIAL = "\",";
 	}
 
-	if ( mOutputSep ) {
-		SPECIAL += mOutputSep;
-	}
 
 	for ( unsigned int i = 0; i < row.size(); i++ ) {
 		if ( mSmartQuotes
