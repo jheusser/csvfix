@@ -33,7 +33,7 @@ static RegisterCommand <SummaryCommand> rc1_(
 
 const char * const SUM_HELP = {
 	"provide summarisation functions\n"
-	"usage: csvfix shuffle [flags] [files ...]\n"
+	"usage: csvfix summary [flags] [files ...]\n"
 	"where flags are:\n"
 	"  -avg fields\tcalculate numeric average of specified fields\n"
 	"  -frq fields\tprepend frequencies of specified fields to output\n"
@@ -338,11 +338,11 @@ void SummaryCommand :: DoMedian( IOManager & io ) {
 		unsigned int sz = mRows.size();
 		double d;
 		if ( sz % 2 ) {
-			unsigned int idx = (sz / 2) + 1;
+			unsigned int idx = (sz / 2);
 			d = ALib::ToReal( mRows.at(idx).at(col) );
 		}
 		else {
-			unsigned int idx = (sz / 2);
+			unsigned int idx = (sz / 2) - 1;
 			double d1 = ALib::ToReal( mRows.at(idx).at(col) );
 			double d2 = ALib::ToReal( mRows.at(idx+1).at(col) );
 			d = (d1 + d2) /2;
