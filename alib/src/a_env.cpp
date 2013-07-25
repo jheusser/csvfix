@@ -322,7 +322,7 @@ unsigned int CommandLine :: BuildFileList( unsigned int start ) {
 	unsigned int pos = Argc() - 1, lastflag = 0;
 	while( pos >= start ) {
 		string arg = Argv( pos );
-		if ( arg.size() && arg != "-" && arg.at(0) == '-' ) {
+		if ( arg.size() && arg != "-" && (arg.at(0) == '-' && ! isdigit( Peek( arg, 1 )))) {
 			lastflag = pos;
 			break;
 		}
