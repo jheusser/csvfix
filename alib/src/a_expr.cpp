@@ -1319,7 +1319,7 @@ void Expression :: ExecOp( const ExprToken & tok ) {
 	else if ( op == "%" ) {
 		double rhs = PopNum();
 		double lhs = PopNum();
-		if ( lhs <= 0 || rhs < 0 ) {
+		if ( lhs < 0 || rhs < 0 ) {
 			ATHROW( "Invalid operands for % operator" );
 		}
 		int n = int(lhs) % int(rhs);
