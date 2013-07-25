@@ -759,7 +759,7 @@ ExprToken ExprTokeniser :: ReadOp() {
 		int pl = std::strlen(p);
 		if ( pl == 1 && mCurrent == p[0] ) {
 			Next();
-			mCanBeUnaryMinus = true;
+			mCanBeUnaryMinus = * p == ')' ? false : true;
 			return ExprToken( ExprToken::etOp, p, Ops[i].mPrec  );
 		}
 		else if ( pl == 2 && mCurrent == p[0] && Peek() == p[1] ) {
