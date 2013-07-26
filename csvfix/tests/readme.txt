@@ -1,7 +1,7 @@
 Tests for CSVfix. These require the bash shell to run. 
 To run all the tests, use:
 
-	runall
+	runtests
 
 To run a single test, use:
 
