@@ -122,6 +122,7 @@ const char * const FLAG_DECR	= "-d";
 const char * const FLAG_DPOINT	= "-dp";
 const char * const FLAG_EDIT	= "-e";
 const char * const FLAG_ENDTAG	= "-et";
+const char * const FLAG_ENULLS	= "-en";
 const char * const FLAG_EEXPR	= "-ee";
 const char * const FLAG_ERRCODE = "-ec";
 const char * const FLAG_ERRSTR = "-es";

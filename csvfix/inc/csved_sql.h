@@ -66,6 +66,7 @@ class SQLCommand : public Command {
 
 		bool DoSQLQuote( unsigned int i ) const;
 		bool NoNullQuote( const std::string & ns ) const;
+		std::string EmptyToNull( const std::string & f ) const;
 
 	private:
 
@@ -76,7 +77,7 @@ class SQLCommand : public Command {
 		std::string mTable, mSep;
 		FieldList mNoQuote;
 		SQLColSpec::Vec mDataCols, mWhereCols;
-		bool mQuoteNulls;
+		bool mQuoteNulls, mEmptyNulls;
 };
 
 //---------------------------------------------------------------------------

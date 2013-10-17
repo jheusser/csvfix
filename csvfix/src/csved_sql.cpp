@@ -51,6 +51,7 @@ const char * const INS_HELP = {
 	"  -s sep\tspecifies statement separator (default ';')\n"
 	"  -nq fields\tspecifies fields not to quote on output\n"
 	"  -qn\t\tforce quoting of NULL values\n"
+	"  -en\t\tcovert empty CSV fields to NULLs\n"
 	"#IBN,SEP,OFL,IFN,SKIP"
 };
 
@@ -64,6 +65,7 @@ const char * const UPD_HELP = {
 	"  -s sep\tspecifies statement separator (default ';')\n"
 	"  -nq fields\tspecifies fields not to quote on output\n"
 	"  -qn\t\tforce quoting of NULL values\n"
+	"  -en\t\tcovert empty CSV fields to NULLs\n"
 	"#IBN,SEP,OFL,IFN,SKIP"
 };
 
@@ -76,6 +78,7 @@ const char * const DEL_HELP = {
 	"  -s sep\tspecifies statement separator (default ';')\n"
 	"  -nq fields\tspecifies fields not to quote on output\n"
 	"  -qn\t\tforce quoting of NULL values\n"
+	"  -en\t\tcovert empty CSV fields to NULLs\n"
 	"#IBN,SEP,OFL,IFN,SKIP"
 };
 
@@ -91,6 +94,7 @@ SQLCommand :: SQLCommand( const string & name,
 	AddFlag( ALib::CommandLineFlag( FLAG_QNULLS, false, 0 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_TABLE, true, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_SQLSEP, false, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_ENULLS, false, 0 ) );
 
 }
 
@@ -118,6 +122,7 @@ void SQLCommand :: GetCommonValues( ALib::CommandLine & cmd ) {
 		CommaListToIndex( ALib::CommaList( noq ), mNoQuote );
 	}
 	mQuoteNulls = cmd.HasFlag( FLAG_QNULLS );
+	mEmptyNulls = cmd.HasFlag( FLAG_ENULLS );
 }
 
 //---------------------------------------------------------------------------
@@ -139,6 +144,20 @@ bool SQLCommand :: NoNullQuote( const string & ns ) const {
 	else {
 		return false;
 	}
+}
+
+//----------------------------------------------------------------------------
+// Convert empty fields to NULL
+//----------------------------------------------------------------------------
+
+string SQLCommand :: EmptyToNull( const string & f ) const {
+	if ( mEmptyNulls && ALib::IsEmpty( f ) ) {
+		return "NULL";
+	}
+	else {
+		return f;
+	}
+
 }
 
 //---------------------------------------------------------------------------
@@ -269,11 +288,13 @@ string SQLCommand :: MakeWhereClause( const CSVRow & row  ) const {
 			wc += " AND ";
 		}
 
+		string field = EmptyToNull( row[wi] );
+
 		wc +=  WhereCols().at(i).mColName
-				+ " = "
-				+ ( (DoSQLQuote( i ) && ! NoNullQuote( row[wi] ))
-					? ALib::SQuote( ALib::SQLQuote( row[ wi] ) )
-					: row[wi] );
+				+ (field == "NULL"  ? " IS " : " = " )
+				+ ( (DoSQLQuote( i ) && ! NoNullQuote( field ))
+					? ALib::SQuote( ALib::SQLQuote( field ) )
+					: field );
 	}
 
 	return "WHERE " + wc;
@@ -353,9 +374,11 @@ string SQLInsertCommand :: CreateValues( const CSVRow & row ) const {
 		if ( vals != "" ) {
 			vals += ", ";
 		}
-		vals += ( DoSQLQuote( i ) && ! NoNullQuote( row[fi] ) )
-					? ALib::SQuote( ALib::SQLQuote( row[ fi] ) )
-					: row[fi];
+
+		string field = EmptyToNull( row[fi] );
+		vals += ( DoSQLQuote( i ) && ! NoNullQuote( field ) )
+					? ALib::SQuote( ALib::SQLQuote( field ) )
+					: field;
 	}
 
 	return " VALUES( " + vals + ")";
@@ -472,11 +495,13 @@ string SQLUpdateCommand :: MakeSetClause( const CSVRow & row ) const {
 			sc += ", ";
 		}
 
+		string field = EmptyToNull( row[fi] );
+
 		sc +=  DataCols().at(i).mColName
 				+ " = "
-				+ (( DoSQLQuote( i ) && ! NoNullQuote( row[fi] ) )
-					? ALib::SQuote( ALib::SQLQuote( row[ fi] ) )
-					: row[fi] );
+				+ (( DoSQLQuote( i ) && ! NoNullQuote( field ) )
+					? ALib::SQuote( ALib::SQLQuote( field ) )
+					: field );
 
 	}
 

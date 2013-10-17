@@ -28,3 +28,7 @@ INSERT INTO stuff ( name, value ) VALUES( 'so is this', 'NULL')
 ;
 INSERT INTO stuff ( name, value ) VALUES( 'this is two', '2')
 ;
+INSERT INTO stuff ( name, value ) VALUES( '1', NULL)
+;
+INSERT INTO stuff ( name, value ) VALUES( NULL, NULL)
+;
