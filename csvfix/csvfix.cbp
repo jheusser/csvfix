@@ -303,8 +303,8 @@
 		<Unit filename="tests/rules/val_names.txt" />
 		<Unit filename="tests/rules/values.txt" />
 		<Unit filename="tests/run1" />
-		<Unit filename="tests/runall.cmd" />
 		<Unit filename="tests/runsrc" />
+		<Unit filename="tests/runtests" />
 		<Unit filename="tests/tests/atable.test" />
 		<Unit filename="tests/tests/case.test" />
 		<Unit filename="tests/tests/dates.test" />
