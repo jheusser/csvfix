@@ -5,6 +5,13 @@
 "Amsterdam","NL","Netherlands"
 "Rome","IT","Italy"
 "Berlin","DE","Germany"
+---- equi join retaining key fields ---
+"London","GB","GB","United Kingdom"
+"Paris","FR","FR","France"
+"Edinurgh","GB","GB","United Kingdom"
+"Amsterdam","NL","NL","Netherlands"
+"Rome","IT","IT","Italy"
+"Berlin","DE","DE","Germany"
 ---- exclude GB + NL ----
 "Paris","FR"
 "Rome","IT"
