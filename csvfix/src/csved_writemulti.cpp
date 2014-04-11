@@ -45,13 +45,12 @@ const char * const WMHELP_HELP = {
 // Standard constructor
 //----------------------------------------------------------------------------
 
-WriteMultiCommand :: WriteMultiCommand( const string& name,
-                                        const string& desc)
+WriteMultiCommand :: WriteMultiCommand( const string & name,
+                                        const string & desc)
     : Command( name, desc, WMHELP_HELP ) {
     AddFlag( ALib::CommandLineFlag( FLAG_MASTER, true, 1 ));
     AddFlag( ALib::CommandLineFlag( FLAG_DETAIL, false, 1 ));
     AddFlag( ALib::CommandLineFlag( FLAG_RECSEP, false, 1 ));
-    AddFlag( ALib::CommandLineFlag( FLAG_FSEP, false, 1 ));
 }
 
 //----------------------------------------------------------------------------

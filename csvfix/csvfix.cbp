@@ -135,6 +135,7 @@
 		<Unit filename="inc/csved_util.h" />
 		<Unit filename="inc/csved_valid.h" />
 		<Unit filename="inc/csved_version.h" />
+		<Unit filename="inc/csved_writemulti.h" />
 		<Unit filename="src/csved_atable.cpp" />
 		<Unit filename="src/csved_block.cpp" />
 		<Unit filename="src/csved_call.cpp" />
@@ -193,6 +194,7 @@
 		<Unit filename="src/csved_unique.cpp" />
 		<Unit filename="src/csved_util.cpp" />
 		<Unit filename="src/csved_valid.cpp" />
+		<Unit filename="src/csved_writemulti.cpp" />
 		<Unit filename="tests/correct/atable.test" />
 		<Unit filename="tests/correct/case.test" />
 		<Unit filename="tests/correct/dates.test" />
