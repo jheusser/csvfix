@@ -46,7 +46,7 @@ class JoinCommand : public Command {
 
 		typedef std::multimap <std::string, CSVRow> MapType;
 		MapType mRowMap;
-		bool mInvert, mIgnoreCase;
+		bool mInvert, mIgnoreCase, mKeep;
 };
 
 //---------------------------------------------------------------------------

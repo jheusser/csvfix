@@ -40,6 +40,7 @@ const char * const JOIN_HELP = {
 	"  -oj\t\tperform outer join\n"
 	"  -inv\t\tinvert sense of join to exclude matching rows\n"
 	"  -ic\t\tignore character case in join columns\n"
+	"  -k\tkeep join fields in output\n"
 	"#ALL"
 };
 
@@ -50,13 +51,13 @@ const char * const JOIN_HELP = {
 JoinCommand :: JoinCommand( const string & name,
 							const string & desc )
 			: Command( name, desc, JOIN_HELP),
-					mOuterJoin( false ), mIgnoreCase( false ) {
+					mOuterJoin( false ), mIgnoreCase( false ), mKeep( false ) {
 
 	AddFlag( ALib::CommandLineFlag( FLAG_COLS, true, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_OUTERJ, false, 0 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_INVERT, false, 0 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_ICASE, false, 0 ) );
-
+	AddFlag( ALib::CommandLineFlag( FLAG_KEEP, false, 0 ) );
 }
 
 //---------------------------------------------------------------------------
@@ -84,6 +85,7 @@ int JoinCommand :: Execute( ALib::CommandLine & cmd ) {
 
 	Clear();
 
+    mKeep = cmd.HasFlag( FLAG_KEEP );
 	mOuterJoin = cmd.HasFlag( FLAG_OUTERJ );
 	mInvert = cmd.HasFlag( FLAG_INVERT );
 	mIgnoreCase = cmd.HasFlag( FLAG_ICASE );
@@ -223,7 +225,7 @@ void JoinCommand :: BuildRowMap( ALib::CSVStreamParser * sp ) {
 		string key = MakeKey( row, false );
 		CSVRow jrow;
 		for ( unsigned int i = 0; i < row.size(); i++ ) {
-			if ( ! IsJoinCol( i ) ) {
+			if ( (! IsJoinCol( i )) || mKeep  ) {
 				jrow.push_back( row[i] );
 			}
 		}
