@@ -2,14 +2,15 @@ readme.txt
 ----------
 
 This is the source for CSVfix and the supporting alib library.
-To build, enter the command "make win" for a Windows build, 
-"make lin" for a Linux/Unix build, or "make mac" for a Mac build.
+Building requires a GCC installation.  To build, enter the command 
+"make win" for a Windows build, "make lin" for a Linux/Unix build, 
+or "make mac" for a Mac build.
 
 For further information, please see the CSVfix website 
-at http://code.google.com/p/csvfix.
+at http://neilb.bitbucket.org/csvfix/
 
 Neil Butterworth
-25-Jul-2013
+13-Apr-2014
 
 
 
