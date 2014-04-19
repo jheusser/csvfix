@@ -12,3 +12,7 @@ UPDATE people SET forename = 'Virginia', surname = 'Woolf' WHERE forename = 'Vir
 ;
 UPDATE people SET forename = 'Oscar', surname = 'Wilde' WHERE forename = 'Oscar'
 ;
+UPDATE stuff SET one = '1', two = NULL WHERE one = '1'
+;
+UPDATE stuff SET one = NULL, two = NULL WHERE one IS NULL
+;
