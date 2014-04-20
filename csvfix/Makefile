@@ -80,6 +80,7 @@ _OBJS = csved_atable.o \
 		csved_unique.o \
 		csved_util.o \
 		csved_valid.o \
+		csved_writemulti.o \
 
 _WINOBJS = csved_odbc.o csved_call.o
 
