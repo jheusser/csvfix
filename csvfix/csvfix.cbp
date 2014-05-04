@@ -115,6 +115,7 @@
 		<Unit filename="inc/csved_put.h" />
 		<Unit filename="inc/csved_readmulti.h" />
 		<Unit filename="inc/csved_rmnewline.h" />
+		<Unit filename="inc/csved_rsort.h" />
 		<Unit filename="inc/csved_rules.h" />
 		<Unit filename="inc/csved_seq.h" />
 		<Unit filename="inc/csved_shuffle.h" />
@@ -177,6 +178,7 @@
 		<Unit filename="src/csved_put.cpp" />
 		<Unit filename="src/csved_readmulti.cpp" />
 		<Unit filename="src/csved_rmnewline.cpp" />
+		<Unit filename="src/csved_rsort.cpp" />
 		<Unit filename="src/csved_rules.cpp" />
 		<Unit filename="src/csved_seq.cpp" />
 		<Unit filename="src/csved_shuffle.cpp" />
