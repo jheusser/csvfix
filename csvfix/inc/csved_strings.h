@@ -90,6 +90,7 @@ const char * const CMD_XMLR		= "read_xml";
 // Flag names
 //---------------------------------------------------------------------------
 
+const char * const FLAG_ASC		= "-a";
 const char * const FLAG_ARG		= "-arg";
 const char * const FLAG_AVG		= "-avg";
 const char * const FLAG_ACTKEEP	= "-k";
@@ -118,6 +119,7 @@ const char * const FLAG_DUPES	= "-d";
 const char * const FLAG_DATE	= "-d";
 const char * const FLAG_DISCARD	= "-d";
 const char * const FLAG_DETAIL	= "-d";
+const char * const FLAG_DESC	= "-d";
 const char * const FLAG_DIR		= "-dir";
 const char * const FLAG_DLL		= "-dll";
 const char * const FLAG_DONLY	= "-d";
@@ -164,6 +166,7 @@ const char * const FLAG_KEEP	= "-k";
 const char * const FLAG_KEY		= "-k";
 const char * const FLAG_KSEP	= "-ts";
 const char * const FLAG_LEN		= "-l";
+const char * const FLAG_LEX		= "-l";
 const char * const FLAG_MASK	= "-m";
 const char * const FLAG_MASTER	= "-m";
 const char * const FLAG_MEDIAN	= "-med";

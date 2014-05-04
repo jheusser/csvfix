@@ -29,6 +29,9 @@ class RowSortCommand : public Command {
 
 		void ProcessFlags( const ALib::CommandLine & cmd );
 
+		FieldList mFields;
+		bool mSortAscending, mSortLex;
+
 };
 
 //------------------------------------------------------------------------

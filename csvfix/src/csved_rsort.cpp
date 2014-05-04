@@ -41,14 +41,19 @@ const char * const ROWSORT_HELP = {
 	"#SMQ,SEP,IBL,IFN,OFL,SKIP,PASS"
 };
 
-//------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 // Standard command ctor
 //---------------------------------------------------------------------------
 
 RowSortCommand :: RowSortCommand( const string & name,
 								const string & desc )
-		: Command( name, desc, ROWSORT_HELP ) {
-
+		: Command( name, desc, ROWSORT_HELP ),
+            mSortAscending( true ), mSortLex( true ){
+   	AddFlag( ALib::CommandLineFlag( FLAG_COLS, false, 1, false) );
+   	AddFlag( ALib::CommandLineFlag( FLAG_ASC, false, 0, false) );
+   	AddFlag( ALib::CommandLineFlag( FLAG_DESC, false, 0, false) );
+   	AddFlag( ALib::CommandLineFlag( FLAG_LEX, false, 0, false) );
+   	AddFlag( ALib::CommandLineFlag( FLAG_NUM, false, 0, false) );
 }
 
 //---------------------------------------------------------------------------
@@ -79,7 +84,10 @@ int RowSortCommand :: Execute( ALib::CommandLine & cmd ) {
 //---------------------------------------------------------------------------
 
 void RowSortCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
-
+    NotBoth( cmd, FLAG_ASC, FLAG_DESC );
+    NotBoth( cmd, FLAG_LEX, FLAG_NUM );
+    mSortAscending = ! cmd.HasFlag( FLAG_DESC );
+    mSortLex = ! cmd.HasFlag( FLAG_NUM );
 }
 
 } // end namespace
