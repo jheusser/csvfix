@@ -58,6 +58,8 @@ const char * const CMD_ESC		= "escape";
 const char * const CMD_REMOVE	= "remove";
 const char * const CMD_READMUL	= "read_multi";
 const char * const CMD_RMNEW	= "rmnew";
+const char * const CMD_RSORT	= "rowsort";
+
 const char * const CMD_SEQ		= "sequence";
 const char * const CMD_SHUFFLE	= "shuffle";
 const char * const CMD_SORT		= "sort";
