@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 // csved_rsort.h
 //
-// Do in-row sortingof CSV fields
+// Do in-row sorting of CSV fields
 //
 // Copyright (C) 2014 Neil Butterworth
 //---------------------------------------------------------------------------
@@ -11,6 +11,8 @@
 
 #include "a_base.h"
 #include "csved_command.h"
+#include <vector>
+#include <string>
 
 namespace CSVED {
 
@@ -28,6 +30,10 @@ class RowSortCommand : public Command {
 	private:
 
 		void ProcessFlags( const ALib::CommandLine & cmd );
+        void SortRow( CSVRow & row );
+
+        std::vector <std::string> GetSortFields( const CSVRow & row ) const;
+        void PutSortFields(  CSVRow & row, const std::vector <std::string> & sf ) const;
 
 		FieldList mFields;
 		bool mSortAscending, mSortLex;
