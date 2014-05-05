@@ -7,9 +7,12 @@
 //---------------------------------------------------------------------------
 
 #include "a_base.h"
+#include "a_collect.h"
 #include "csved_cli.h"
 #include "csved_rsort.h"
 #include "csved_strings.h"
+
+#include <algorithm>
 
 using std::string;
 using std::vector;
@@ -57,6 +60,7 @@ RowSortCommand :: RowSortCommand( const string & name,
 }
 
 //---------------------------------------------------------------------------
+// Sort fields in CSV records
 //---------------------------------------------------------------------------
 
 int RowSortCommand :: Execute( ALib::CommandLine & cmd ) {
@@ -72,11 +76,59 @@ int RowSortCommand :: Execute( ALib::CommandLine & cmd ) {
 			continue;
 		}
 		if ( ! Pass( row ) ) {
+            SortRow( row );
 		}
 		io.WriteRow( row );
 	}
 
 	return 0;
+}
+
+//---------------------------------------------------------------------------
+// Get the fields to be sorted into a temporary vector
+//---------------------------------------------------------------------------
+
+vector <string> RowSortCommand :: GetSortFields( const CSVRow & r ) const {
+    vector <string> sf;
+    for( unsigned int i = 0; i < r.size(); i++ ) {
+        if ( mFields.size() == 0 || ALib::Contains( mFields, i ) ) {
+            sf.push_back( r[i] );
+        }
+    }
+    return sf;
+
+}
+
+//---------------------------------------------------------------------------
+// Put the sorted fields back in the row for output.
+//---------------------------------------------------------------------------
+
+void RowSortCommand ::PutSortFields(  CSVRow & row,
+                                        const vector <string> & sf ) const {
+    for( unsigned int i =0; i < sf.size(); i++ ) {
+        if( mFields.size() == 0 ) {
+            row[i] = sf[i];
+        }
+        else {
+            row[mFields[i]] = sf[i];
+        }
+    }
+}
+
+
+//---------------------------------------------------------------------------
+// Sort CSV fields in a single CSV record
+//---------------------------------------------------------------------------
+
+void RowSortCommand :: SortRow( CSVRow & row ) {
+    if ( mSortLex ) {
+        vector <string> sf = GetSortFields( row );
+        std::sort( sf.begin(), sf.end() );
+        PutSortFields( row, sf );
+    }
+    else {
+        CSVTHROW( "not implemented yet" );
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -88,6 +140,10 @@ void RowSortCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
     NotBoth( cmd, FLAG_LEX, FLAG_NUM );
     mSortAscending = ! cmd.HasFlag( FLAG_DESC );
     mSortLex = ! cmd.HasFlag( FLAG_NUM );
+    if ( cmd.HasFlag( FLAG_COLS )) {
+        ALib::CommaList cl( cmd.GetValue( FLAG_COLS ));
+        CommaListToIndex( cl, mFields );
+    }
 }
 
 } // end namespace
