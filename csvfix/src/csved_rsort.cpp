@@ -84,6 +84,10 @@ int RowSortCommand :: Execute( ALib::CommandLine & cmd ) {
 	return 0;
 }
 
+//---------------------------------------------------------------------------
+// Sort helpers
+//---------------------------------------------------------------------------
+
 template <typename T>
 struct SortDesc {
     bool operator()( const T & a, const T  & b ) {
@@ -91,6 +95,27 @@ struct SortDesc {
     }
 };
 
+struct StrNum {
+    string mStr;
+    double mNum;
+    StrNum( const string & s ) : mStr( s ), mNum( ALib::ToReal( s ) ) {}
+};
+
+bool operator<( const StrNum & a, const StrNum & b ) {
+    return a.mNum < b.mNum;
+}
+
+struct StrNumSortDesc {
+    bool operator()( const StrNum & a, const StrNum  & b ) {
+        return a.mNum >= b.mNum;
+    }
+};
+
+void Dump( const vector<StrNum> & sn ) {
+    for( unsigned int i = 0; i < sn.size(); i++) {
+        std::cout << sn[i].mStr << " " << sn[i].mNum << std::endl;
+    }
+}
 //---------------------------------------------------------------------------
 // Get the fields to be sorted into a temporary vector
 //---------------------------------------------------------------------------
@@ -137,9 +162,39 @@ void RowSortCommand :: SortRow( CSVRow & row ) {
         }
     }
     else {
-        CSVTHROW( "not implemented yet" );
+        vector <StrNum> sn;
+        for( unsigned int i = 0; i < sf.size(); i++ ) {
+            sn.push_back( StrNum( sf[i] ) );
+        }
+        if ( mSortAscending ) {
+            std::sort( sn.begin(), sn.end() );
+        }
+        else {
+            StrNumSortDesc sd;
+            std::sort( sn.begin(), sn.end(), sd );
+        }
+        for( unsigned int i = 0; i < sn.size(); i++ ) {
+            sf[i] = sn[i].mStr;
+        }
     }
     PutSortFields( row, sf );
+}
+
+//---------------------------------------------------------------------------
+// Check fields to sort are contiguous
+//---------------------------------------------------------------------------
+
+static void CheckContiguous( const FieldList & fl ) {
+    if ( fl.size() == 0 ){
+        return;
+    }
+    unsigned int pos = fl[0];
+    for( unsigned int i = 1; i < fl.size(); i++ ) {
+        if ( fl[i] != pos + 1 ) {
+            CSVTHROW( "Fields to sort must be contiguous" );
+        }
+        pos = fl[i];
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -154,6 +209,7 @@ void RowSortCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
     if ( cmd.HasFlag( FLAG_COLS )) {
         ALib::CommaList cl( cmd.GetValue( FLAG_COLS ));
         CommaListToIndex( cl, mFields );
+        CheckContiguous( mFields );
     }
 }
 
