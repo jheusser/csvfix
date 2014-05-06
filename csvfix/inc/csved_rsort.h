@@ -16,6 +16,8 @@
 
 namespace CSVED {
 
+
+
 //---------------------------------------------------------------------------
 
 class RowSortCommand : public Command {
@@ -31,11 +33,11 @@ class RowSortCommand : public Command {
 
 		void ProcessFlags( const ALib::CommandLine & cmd );
         void SortRow( CSVRow & row );
-
-        std::vector <std::string> GetSortFields( const CSVRow & row ) const;
+        std::vector <std::string> GetSortFields( const CSVRow & row ) ;
         void PutSortFields(  CSVRow & row, const std::vector <std::string> & sf ) const;
 
 		FieldList mFields;
+		unsigned int mStartPos;
 		bool mSortAscending, mSortLex;
 
 };

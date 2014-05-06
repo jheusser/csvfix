@@ -51,7 +51,7 @@ const char * const ROWSORT_HELP = {
 RowSortCommand :: RowSortCommand( const string & name,
 								const string & desc )
 		: Command( name, desc, ROWSORT_HELP ),
-            mSortAscending( true ), mSortLex( true ){
+            mStartPos(UINT_MAX), mSortAscending( true ), mSortLex( true ){
    	AddFlag( ALib::CommandLineFlag( FLAG_COLS, false, 1, false) );
    	AddFlag( ALib::CommandLineFlag( FLAG_ASC, false, 0, false) );
    	AddFlag( ALib::CommandLineFlag( FLAG_DESC, false, 0, false) );
@@ -84,14 +84,24 @@ int RowSortCommand :: Execute( ALib::CommandLine & cmd ) {
 	return 0;
 }
 
+template <typename T>
+struct SortDesc {
+    bool operator()( const T & a, const T  & b ) {
+        return a >= b;
+    }
+};
+
 //---------------------------------------------------------------------------
 // Get the fields to be sorted into a temporary vector
 //---------------------------------------------------------------------------
 
-vector <string> RowSortCommand :: GetSortFields( const CSVRow & r ) const {
+vector <string> RowSortCommand :: GetSortFields( const CSVRow & r )  {
     vector <string> sf;
     for( unsigned int i = 0; i < r.size(); i++ ) {
         if ( mFields.size() == 0 || ALib::Contains( mFields, i ) ) {
+            if ( mStartPos == UINT_MAX ) {
+                mStartPos = i;
+            }
             sf.push_back( r[i] );
         }
     }
@@ -106,12 +116,7 @@ vector <string> RowSortCommand :: GetSortFields( const CSVRow & r ) const {
 void RowSortCommand ::PutSortFields(  CSVRow & row,
                                         const vector <string> & sf ) const {
     for( unsigned int i =0; i < sf.size(); i++ ) {
-        if( mFields.size() == 0 ) {
-            row[i] = sf[i];
-        }
-        else {
-            row[mFields[i]] = sf[i];
-        }
+        row[mStartPos + i] = sf[i];
     }
 }
 
@@ -121,14 +126,20 @@ void RowSortCommand ::PutSortFields(  CSVRow & row,
 //---------------------------------------------------------------------------
 
 void RowSortCommand :: SortRow( CSVRow & row ) {
+    vector <string> sf = GetSortFields( row );
     if ( mSortLex ) {
-        vector <string> sf = GetSortFields( row );
-        std::sort( sf.begin(), sf.end() );
-        PutSortFields( row, sf );
+        if ( mSortAscending ) {
+            std::sort( sf.begin(), sf.end() );
+        }
+        else {
+            SortDesc <string> sd;
+            std::sort( sf.begin(), sf.end(), sd );
+        }
     }
     else {
         CSVTHROW( "not implemented yet" );
     }
+    PutSortFields( row, sf );
 }
 
 //---------------------------------------------------------------------------
