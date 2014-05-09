@@ -453,6 +453,15 @@ static string FuncRound( const deque <string> & params, Expression * e ) {
 	return os.str();
 }
 
+// exit imediately with error code of first parameterand write second
+// parameter to std::error
+static string FuncError( const deque <string> & params, Expression * e ) {
+    int n = ToInteger( params[0] );
+    std::cerr << params[1] << std::endl;
+    std::exit( n );
+    return "";   // never happen
+}
+
 //----------------------------------------------------------------------------
 // Add all the functions to the function dictionary
 //----------------------------------------------------------------------------
@@ -460,6 +469,7 @@ static string FuncRound( const deque <string> & params, Expression * e ) {
 ADD_FUNC( "abs", 		FuncAbs, 		1 );
 ADD_FUNC( "bool", 		FuncBool, 		1 );
 ADD_FUNC( "day", 		FuncDay, 		1 );
+ADD_FUNC( "error", 		FuncError,   	2 );
 ADD_FUNC( "env", 		FuncGetenv, 	1 );
 ADD_FUNC( "field", 		FuncField, 		1 );
 ADD_FUNC( "find", 		FuncFind, 		1 );
