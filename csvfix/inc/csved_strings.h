@@ -51,6 +51,7 @@ const char * const CMD_MONEY	= "money";
 const char * const CMD_NUMBER	= "number";
 const char * const CMD_ODBCGET	= "odbc_get";
 const char * const CMD_ORDER	= "order";
+const char * const CMD_PIVOT	= "pivot";
 const char * const CMD_PRINTF	= "printf";
 const char * const CMD_PAD		= "pad";
 const char * const CMD_PUT		= "put";
@@ -90,6 +91,7 @@ const char * const CMD_XMLR		= "read_xml";
 // Flag names
 //---------------------------------------------------------------------------
 
+const char * const FLAG_ACTION	= "-a";
 const char * const FLAG_ASC		= "-a";
 const char * const FLAG_ARG		= "-arg";
 const char * const FLAG_AVG		= "-avg";
@@ -108,6 +110,7 @@ const char * const FLAG_CENTS	= "-cn";
 const char * const FLAG_CHARS	= "-s";
 const char * const FLAG_CHAR	= "-c";
 const char * const FLAG_CMD		= "-c";
+const char * const FLAG_COL	    = "-c";
 const char * const FLAG_COLS	= "-f";
 const char * const FLAG_CMULTI	= "-cm";
 const char * const FLAG_CONSTR	= "-cs";
@@ -202,6 +205,7 @@ const char * const FLAG_REVCOLS	= "-rf";
 const char * const FLAG_RECSEP	= "-rs";
 const char * const FLAG_RSEED	= "-rs";
 const char * const FLAG_RFSEED	= "-seed";
+const char * const FLAG_ROW 	= "-r";
 const char * const FLAG_RTIME	= "-rt";
 const char * const FLAG_RULER	= "-ru";
 const char * const FLAG_RALIGN	= "-ra";
