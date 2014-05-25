@@ -15,6 +15,7 @@
 #include <utility>
 #include <string>
 #include <map>
+#include <set>
 
 namespace CSVED {
 
@@ -59,7 +60,7 @@ class PivotCommand : public Command {
 
         typedef std::map <ColRow, double> MapType;
         MapType mColRowValMap;
-        std::vector <std::string> mCols, mRows;
+        std::set <std::string> mCols, mRows;
 
         Action mAction;
         unsigned int mCol, mRow, mFact;

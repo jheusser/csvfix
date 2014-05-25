@@ -79,8 +79,8 @@ int PivotCommand :: Execute( ALib::CommandLine & cmd ) {
 	while( io.ReadCSV( row ) ) {
         ColRow cr = MakeColRow( row );
         AddFact( cr, GetFact( row ));
-        mCols.push_back( row[mCol] );
-        mRows.push_back( row[mRow] );
+        mCols.insert( row[mCol] );
+        mRows.insert( row[mRow] );
         rowcount++;
 	}
 
@@ -89,10 +89,11 @@ int PivotCommand :: Execute( ALib::CommandLine & cmd ) {
 	return 0;
 }
 
-void PivotCommand :: OutputPivot( IOManager & io, unsigned int rowcount ) {
+//---------------------------------------------------------------------------
+// Output the pivot data
+//---------------------------------------------------------------------------
 
-    std::sort( mCols.begin(), mCols.end() );
-    std::sort( mRows.begin(), mRows.end() );
+void PivotCommand :: OutputPivot( IOManager & io, unsigned int rowcount ) {
 
     CSVRow r;
     r.push_back( "" );    // corresponds to row header
@@ -111,6 +112,8 @@ void PivotCommand :: OutputPivot( IOManager & io, unsigned int rowcount ) {
         }
         io.WriteRow( r );
     }
+
+
 }
 
 //---------------------------------------------------------------------------
