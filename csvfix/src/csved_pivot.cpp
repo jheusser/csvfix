@@ -2,6 +2,7 @@
 // csved_pivot.cpp
 //
 // Simple pivot table stuff.
+// Doesn't support skip/pass.
 //
 // Copyright (C) 2014 Neil Butterworth
 //---------------------------------------------------------------------------
@@ -65,12 +66,13 @@ PivotCommand :: PivotCommand( const string & name,
 }
 
 //---------------------------------------------------------------------------
-// Pivot the data!
+// Pivot the data. We store/accumulate every fact in a map indexed by
+// column and row. We also store the unique column androw values so
+// we can iterate over them when actually producing the output.
 //---------------------------------------------------------------------------
 
 int PivotCommand :: Execute( ALib::CommandLine & cmd ) {
 
-	GetSkipOptions( cmd );
     ProcessFlags( cmd );
 	IOManager io( cmd );
 	CSVRow row;
@@ -90,7 +92,8 @@ int PivotCommand :: Execute( ALib::CommandLine & cmd ) {
 }
 
 //---------------------------------------------------------------------------
-// Output the pivot data
+// Output the pivot data.
+// IMPORTANT: only works for sum and count actions for now.
 //---------------------------------------------------------------------------
 
 void PivotCommand :: OutputPivot( IOManager & io, unsigned int rowcount ) {
