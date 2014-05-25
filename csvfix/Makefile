@@ -59,6 +59,7 @@ _OBJS = csved_atable.o \
 		csved_money.o \
 		csved_number.o \
 		csved_order.o \
+		csved_pivot.o \
 		csved_printf.o \
 		csved_put.o \
 		csved_readmulti.o \
