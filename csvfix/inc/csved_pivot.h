@@ -12,6 +12,10 @@
 #include "a_base.h"
 #include "csved_command.h"
 
+#include <utility>
+#include <string>
+#include <map>
+
 namespace CSVED {
 
 //---------------------------------------------------------------------------
@@ -32,10 +36,33 @@ class PivotCommand : public Command {
 
 	private:
 
+
+        struct ColRow{
+
+            std::string mCol;
+            std::string mRow;
+
+            ColRow( const std::string & c, const std::string & r )
+                    : mCol(c), mRow(r) {}
+
+
+            bool operator < ( const ColRow & r ) const {
+                return std::tie( mCol, mRow ) < std::tie( r.mCol, r.mRow );
+            }
+        };
+
         void ProcessFlags( const ALib::CommandLine & cmd );
+        ColRow MakeColRow( const CSVRow & row ) const;
+        std::string GetFact( const CSVRow & row ) const;
+        void AddFact( const ColRow & cr, const std::string & fact );
+        void OutputPivot( IOManager & io, unsigned int rowcount );
+
+        typedef std::map <ColRow, double> MapType;
+        MapType mColRowValMap;
+        std::vector <std::string> mCols, mRows;
 
         Action mAction;
-        unsigned int mCol, mRow;
+        unsigned int mCol, mRow, mFact;
 
 };
 
