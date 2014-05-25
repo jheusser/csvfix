@@ -44,7 +44,8 @@ const char * const PIVOT_HELP = {
 	"where flags are:\n"
 	"  -c field\tfield to use for column headers\n"
 	"  -r field\tfield to use for row header \n"
-	"  -a act\taction to perfrm (one of sum, avg, count)\n"
+	"  -a act\taction to perform (one of sum, avg, count)\n"
+	"  -f field\tfield that represents the fact you want to perform action on\n"
 	"#ALL,SKIP,PASS"
 };
 
@@ -59,6 +60,7 @@ PivotCommand :: PivotCommand( const string & name,
 	AddFlag( ALib::CommandLineFlag( FLAG_ACTION, true, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_COL, true, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_ROW, true, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_FACT, true, 1 ) );
 
 }
 
@@ -69,20 +71,95 @@ PivotCommand :: PivotCommand( const string & name,
 int PivotCommand :: Execute( ALib::CommandLine & cmd ) {
 
 	GetSkipOptions( cmd );
+    ProcessFlags( cmd );
 	IOManager io( cmd );
 	CSVRow row;
+    unsigned int rowcount = 0;
 
 	while( io.ReadCSV( row ) ) {
+        ColRow cr = MakeColRow( row );
+        AddFact( cr, GetFact( row ));
+        mCols.push_back( row[mCol] );
+        mRows.push_back( row[mRow] );
+        rowcount++;
 	}
+
+    OutputPivot( io, rowcount );
 
 	return 0;
 }
 
+void PivotCommand :: OutputPivot( IOManager & io, unsigned int rowcount ) {
+
+    std::sort( mCols.begin(), mCols.end() );
+    std::sort( mRows.begin(), mRows.end() );
+
+    CSVRow r;
+    r.push_back( "" );    // corresponds to row header
+    for ( auto col : mCols ) {
+        r.push_back( col );
+    }
+    io.WriteRow( r );
+
+    for( auto row : mRows ) {
+        r.clear();
+        r.push_back( row );
+        for ( auto col : mCols ) {
+            ColRow cr( col, row );
+            double val = mColRowValMap[ cr ];
+            r.push_back( ALib::Str( val ) );
+        }
+        io.WriteRow( r );
+    }
+}
+
 //---------------------------------------------------------------------------
-// Get positive integer value for row and column fields
+// Add fact value to total, or simply count it.
 //---------------------------------------------------------------------------
 
-unsigned int GetRowCol( const ALib::CommandLine & cmd, const string & option ) {
+void PivotCommand :: AddFact( const ColRow & cr, const string & fact )  {
+    if ( (mAction == Action::Average || mAction == Action::Sum) ) {
+        if ( ! ALib::IsNumber( fact ) ) {
+            CSVTHROW( "Non-numeric fact: " << fact);
+        }
+        double fd = ALib::ToReal( fact );
+        mColRowValMap[cr] += fd;
+    }
+    else {
+        mColRowValMap[cr] += 1;
+    }
+}
+
+//---------------------------------------------------------------------------
+// Get fact field as string.
+//---------------------------------------------------------------------------
+
+string PivotCommand :: GetFact( const CSVRow & row ) const {
+    if ( mFact >= row.size() ) {
+        CSVTHROW( "Invalid fact index: " << mFact );
+    }
+    return row[mFact];
+}
+
+//---------------------------------------------------------------------------
+// Create ColRow combination object from two CSV fields.
+//---------------------------------------------------------------------------
+
+PivotCommand::ColRow PivotCommand:: MakeColRow( const CSVRow & row ) const {
+
+    if ( mCol >= row.size() || mRow >= row.size() ) {
+        CSVTHROW( "Invalid row/column index" );
+    }
+
+    return PivotCommand::ColRow( row[mCol], row[mRow] );
+}
+
+//---------------------------------------------------------------------------
+// Get positive integer value for row ,column ad fact  fields
+//---------------------------------------------------------------------------
+
+static unsigned int GetField( const ALib::CommandLine & cmd,
+                                const string & option ) {
     string rc = cmd.GetValue( option );
     if ( ! ALib::IsInteger( rc ) ) {
         CSVTHROW( "Value for " << option << " must be integer" );
@@ -91,7 +168,7 @@ unsigned int GetRowCol( const ALib::CommandLine & cmd, const string & option ) {
     if ( n <= 0 ) {
         CSVTHROW( "Value for " << option << " must be greater than zero" );
     }
-    return (unsigned int) n;
+    return (unsigned int) n - 1;
 }
 
 //---------------------------------------------------------------------------
@@ -121,8 +198,9 @@ PivotCommand::Action GetAction( const ALib::CommandLine & cmd ) {
 //---------------------------------------------------------------------------
 
 void PivotCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
-    mRow = GetRowCol( cmd, FLAG_ROW );
-    mCol = GetRowCol( cmd, FLAG_COL );
+    mRow = GetField( cmd, FLAG_ROW );
+    mCol = GetField( cmd, FLAG_COL );
+    mFact = GetField( cmd, FLAG_FACT );
     if ( mRow == mCol ) {
         CSVTHROW( "Row and column options cannot have the same value" );
     }

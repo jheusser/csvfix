@@ -111,6 +111,7 @@
 		<Unit filename="inc/csved_number.h" />
 		<Unit filename="inc/csved_odbc.h" />
 		<Unit filename="inc/csved_order.h" />
+		<Unit filename="inc/csved_pivot.h" />
 		<Unit filename="inc/csved_printf.h" />
 		<Unit filename="inc/csved_put.h" />
 		<Unit filename="inc/csved_readmulti.h" />
@@ -174,6 +175,7 @@
 		<Unit filename="src/csved_number.cpp" />
 		<Unit filename="src/csved_odbc.cpp" />
 		<Unit filename="src/csved_order.cpp" />
+		<Unit filename="src/csved_pivot.cpp" />
 		<Unit filename="src/csved_printf.cpp" />
 		<Unit filename="src/csved_put.cpp" />
 		<Unit filename="src/csved_readmulti.cpp" />

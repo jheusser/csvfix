@@ -140,6 +140,7 @@ const char * const FLAG_ESCOFF	= "-noc";
 const char * const FLAG_EXPR	= "-e";
 const char * const FLAG_EXCLF	= "-xf";
 const char * const FLAG_EXCLNL	= "-x";
+const char * const FLAG_FACT	= "-f";
 const char * const FLAG_FCOUNT	= "-fc";
 const char * const FLAG_FSEP	= "-fs";
 const char * const FLAG_FILTBAD	= "-x";
