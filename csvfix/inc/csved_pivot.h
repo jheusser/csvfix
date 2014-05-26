@@ -37,6 +37,18 @@ class PivotCommand : public Command {
 
 	private:
 
+        struct SumCount {
+
+            double mSum;
+            unsigned int mCount;
+
+            SumCount() : mSum(0), mCount(0) {}
+
+            void Update( double val ) {
+                mSum += val;
+                mCount++;
+            }
+        };
 
         struct ColRow{
 
@@ -56,9 +68,9 @@ class PivotCommand : public Command {
         ColRow MakeColRow( const CSVRow & row ) const;
         std::string GetFact( const CSVRow & row ) const;
         void AddFact( const ColRow & cr, const std::string & fact );
-        void OutputPivot( IOManager & io, unsigned int rowcount );
+        void OutputPivot( IOManager & io );
 
-        typedef std::map <ColRow, double> MapType;
+        typedef std::map <ColRow, SumCount> MapType;
         MapType mColRowValMap;
         std::set <std::string> mCols, mRows;
 
