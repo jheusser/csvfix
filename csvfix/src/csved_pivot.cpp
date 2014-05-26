@@ -47,7 +47,7 @@ const char * const PIVOT_HELP = {
 	"  -r field\tfield to use for row header \n"
 	"  -a act\taction to perform (one of sum, avg, count)\n"
 	"  -f field\tfield that represents the fact you want to perform action on\n"
-	"#ALL,SKIP,PASS"
+	"#ALL"
 };
 
 //---------------------------------------------------------------------------
@@ -76,27 +76,24 @@ int PivotCommand :: Execute( ALib::CommandLine & cmd ) {
     ProcessFlags( cmd );
 	IOManager io( cmd );
 	CSVRow row;
-    unsigned int rowcount = 0;
 
 	while( io.ReadCSV( row ) ) {
         ColRow cr = MakeColRow( row );
         AddFact( cr, GetFact( row ));
         mCols.insert( row[mCol] );
         mRows.insert( row[mRow] );
-        rowcount++;
 	}
 
-    OutputPivot( io, rowcount );
+    OutputPivot( io );
 
 	return 0;
 }
 
 //---------------------------------------------------------------------------
 // Output the pivot data.
-// IMPORTANT: only works for sum and count actions for now.
 //---------------------------------------------------------------------------
 
-void PivotCommand :: OutputPivot( IOManager & io, unsigned int rowcount ) {
+void PivotCommand :: OutputPivot( IOManager & io ) {
 
     CSVRow r;
     r.push_back( "" );    // corresponds to row header
@@ -110,8 +107,13 @@ void PivotCommand :: OutputPivot( IOManager & io, unsigned int rowcount ) {
         r.push_back( row );
         for ( auto col : mCols ) {
             ColRow cr( col, row );
-            double val = mColRowValMap[ cr ];
-            r.push_back( ALib::Str( val ) );
+            SumCount sc = mColRowValMap[ cr ];
+            if ( mAction == Action::Average ) {
+                r.push_back( ALib::Str( sc.mSum / sc.mCount ) );
+            }
+            else {
+                r.push_back( ALib::Str( sc.mSum ) );
+            }
         }
         io.WriteRow( r );
     }
@@ -129,10 +131,10 @@ void PivotCommand :: AddFact( const ColRow & cr, const string & fact )  {
             CSVTHROW( "Non-numeric fact: " << fact);
         }
         double fd = ALib::ToReal( fact );
-        mColRowValMap[cr] += fd;
+        mColRowValMap[cr].Update( fd );
     }
     else {
-        mColRowValMap[cr] += 1;
+        mColRowValMap[cr].Update(1);
     }
 }
 
@@ -194,7 +196,7 @@ PivotCommand::Action GetAction( const ALib::CommandLine & cmd ) {
         return PivotCommand::Action::Average;
     }
     else {
-        CSVTHROW( "Invalid value for " << FLAG_ACTION << ". Need one of sum, count, average" );
+        CSVTHROW( "Invalid value for " << FLAG_ACTION << ". Need one of sum, count, avg" );
     }
 
 }
