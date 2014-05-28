@@ -66,7 +66,7 @@ int WriteMultiCommand :: Execute( ALib::CommandLine & cmd ) {
     CSVRow row, master;
     bool haveout = false;
     while( io.ReadCSV( row ) ) {
-		if ( Skip( row ) ) {
+		if ( Skip( io, row ) ) {
 			continue;
 		}
         if ( GetNewMaster( row, master )) {    // new master

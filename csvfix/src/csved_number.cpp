@@ -81,10 +81,10 @@ int NumberCommand :: Execute( ALib::CommandLine & cmd )  {
 
 	while( io.ReadCSV( row ) ) {
 
-		if ( Skip( row ) ) {
+		if ( Skip( io, row ) ) {
 			continue;
 		}
-		if( ! Pass( row ) ) {
+		if( ! Pass( io, row ) ) {
 			Convert( row );
 		}
 
