@@ -76,7 +76,7 @@ int TemplateCommand :: Execute( ALib::CommandLine & cmd ) {
 	CSVRow row;
 
 	while( io.ReadCSV( row ) ) {
-		if ( Skip( row ) ) {
+		if ( Skip( io, row ) ) {
 			continue;
 		}
 

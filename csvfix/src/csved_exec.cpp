@@ -70,7 +70,7 @@ int ExecCommand :: Execute( ALib::CommandLine & cmd ) {
 	ALib::Executor ex;
 
 	while( io.ReadCSV( row ) ) {
-		if ( Skip( row ) ) {
+		if ( Skip( io, row ) ) {
 			continue;
 		}
 		string cmd = MakeCmd( row );
@@ -85,7 +85,7 @@ int ExecCommand :: Execute( ALib::CommandLine & cmd ) {
 		while( std::getline( is, line ) ) {
 			if ( csv ) {
 				CSVRow tmp( row ), cmdout;
-				if ( ! Pass( tmp ) ) {
+				if ( ! Pass( io, tmp ) ) {
 					clp.Parse( line, cmdout );
 					ALib::operator+=( tmp, cmdout );
 					io.WriteRow( tmp );
