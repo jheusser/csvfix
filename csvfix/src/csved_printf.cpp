@@ -252,6 +252,30 @@ PrintfCommand::Format PrintfCommand :: GetFormat( unsigned int & pos,
 }
 
 //----------------------------------------------------------------------------
+// Handle backslash escape characters
+//---------------------------------------------------------------------------
+
+static char GetEscaped( const string & fmt, unsigned int & pos ) {
+    char c = Peek( pos++, fmt );
+    if ( c == 0 ) {
+        CSVTHROW( "Invalid escape" );
+    }
+    else if ( c == 'n' ) {
+        return '\n';
+    }
+    else if ( c == 'r' ) {
+        return '\r';
+    }
+    else if ( c == 't' ) {
+        return '\t';
+    }
+    else {
+        return c;
+    }
+
+}
+
+//----------------------------------------------------------------------------
 // literals are things not beginning with '%'
 //----------------------------------------------------------------------------
 
@@ -259,7 +283,12 @@ PrintfCommand::Format PrintfCommand :: GetLiteral( unsigned int & pos,
 														const string & fmt ) {
 	string lit;
 	while( pos < fmt.size() && fmt[pos] != '%' ) {
-		lit += fmt[pos++];
+        if ( fmt[pos] == '\\' ) {
+            lit += GetEscaped( fmt, ++pos );
+        }
+        else {
+            lit += fmt[pos++];
+        }
 	}
 	return Format( Literal, lit );
 }
