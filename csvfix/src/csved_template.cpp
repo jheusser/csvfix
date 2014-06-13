@@ -10,6 +10,8 @@
 #include "csved_template.h"
 #include "csved_strings.h"
 #include "csved_except.h"
+#include "csved_util.h"
+
 #include "a_expr.h"
 #include <fstream>
 
@@ -205,15 +207,13 @@ string TemplateCommand :: ReplaceColumns( const string & tplate,
 }
 
 //---------------------------------------------------------------------------
-// Read template file into mTemplate member
+// Read template file into mTemplate member.
+// Can now specify template text as command line option.
 //---------------------------------------------------------------------------
 
 void TemplateCommand :: ReadTemplate( const ALib::CommandLine & cmd ) {
 
-    if ( cmd.HasFlag( FLAG_TPLSTR) && cmd.HasFlag(FLAG_TFILE) ) {
-        CSVTHROW( "Cannot specify both " << FLAG_TPLSTR
-                    << " and " << FLAG_TFILE << " options" );
-	}
+    NotBoth( cmd, FLAG_TPLSTR, FLAG_TFILE );
 
 	if ( cmd.HasFlag( FLAG_TFILE ) ) {
         string fname = cmd.GetValue( FLAG_TFILE );
