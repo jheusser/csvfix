@@ -44,6 +44,7 @@ const char * const TPL_HELP = {
 	"where flags are:\n"
 	"  -ft file\tspecify name of template file\n"
 	"  -fn ftpl\tspecify template for generating file names\n"
+	"  -ts str\tspecifies a string containing the template\n"
 	"#IBL,SEP,IFN,OFL,SKIP"
 };
 
@@ -55,8 +56,9 @@ TemplateCommand ::	TemplateCommand( const string & name,
 									 const string & desc )
 		: Command( name, desc, TPL_HELP ) {
 
-	AddFlag( ALib::CommandLineFlag( FLAG_TFILE, true, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_TFILE, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_FNAMES, false, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_TPLSTR, false, 1 ) );
 }
 
 //---------------------------------------------------------------------------
@@ -207,23 +209,39 @@ string TemplateCommand :: ReplaceColumns( const string & tplate,
 //---------------------------------------------------------------------------
 
 void TemplateCommand :: ReadTemplate( const ALib::CommandLine & cmd ) {
-	string fname = cmd.GetValue( FLAG_TFILE );
-	if ( ALib::IsEmpty( fname ) ) {
-		CSVTHROW( "Need template file name specified with "
-						<< FLAG_TFILE << " flag" );
-	}
-	std::ifstream ifs( fname.c_str() );
-	if ( ! ifs.is_open() ) {
-		CSVTHROW( "Cannot open file " << fname << "  for input" );
+
+    if ( cmd.HasFlag( FLAG_TPLSTR) && cmd.HasFlag(FLAG_TFILE) ) {
+        CSVTHROW( "Cannot specify both " << FLAG_TPLSTR
+                    << " and " << FLAG_TFILE << " options" );
 	}
 
-	mTemplate = "";
-	string line;
-	while( std::getline( ifs, line ) ) {
-		mTemplate += line + "\n";
-	}
+	if ( cmd.HasFlag( FLAG_TFILE ) ) {
+        string fname = cmd.GetValue( FLAG_TFILE );
+        if ( ALib::IsEmpty( fname ) ) {
+            CSVTHROW( "Need template file name specified with "
+                            << FLAG_TFILE << " flag" );
+        }
+        std::ifstream ifs( fname.c_str() );
+        if ( ! ifs.is_open() ) {
+            CSVTHROW( "Cannot open file " << fname << "  for input" );
+        }
 
-	ifs.close();
+        mTemplate = "";
+        string line;
+        while( std::getline( ifs, line ) ) {
+            mTemplate += line + "\n";
+        }
+    }
+    else if( cmd.HasFlag( FLAG_TPLSTR ) ) {
+        mTemplate = cmd.GetValue( FLAG_TPLSTR );
+        if ( ALib::IsEmpty( mTemplate ) ) {
+            CSVTHROW( "Empty template string not allowed" );
+        }
+    }
+    else {
+        CSVTHROW( "Need one of " << FLAG_TFILE << " or " << FLAG_TPLSTR );
+    }
+
 }
 
 //------------------------------------------------------------------------

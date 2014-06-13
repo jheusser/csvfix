@@ -221,6 +221,7 @@ const char * const FLAG_STR		= "-s";
 const char * const FLAG_STRIC	= "-si";
 const char * const FLAG_TABLE	= "-t";
 const char * const FLAG_SQLTBL	= "-tbl";
+const char * const FLAG_TPLSTR	= "-ts";
 const char * const FLAG_TFILE	= "-tf";
 const char * const FLAG_TONLY	= "-t";
 const char * const FLAG_TOV		= "-tv";
