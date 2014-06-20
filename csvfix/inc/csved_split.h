@@ -11,6 +11,7 @@
 
 #include "a_base.h"
 #include "csved_command.h"
+#include <vector>
 
 namespace CSVED {
 
@@ -59,12 +60,17 @@ class SplitFixed : public SplitBase {
 	private:
 
 		void CreatePositions( const std::string & ps );
+		void CreateLengths( const std::string & ls );
+
 		void AddPosition( const std::string & spos,
 							const std::string & slen );
 		void Split( CSVRow & row );
+		void SplitLengths( CSVRow & row );
+
 
 		typedef std::vector <std::pair<unsigned int,unsigned int> > PairVec;
 		PairVec mPositions;
+		std::vector <int> mLengths;
 };
 
 //---------------------------------------------------------------------------
