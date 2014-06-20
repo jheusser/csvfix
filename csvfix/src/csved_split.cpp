@@ -163,23 +163,6 @@ void SplitFixed :: CreateLengths( const string & ls ) {
 }
 
 //---------------------------------------------------------------------------
-// helper to extract substrings safely
-//---------------------------------------------------------------------------
-
-static string SafeSubstr( const string & s, int start, int len ) {
-    int slen = s.size();
-    if (start >= slen ) {
-        return "";
-    }
-    else if ( start + len >= slen ) {
-        return s.substr( start, slen - start );
-    }
-    else {
-        return s.substr( start, slen );
-    }
-}
-
-//---------------------------------------------------------------------------
 // Split using field lengths
 //---------------------------------------------------------------------------
 
@@ -198,11 +181,11 @@ void SplitFixed :: SplitLengths( CSVRow & row ) {
     for (unsigned int i = 0; i < mLengths.size(); i++) {
         int len = mLengths[i];
         if ( len == 0 ) {
-            tmp.push_back( vlen == 0 ? "" : SafeSubstr( target, pos, vlen ));
+            tmp.push_back( vlen == 0 ? "" : target.substr( pos, vlen ));
             pos += vlen;
         }
         else {
-            tmp.push_back( SafeSubstr( target, pos, len ) );
+            tmp.push_back( target.substr( pos, len ) );
             pos += len;
         }
     }
