@@ -50,6 +50,7 @@ const char * const FSPLIT_HELP = {
 	"where flags are:\n"
 	"  -f field\tindex of the field to be split\n"
 	"  -p plist\tlist of positions to split, in start:len format\n"
+	"  -l lengths\tlengths of fields to split (mutually exclusive with -p)\n"
 	"  -k\t\tretain field being split in output (default is discard it)\n"
 	"#ALL,SKIP,PASS"
 };
@@ -125,7 +126,87 @@ void SplitBase :: Insert( CSVRow & row, const CSVRow & split ) {
 SplitFixed :: SplitFixed( const string & name,
 							const string & desc )
 	: SplitBase( name, desc, FSPLIT_HELP ) {
-	AddFlag( ALib::CommandLineFlag( FLAG_POS, true, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_POS, false, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_FLEN, false, 1 ) );
+
+}
+//---------------------------------------------------------------------------
+// Create list of field lengths. One field is allowed to be of variable
+// length.
+//---------------------------------------------------------------------------
+
+const string VARLEN = "*";
+
+void SplitFixed :: CreateLengths( const string & ls ) {
+    ALib::CommaList cl( ls );
+    bool havevar = false;
+    for( unsigned int i = 0; i < cl.Size(); i++ ) {
+        string len = cl.At( i );
+        if ( len == VARLEN ) {
+            if ( havevar ) {
+                CSVTHROW( "Only a single variable-length field is allowed" );
+            }
+            havevar = true;
+            mLengths.push_back( 0 );    // variable length indicator
+        }
+        else if ( ALib::IsInteger( len ) ) {
+            int l = ALib::ToInteger( len );
+            if ( l <= 0 ) {
+                CSVTHROW( "Invalid field length: " << len );
+            }
+            mLengths.push_back( l );
+        }
+        else {
+            CSVTHROW( "Invalid field length: " << len );
+        }
+    }
+}
+
+//---------------------------------------------------------------------------
+// helper to extract substrings safely
+//---------------------------------------------------------------------------
+
+static string SafeSubstr( const string & s, int start, int len ) {
+    int slen = s.size();
+    if (start >= slen ) {
+        return "";
+    }
+    else if ( start + len >= slen ) {
+        return s.substr( start, slen - start );
+    }
+    else {
+        return s.substr( start, slen );
+    }
+}
+
+//---------------------------------------------------------------------------
+// Split using field lengths
+//---------------------------------------------------------------------------
+
+void SplitFixed :: SplitLengths( CSVRow & row ) {
+    string target = Field() < row.size() ? row[ Field() ] : "";
+    int flens =0;
+    for (unsigned int i = 0; i < mLengths.size(); i++) {
+        flens += mLengths[i];
+    }
+    int vlen = target.size() - flens;
+    if ( vlen < 0 ) {
+        vlen = 0;
+    }
+    CSVRow tmp;
+    int pos = 0;
+    for (unsigned int i = 0; i < mLengths.size(); i++) {
+        int len = mLengths[i];
+        if ( len == 0 ) {
+            tmp.push_back( vlen == 0 ? "" : SafeSubstr( target, pos, vlen ));
+            pos += vlen;
+        }
+        else {
+            tmp.push_back( SafeSubstr( target, pos, len ) );
+            pos += len;
+        }
+    }
+    Insert( row, tmp );
 }
 
 //---------------------------------------------------------------------------
@@ -134,15 +215,27 @@ SplitFixed :: SplitFixed( const string & name,
 
 int SplitFixed :: Execute( ALib::CommandLine & cmd ) {
 
+    NotBoth( cmd, FLAG_POS, FLAG_FLEN );
 	GetSkipOptions( cmd );
 	GetCommonFlags( cmd );
-	string pos = cmd.GetValue( FLAG_POS );
 
-	if ( ALib::IsEmpty( pos ) ) {
-		CSVTHROW( "Need list of position pairs specified by " << FLAG_POS );
-	}
-
-	CreatePositions( pos );
+	if ( cmd.HasFlag( FLAG_POS ) ) {
+        string pos = cmd.GetValue( FLAG_POS );
+        if ( ALib::IsEmpty( pos ) ) {
+            CSVTHROW( "Need list of position pairs specified by " << FLAG_POS );
+        }
+        CreatePositions( pos );
+    }
+    else if ( cmd.HasFlag( FLAG_FLEN ) ) {
+        string lens = cmd.GetValue( FLAG_FLEN );
+        if ( ALib::IsEmpty( lens ) ) {
+            CSVTHROW( "Need list of lengths specified by " << FLAG_FLEN );
+        }
+        CreateLengths( lens );
+    }
+    else {
+        CSVTHROW( "Need one of" << FLAG_POS << " or " << FLAG_FLEN );
+    }
 
 	IOManager io( cmd );
 	CSVRow row;
@@ -152,7 +245,12 @@ int SplitFixed :: Execute( ALib::CommandLine & cmd ) {
 			continue;
 		}
 		if( ! Pass( io,row ) ) {
-			Split( row );
+            if ( mLengths.size() ) {
+                SplitLengths( row );
+            }
+            else {
+                Split( row );
+            }
 		}
 		io.WriteRow( row );
 	}

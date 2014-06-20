@@ -143,6 +143,7 @@ const char * const FLAG_EXCLNL	= "-x";
 const char * const FLAG_FACT	= "-f";
 const char * const FLAG_FCOUNT	= "-fc";
 const char * const FLAG_FSEP	= "-fs";
+const char * const FLAG_FLEN	= "-l";
 const char * const FLAG_FILTBAD	= "-x";
 const char * const FLAG_FMT		= "-fmt";
 const char * const FLAG_FNAMES	= "-fn";
