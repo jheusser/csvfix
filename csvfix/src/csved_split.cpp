@@ -66,6 +66,7 @@ const char * const RESPLIT_HELP = {
 	"where flags are:\n"
 	"  -f field\tindex of the field to be split\n"
 	"  -r regex\tregular expression to use to perform split\n"
+	"  -ic\t\tignore case when matching regular expressions\n"
 	"  -k\t\tretain field being split in output (default is discard it)\n"
 	"#ALL,SKIP,PASS"
 };
@@ -141,6 +142,7 @@ SplitRegex :: SplitRegex( const string & name,
 							const string & desc )
 	: SplitBase( name, desc, RESPLIT_HELP ) {
 	AddFlag( ALib::CommandLineFlag( FLAG_REGEX, true, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_ICASE, false, 0 ) );
 }
 
 //---------------------------------------------------------------------------
@@ -167,7 +169,10 @@ int SplitRegex :: Execute( ALib::CommandLine & cmd ) {
 	GetCommonFlags( cmd );
 
     string rs = cmd.GetValue( FLAG_REGEX );
-    mRegex = ALib::RegEx( rs );
+    bool ic = cmd.HasFlag( FLAG_ICASE );
+    ALib::RegEx::CaseSense cs = ic  ? ALib::RegEx::Insensitive
+                                    : ALib::RegEx::Sensitive;
+    mRegex = ALib::RegEx( rs, cs );
 
 	IOManager io( cmd );
 	CSVRow row;
