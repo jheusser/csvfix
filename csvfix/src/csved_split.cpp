@@ -37,6 +37,11 @@ static RegisterCommand <SplitFixed> rc1_(
 
 static RegisterCommand <SplitChar> rc2_(
 	CMD_SPLCHR,
+	"split using regular expression"
+);
+
+static RegisterCommand <SplitRegex> rc3_(
+	CMD_SPLREGEX,
 	"split at character or character type transition"
 );
 
@@ -55,6 +60,15 @@ const char * const FSPLIT_HELP = {
 	"#ALL,SKIP,PASS"
 };
 
+const char * const RESPLIT_HELP = {
+	"split using regular expression\n"
+	"usage: csvfix split_fixed  [flags] [file ...]\n"
+	"where flags are:\n"
+	"  -f field\tindex of the field to be split\n"
+	"  -r regex\tregular expression to use to perform split\n"
+	"  -k\t\tretain field being split in output (default is discard it)\n"
+	"#ALL,SKIP,PASS"
+};
 const char * const CSPLIT_HELP = {
 	"split CSV field at specific character(s) or character type transition\n"
 	"usage: csvfix split_char  [flags] [file ...]\n"
@@ -119,6 +133,59 @@ void SplitBase :: Insert( CSVRow & row, const CSVRow & split ) {
 	row.swap( tmp );
 }
 
+//---------------------------------------------------------------------------
+// Split via regular expression
+//---------------------------------------------------------------------------
+
+SplitRegex :: SplitRegex( const string & name,
+							const string & desc )
+	: SplitBase( name, desc, RESPLIT_HELP ) {
+	AddFlag( ALib::CommandLineFlag( FLAG_REGEX, true, 1 ) );
+}
+
+//---------------------------------------------------------------------------
+// Split using bracketed exressions then recall and insert into row.
+//---------------------------------------------------------------------------
+
+void SplitRegex :: Split( CSVRow & row ) {
+    CSVRow tmp;
+    string target = Field() < row.size() ? row[ Field() ] : "";
+    mRegex.FindIn( target );
+    for( unsigned int i = 0; i < mRegex.SavedMatchCount(); i++ ) {
+        tmp.push_back( mRegex.SavedMatch(i) );
+    }
+    Insert( row, tmp );
+}
+
+//---------------------------------------------------------------------------
+// Perform regex split.
+//---------------------------------------------------------------------------
+
+int SplitRegex :: Execute( ALib::CommandLine & cmd ) {
+
+	GetSkipOptions( cmd );
+	GetCommonFlags( cmd );
+
+    string rs = cmd.GetValue( FLAG_REGEX );
+    mRegex = ALib::RegEx( rs );
+
+	IOManager io( cmd );
+	CSVRow row;
+
+	while( io.ReadCSV( row ) ) {
+		if ( Skip( io, row ) ) {
+			continue;
+		}
+		if( ! Pass( io,row ) ) {
+            Split( row );
+		}
+		io.WriteRow( row );
+	}
+
+	return 0;
+}
+
+
 //------------------------------------------------------------------------
 // Split by fixed positions in field
 //---------------------------------------------------------------------------
@@ -130,6 +197,8 @@ SplitFixed :: SplitFixed( const string & name,
 	AddFlag( ALib::CommandLineFlag( FLAG_FLEN, false, 1 ) );
 
 }
+
+
 //---------------------------------------------------------------------------
 // Create list of field lengths. One field is allowed to be of variable
 // length.
@@ -237,8 +306,6 @@ int SplitFixed :: Execute( ALib::CommandLine & cmd ) {
 		}
 		io.WriteRow( row );
 	}
-
-
 	return 0;
 }
 

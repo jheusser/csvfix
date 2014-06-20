@@ -10,6 +10,7 @@
 #define INC_CSVED_SPLIT_H
 
 #include "a_base.h"
+#include "a_regex.h"
 #include "csved_command.h"
 #include <vector>
 
@@ -43,6 +44,26 @@ class SplitBase : public Command {
 		unsigned int mField;
 		bool mKeep;
 };
+
+//----------------------------------------------------------------------------
+// Split using regular expressions.
+//----------------------------------------------------------------------------
+
+class SplitRegex : public SplitBase {
+
+	public:
+
+		SplitRegex( const std::string & name,
+						const std::string & desc );
+
+		int Execute( ALib::CommandLine & cmd );
+
+	private:
+
+        void Split( CSVRow & row );
+        ALib::RegEx mRegex;
+};
+
 
 //---------------------------------------------------------------------------
 // Split at fixed positions
