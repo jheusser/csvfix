@@ -34,6 +34,7 @@ const char * const PRINTF_HELP = {
 	"  -fmt fmt\tspecify fields and printf-style formatters\n"
 	"  -f fields\tfield order to pass to formatter\n"
 	"  -q\t\tapply CSV quoting to each printf conversion\n"
+	"  -csv\t\ttreat output as CSV field and append to input row\n"
 	"#SMQ,SEP,IBL,IFN,OFL,SEP,SKIP,PASS"
 };
 
@@ -48,7 +49,7 @@ PrintfCommand :: PrintfCommand( const string & name,
 	AddFlag( ALib::CommandLineFlag( FLAG_FMT, true, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_COLS, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_QUOTE, false, 0 ) );
-
+	AddFlag( ALib::CommandLineFlag( FLAG_CSV, false, 0 ) );
 }
 
 //----------------------------------------------------------------------------
@@ -59,7 +60,10 @@ int PrintfCommand :: Execute( ALib::CommandLine & cmd ) {
 
 	GetSkipOptions( cmd );
 	string fmt = cmd.GetValue( FLAG_FMT );
+
+    NotBoth( cmd, FLAG_QUOTE, FLAG_CSV );
 	mCSVQuote = cmd.HasFlag( FLAG_QUOTE );
+    bool csv = cmd.HasFlag( FLAG_CSV );
 
 	ParseFormat( fmt );
 	if ( cmd.HasFlag( FLAG_COLS ) ) {
@@ -80,6 +84,10 @@ int PrintfCommand :: Execute( ALib::CommandLine & cmd ) {
 		if ( Pass( io, row ) ) {
 			io.WriteRow( row );
 		}
+		if ( csv ) {
+            row.push_back( FormatRow( row ) );
+            io.WriteRow( row );
+        }
 		else {
 			string line = FormatRow( row );
 			io.Out() << line << std::endl;
