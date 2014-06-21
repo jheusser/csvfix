@@ -1,10 +1,16 @@
 //---------------------------------------------------------------------------
 // csved_split.cpp
 //
-// split single field to multple fields
-// can split on specific character or on transitions between char types
+// split single field to multiple fields
+// can split on:
 //
-// Copyright (C) 2009 Neil Butterworth
+//      specific character
+//      transitions between char types
+//      field position and length
+//      field length (with one variable length field)
+//      regular expression match
+//
+// Copyright (C) 2014 Neil Butterworth
 //---------------------------------------------------------------------------
 
 #include "a_base.h"
@@ -19,16 +25,15 @@ using std::vector;
 namespace CSVED {
 
 //----------------------------------------------------------------------------
-// Transition split values
+// Transition split options
 //----------------------------------------------------------------------------
 
-const char * const FLAG_TRANA2N	= "-tan";
-const char * const FLAG_TRANN2A	= "-tna";
+const char * const FLAG_TRANA2N	= "-tan";   // from alpha to digit
+const char * const FLAG_TRANN2A	= "-tna";   // from digit to alpha
 
 //---------------------------------------------------------------------------
-// Register split command
+// Register split commands
 //---------------------------------------------------------------------------
-
 
 static RegisterCommand <SplitFixed> rc1_(
 	CMD_SPLFIX,
@@ -200,16 +205,16 @@ SplitFixed :: SplitFixed( const string & name,
 	: SplitBase( name, desc, FSPLIT_HELP ) {
 	AddFlag( ALib::CommandLineFlag( FLAG_POS, false, 1 ) );
 	AddFlag( ALib::CommandLineFlag( FLAG_FLEN, false, 1 ) );
-
 }
 
 
 //---------------------------------------------------------------------------
 // Create list of field lengths. One field is allowed to be of variable
-// length.
+// length, which for each record will evaluate to the length of the input
+// minus the lengths of all the fixed length fields.
 //---------------------------------------------------------------------------
 
-const string VARLEN = "*";
+const string VARLEN = "*";   // variable length
 
 void SplitFixed :: CreateLengths( const string & ls ) {
     ALib::CommaList cl( ls );
@@ -237,7 +242,9 @@ void SplitFixed :: CreateLengths( const string & ls ) {
 }
 
 //---------------------------------------------------------------------------
-// Split using field lengths
+// Split using field lengths. If a variable length field (length 0) was
+// specified, its length is the length of the input minus the lengths of all 
+// the other fields.
 //---------------------------------------------------------------------------
 
 void SplitFixed :: SplitLengths( CSVRow & row ) {
