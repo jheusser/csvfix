@@ -15,6 +15,7 @@
 
 using std::string;
 using std::vector;
+using namespace std;
 
 namespace CSVED {
 
@@ -35,7 +36,7 @@ const char * const ERASE_HELP = {
 	"erase fields using regular expressions"
 	"usage: csvfix erase  [flags] [file ...]\n"
 	"where flags are:\n"
-	"  -f fields\tlist of fields to exclude (default is all)\n"
+	"  -f fields\tlist of fields to check for exclusion (default is all)\n"
 	"  -r regexp\terase fields that match this regular expression\n"
     "  -n regex\terase fields which do not match this regular expression\n"
 	"  -k\t\tif all fields are erased, retain empty row (default is to delete it)\n"
@@ -107,7 +108,7 @@ bool EraseCommand :: EraseField( const std::string & field ) const{
 CSVRow EraseCommand :: EraseFields( const CSVRow & row ) const {
     CSVRow newrow;
     for( unsigned int i = 0; i < row.size(); i++ ) {
-        if ( mFields.size() && ALib::Contains( mFields, i ) ) {
+        if ( mFields.size() == 0 || ALib::Contains( mFields, i ) ) {
             if ( ! EraseField( row[i] ) ) {
                 newrow.push_back( row[i] );
             }
