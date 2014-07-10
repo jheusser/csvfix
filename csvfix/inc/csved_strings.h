@@ -28,6 +28,7 @@ const char * const CMD_DSVR		= "read_dsv";
 const char * const CMD_DSVW		= "write_dsv";
 const char * const CMD_ECHO		= "echo";
 const char * const CMD_EDIT		= "edit";
+const char * const CMD_ERASE	= "erase";
 const char * const CMD_EVAL		= "eval";
 const char * const CMD_EXCLUDE	= "exclude";
 const char * const CMD_EXEC		= "exec";
