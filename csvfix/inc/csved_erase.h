@@ -33,9 +33,20 @@ class EraseCommand : public Command {
 	private:
 
 		void ProcessFlags( const ALib::CommandLine & cmd );
+        CSVRow EraseFields( const CSVRow & row ) const;
+        bool EraseField( const std::string & field ) const;
+
+        struct RegexAction {
+            ALib::RegEx mRegex;
+            bool mMatch;
+            RegexAction( const ALib::RegEx & re, bool match )
+                : mRegex( re ), mMatch( match ) {}
+
+        };
 
 		FieldList mFields;
-		std::vector <ALib::Expression> mExprs;
+		std::vector <RegexAction> mExprs;
+		bool mKeep;
 };
 
 //------------------------------------------------------------------------
