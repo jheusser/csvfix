@@ -50,6 +50,11 @@ EraseCommand ::EraseCommand( const string & name,
 								const string & desc )
 		: Command( name, desc, ERASE_HELP ) {
 
+	AddFlag( ALib::CommandLineFlag( FLAG_COLS, false, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_REGEX, false, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_NOTRE, false, 1 ) );
+	AddFlag( ALib::CommandLineFlag( FLAG_KEEP, false, 0 ) );
+
 }
 
 //---------------------------------------------------------------------------
@@ -62,29 +67,76 @@ int EraseCommand :: Execute( ALib::CommandLine & cmd ) {
 	ProcessFlags( cmd );
 
 	IOManager io( cmd );
-	CSVRow row;
+	CSVRow row, newrow;
 
 	while( io.ReadCSV( row ) ) {
 		if ( Skip( io, row ) ) {
 			continue;
 		}
 		if ( ! Pass( io, row ) ) {
+            newrow = EraseFields( row );
 		}
-		io.WriteRow( row );
+        if ( newrow.size() != 0 || mKeep ) {
+            io.WriteRow( newrow );
+        }
 	}
 
 	return 0;
 }
 
+//---------------------------------------------------------------------------
+// Should this field be erased?
+//---------------------------------------------------------------------------
+
+bool EraseCommand :: EraseField( const std::string & field ) const{
+    for ( unsigned int i = 0; i < mExprs.size(); i++ ) {
+        ALib::RegEx::Pos pos = mExprs[i].mRegex.FindIn( field );
+        if ( (pos.Found() && mExprs[i].mMatch)
+              || (! pos.Found() && ! mExprs[i].mMatch ) ) {
+            return true;
+        }
+    }
+    return false;
+}
 
 //---------------------------------------------------------------------------
-// Handle all user options with error checking. Currently possible to pass
-// empty expression, but probably shouldn't be.
+// Erase fields that match/do not match regexes, returning new row without
+// the erased fields.
+//---------------------------------------------------------------------------
+
+CSVRow EraseCommand :: EraseFields( const CSVRow & row ) const {
+    CSVRow newrow;
+    for( unsigned int i = 0; i < row.size(); i++ ) {
+        if ( mFields.size() && ALib::Contains( mFields, i ) ) {
+            if ( ! EraseField( row[i] ) ) {
+                newrow.push_back( row[i] );
+            }
+        }
+        else {
+            newrow.push_back( row[i] );
+        }
+    }
+    return newrow;
+}
+
+//---------------------------------------------------------------------------
+// Handle all user options with error checking.
 //---------------------------------------------------------------------------
 
 void EraseCommand :: ProcessFlags( const ALib::CommandLine & cmd ) {
 
-	NotBoth( cmd, FLAG_REVCOLS, FLAG_COLS, ReqOp::Required );
+    if ( ! cmd.HasFlag( FLAG_REGEX ) && ! cmd.HasFlag( FLAG_NOTRE ) ) {
+        CSVTHROW( "Need at least one of " << FLAG_REGEX << " or " << FLAG_NOTRE );
+    }
+
+    for(  int i = 1; i < cmd.Argc(); i++ ) {
+        if ( cmd.Argv(i) == FLAG_REGEX || cmd.Argv(i) == FLAG_NOTRE ) {
+            mExprs.push_back( RegexAction( ALib::RegEx( cmd.Argv(i+1)), cmd.Argv(i) == FLAG_REGEX ));
+            i++;
+        }
+    }
+    mKeep = cmd.HasFlag( FLAG_KEEP );
+    CommaListToIndex( ALib::CommaList( cmd.GetValue( FLAG_COLS) ), mFields );
 
 }
 

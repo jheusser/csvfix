@@ -185,6 +185,7 @@ const char * const FLAG_NOQUOTE	= "-nq";
 const char * const FLAG_NLOK	= "-nl";
 const char * const FLAG_NOCREAT = "-nc";
 const char * const FLAG_NOINFO	= "-ni";
+const char * const FLAG_NOTRE	= "-n";
 const char * const FLAG_NUM		= "-n";
 const char * const FLAG_NULLSTR	= "-ns";
 const char * const FLAG_OMODE	= "-om";
