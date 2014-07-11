@@ -1,1 +1,1 @@
-object file output directory
+alib  object file output directory
