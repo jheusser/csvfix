@@ -88,6 +88,7 @@
 		<Unit filename="inc/csved_dsv.h" />
 		<Unit filename="inc/csved_echo.h" />
 		<Unit filename="inc/csved_edit.h" />
+		<Unit filename="inc/csved_erase.h" />
 		<Unit filename="inc/csved_escape.h" />
 		<Unit filename="inc/csved_eval.h" />
 		<Unit filename="inc/csved_evalvars.h" />
@@ -151,6 +152,7 @@
 		<Unit filename="src/csved_dsv.cpp" />
 		<Unit filename="src/csved_echo.cpp" />
 		<Unit filename="src/csved_edit.cpp" />
+		<Unit filename="src/csved_erase.cpp" />
 		<Unit filename="src/csved_escape.cpp" />
 		<Unit filename="src/csved_eval.cpp" />
 		<Unit filename="src/csved_evalvars.cpp" />
