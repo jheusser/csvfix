@@ -1,1 +1,1 @@
-library file output directory
+alib library output directory
